@@ -1,15 +1,14 @@
 /** @type {import("snowpack").SnowpackUserConfig } */
 export default {
+  exclude: ["**/node_modules/**/*", ".vscode"],
   mount: {
-    /* ... */
+    public: { url: "/" },
+    src: { url: "/dist" },
   },
   plugins: [
     /* ... */
   ],
-  routes: [
-    /* Enable an SPA Fallback in development: */
-    // {"match": "routes", "src": ".*", "dest": "/index.html"},
-  ],
+  routes: [{ match: "routes", src: ".*", dest: "/index.html" }],
   optimize: {
     /* Example: Bundle your final build: */
     // "bundle": true,
@@ -21,6 +20,7 @@ export default {
     /* ... */
   },
   buildOptions: {
-    /* ... */
+    clean: true,
+    jsxInject: `import React from 'react'`,
   },
 };
