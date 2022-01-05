@@ -4,9 +4,8 @@ import { pxToAll, pxToRem } from "../utils/theme.utils.js";
 
 export default function HomeContentPage() {
   return (
-    <Flex direction={"column"} pb={pxToRem(20)} px={pxToRem(30)} width={"100%"}>
-      <Header />
-      <Text textStyle={"h4"} layerStyle={"h4"}>
+    <Flex direction={"column"}>
+      <Text textStyle={"h4"} color={"text.secondary"}>
         Good Evening
       </Text>
     </Flex>

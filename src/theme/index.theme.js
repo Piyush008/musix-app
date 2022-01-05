@@ -4,30 +4,29 @@ import breakpoints from "./foundations/breakpoints";
 import styles from "./styles.global";
 import CustomItem from "./components/CustomItem";
 import { pxToAll, pxToRem } from "../utils/theme.utils.js";
+import colors from "./foundations/colors";
 const theme = extendTheme({
   breakpoints,
   ...typography,
+  colors,
   components: {
     CustomItem,
   },
   layerStyles: {
     selected: {
-      bg: "teal.900",
+      bg: "shade.secondary",
       borderRadius: pxToAll(5),
-      color: "gray.300",
+      color: "text.secondary",
     },
     iconDisabled: {
       transition: "color 1s",
-      color: "gray.500",
+      color: "text.disabled",
       cursor: "not-allowed",
     },
     iconActive: {
       transition: "color 1s",
-      color: "gray.300",
+      color: "text.secondary",
       cursor: "pointer",
-    },
-    h4: {
-      color: "gray.300",
     },
   },
   textStyles: {

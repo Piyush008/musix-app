@@ -1,10 +1,20 @@
 import { Icon } from "@chakra-ui/react";
 import { useEffect } from "react";
+import { spotifyAxios } from "../../utils/axios.utils.js";
+import { SPOTIFY_AUTH } from "../../utils/constants/privateKey.constants.js";
 import { pxToAll } from "../../utils/theme.utils.js";
 
 export default function Logo() {
   useEffect(() => {
-    console.log("Logo Initiated");
+    async function fetchData() {
+      const resp = await spotifyAxios(SPOTIFY_AUTH).post(
+        "https://accounts.spotify.com/api/token?grant_type=client_credentials",
+        null,
+        { baseURL: "" }
+      );
+      console.log(resp.data);
+    }
+    fetchData();
   }, []);
   return (
     <Icon

@@ -19,6 +19,7 @@ import Logo from "../logo/Logo";
 import { useLocation, useNavigate } from "react-router-dom";
 import ROUTER from "../../utils/constants/router.constants.js";
 import { useEffect } from "react";
+import useAgent from "../../hooks/useAgent.js";
 
 function CustomItem(props) {
   const { variant, size, ...rest } = props;
@@ -30,7 +31,7 @@ export default function DesktopSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const pathName = location.pathname;
-  const [width] = useMediaQuery("(min-width:768px)");
+  const isMobile = useAgent();
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -39,7 +40,7 @@ export default function DesktopSideBar() {
   useEffect(() => {
     console.log("Hiiiiiiiiiiiii");
   }, []);
-  if (width)
+  if (!isMobile)
     return (
       <Flex
         direction={"column"}
