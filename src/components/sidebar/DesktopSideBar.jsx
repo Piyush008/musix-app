@@ -37,16 +37,16 @@ export default function DesktopSideBar() {
     navigate(path);
   };
 
-  useEffect(() => {
-    console.log("Hiiiiiiiiiiiii");
-  }, []);
   if (!isMobile)
     return (
       <Flex
         direction={"column"}
-        bg="blackAlpha.500"
-        minW={pxToRem(230)}
+        bg="shade.primary"
+        minW={pxToAll(230)}
         pr={pxToAll(10)}
+        boxShadow={`0 0 ${pxToRem(5)} rgba(0,0,0, 0.36)`}
+        borderBottomRightRadius={`${pxToRem(10)}`}
+        borderTopRightRadius={`${pxToRem(10)}`}
       >
         <Box my={pxToAll(30)} ml={pxToAll(20)}>
           <Logo />

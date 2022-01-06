@@ -8,6 +8,7 @@ import {
   useMediaQuery,
   IconButton,
   Wrap,
+  Button,
 } from "@chakra-ui/react";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { pxToAll } from "../../utils/theme.utils.js";
@@ -37,7 +38,8 @@ export default function Header() {
         <Logo />
       )}
       <Box>
-        <Avatar src="https://bit.ly/broken-link" size="xs" />
+        {/* <Avatar src="https://bit.ly/broken-link" size="xs" /> */}
+        <Button size={"md"}>Enter Musix</Button>
       </Box>
     </HStack>
   );

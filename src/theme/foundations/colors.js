@@ -2,8 +2,9 @@ import { color } from "@chakra-ui/react";
 
 const colors = {
   shade: {
-    primary: "",
+    primary: "rgba(0, 0, 0, 0.36)",
     secondary: "#1D4044",
+    hoverPrimary: "rgba(0,0,0,0.5)",
   },
   text: {
     primary: "#A0AEC0",

@@ -3,13 +3,13 @@ import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 const CustomItem = {
   baseStyle: {
     _hover: {
-      color: "gray.300",
+      color: "text.secondary",
       cursor: "pointer",
     },
   },
   sizes: {
     md: {
-      fontSize: pxToRem(18),
+      fontSize: pxToAll(18),
       lineHeight: 1.25,
       p: pxToAll(10),
     },

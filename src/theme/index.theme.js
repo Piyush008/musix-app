@@ -3,6 +3,7 @@ import typography from "./foundations/typography";
 import breakpoints from "./foundations/breakpoints";
 import styles from "./styles.global";
 import CustomItem from "./components/CustomItem";
+import Button from "./components/Button";
 import { pxToAll, pxToRem } from "../utils/theme.utils.js";
 import colors from "./foundations/colors";
 const theme = extendTheme({
@@ -11,6 +12,7 @@ const theme = extendTheme({
   colors,
   components: {
     CustomItem,
+    Button,
   },
   layerStyles: {
     selected: {
@@ -19,12 +21,10 @@ const theme = extendTheme({
       color: "text.secondary",
     },
     iconDisabled: {
-      transition: "color 1s",
       color: "text.disabled",
       cursor: "not-allowed",
     },
     iconActive: {
-      transition: "color 1s",
       color: "text.secondary",
       cursor: "pointer",
     },
