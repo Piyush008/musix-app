@@ -19,22 +19,30 @@ import {
   MdKeyboardArrowRight,
   MdSearch,
 } from "react-icons/md";
-import { pxToAll } from "../../utils/theme.utils.js";
+import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo";
 import useAgent from "../../hooks/useAgent.js";
 import { Route, Routes } from "react-router-dom";
 import ROUTER from "../../utils/constants/router.constants.js";
+import AgentDetect from "../util/AgentDetect.jsx";
 
 export default function Header() {
-  const isMobile = useAgent();
   return (
     <HStack
       justifyContent={"space-between"}
       h={pxToAll(80)}
       alignItems={"center"}
+      pos={"sticky"}
+      top={"0"}
+      zIndex={"1"}
+      right={"0"}
+      bg={"brand.primary"}
+      px={pxToRem(30)}
+      py={pxToRem(20)}
     >
-      {!isMobile ? (
-        <>
+      <AgentDetect
+        mobileComponent={<Logo />}
+        desktopComponent={
           <HStack>
             <Circle size={pxToAll(35)} bg="shade.secondary">
               <Icon as={MdKeyboardArrowLeft} textStyle={"icon.md"} />
@@ -56,36 +64,11 @@ export default function Header() {
               />
             </Routes>
           </HStack>
-          <Box>
-            <Button>Enter Musix</Button>
-          </Box>
-        </>
-      ) : (
-        <Routes>
-          <Route
-            path={`${ROUTER.SEARCH}/*`}
-            element={
-              <InputGroup>
-                <InputLeftElement
-                  children={<Icon as={MdSearch} textStyle={"icon.md"} />}
-                />
-                <Input />
-              </InputGroup>
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <>
-                <Logo />
-                <Box>
-                  <Button>Enter Musix</Button>
-                </Box>
-              </>
-            }
-          />
-        </Routes>
-      )}
+        }
+      />
+      <Box>
+        <Button>Enter Musix</Button>
+      </Box>
     </HStack>
   );
 }
