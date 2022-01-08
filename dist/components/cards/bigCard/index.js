@@ -1,8 +1,8 @@
-import React from "../../../../../_snowpack/pkg/react.js";
-import {Box, IconButton, Image, Text} from "../../../../../_snowpack/pkg/@chakra-ui/react.js";
-import {useState} from "../../../../../_snowpack/pkg/react.js";
+import React from "../../../../_snowpack/pkg/react.js";
+import {Box, IconButton, Image, Text} from "../../../../_snowpack/pkg/@chakra-ui/react.js";
+import {useState} from "../../../../_snowpack/pkg/react.js";
 import {pxToAll} from "../../../utils/theme.utils.js";
-import {FaPlay, FaPause} from "../../../../../_snowpack/pkg/react-icons/fa.js";
+import {FaPlay, FaPause} from "../../../../_snowpack/pkg/react-icons/fa.js";
 function BigCard({
   imageSource,
   imageBorderRadius,

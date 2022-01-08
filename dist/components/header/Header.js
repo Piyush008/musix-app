@@ -1,5 +1,5 @@
-import React from "../../../../_snowpack/pkg/react.js";
-import {useState} from "../../../../_snowpack/pkg/react.js";
+import React from "../../../_snowpack/pkg/react.js";
+import {useState} from "../../../_snowpack/pkg/react.js";
 import {
   Avatar,
   Box,
@@ -14,16 +14,16 @@ import {
   InputGroup,
   InputLeftAddon,
   InputLeftElement
-} from "../../../../_snowpack/pkg/@chakra-ui/react.js";
+} from "../../../_snowpack/pkg/@chakra-ui/react.js";
 import {
   MdKeyboardArrowLeft,
   MdKeyboardArrowRight,
   MdSearch
-} from "../../../../_snowpack/pkg/react-icons/md.js";
+} from "../../../_snowpack/pkg/react-icons/md.js";
 import {pxToAll} from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo.js";
 import useAgent from "../../hooks/useAgent.js";
-import {Route, Routes} from "../../../../_snowpack/pkg/react-router-dom.js";
+import {Route, Routes} from "../../../_snowpack/pkg/react-router-dom.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 export default function Header() {
   const isMobile = useAgent();

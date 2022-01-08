@@ -1,4 +1,4 @@
-import { color } from "../../../../_snowpack/pkg/@chakra-ui/react.js";
+import { color } from "../../../_snowpack/pkg/@chakra-ui/react.js";
 
 const colors = {
   shade: {

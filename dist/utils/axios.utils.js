@@ -1,5 +1,5 @@
-import { KJUR as kjur } from "../../../_snowpack/pkg/jsrsasign.js";
-import axios from "../../../_snowpack/pkg/axios.js";
+import { KJUR as kjur } from "../../_snowpack/pkg/jsrsasign.js";
+import axios from "../../_snowpack/pkg/axios.js";
 import { MUSIX_URL, SPOTIFY_URL } from "./constants/url.constants.js";
 
 const musixToken = () => {

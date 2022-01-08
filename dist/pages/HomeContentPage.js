@@ -1,5 +1,5 @@
-import React from "../../../_snowpack/pkg/react.js";
-import {Box, Flex, Grid, GridItem, HStack, Text} from "../../../_snowpack/pkg/@chakra-ui/react.js";
+import React from "../../_snowpack/pkg/react.js";
+import {Box, Flex, Grid, GridItem, HStack, Text} from "../../_snowpack/pkg/@chakra-ui/react.js";
 import BigCard from "../components/cards/bigCard/index.js";
 import Header from "../components/header/Header.js";
 import {pxToAll, pxToRem} from "../utils/theme.utils.js";
