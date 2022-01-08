@@ -1,4 +1,4 @@
-import { extendTheme } from "../../_snowpack/pkg/@chakra-ui/react.js";
+import { extendTheme } from "../../../_snowpack/pkg/@chakra-ui/react.js";
 import typography from "./foundations/typography.js";
 import breakpoints from "./foundations/breakpoints.js";
 import styles from "./styles.global.js";

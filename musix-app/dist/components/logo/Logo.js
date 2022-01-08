@@ -1,6 +1,6 @@
-import React from "../../../_snowpack/pkg/react.js";
-import {Icon} from "../../../_snowpack/pkg/@chakra-ui/react.js";
-import {useEffect} from "../../../_snowpack/pkg/react.js";
+import React from "../../../../_snowpack/pkg/react.js";
+import {Icon} from "../../../../_snowpack/pkg/@chakra-ui/react.js";
+import {useEffect} from "../../../../_snowpack/pkg/react.js";
 import {spotifyAxios} from "../../utils/axios.utils.js";
 import {SPOTIFY_AUTH} from "../../utils/constants/privateKey.constants.js";
 import {getNewReleases, spotifyAuth} from "../../utils/spotify.utils.js";

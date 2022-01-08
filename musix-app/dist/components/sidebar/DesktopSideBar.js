@@ -1,4 +1,4 @@
-import React from "../../../_snowpack/pkg/react.js";
+import React from "../../../../_snowpack/pkg/react.js";
 import {
   Box,
   Divider,
@@ -7,17 +7,17 @@ import {
   ListIcon,
   useMediaQuery,
   useStyleConfig
-} from "../../../_snowpack/pkg/@chakra-ui/react.js";
+} from "../../../../_snowpack/pkg/@chakra-ui/react.js";
 import {
   MdHome,
   MdLibraryBooks,
   MdPlaylistAdd,
   MdSearch
-} from "../../../_snowpack/pkg/react-icons/md.js";
-import {FcLike} from "../../../_snowpack/pkg/react-icons/fc.js";
+} from "../../../../_snowpack/pkg/react-icons/md.js";
+import {FcLike} from "../../../../_snowpack/pkg/react-icons/fc.js";
 import {pxToAll, pxToRem} from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo.js";
-import {useLocation, useNavigate, useParams} from "../../../_snowpack/pkg/react-router-dom.js";
+import {useLocation, useNavigate, useParams} from "../../../../_snowpack/pkg/react-router-dom.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import useAgent from "../../hooks/useAgent.js";
 function CustomItem(props) {

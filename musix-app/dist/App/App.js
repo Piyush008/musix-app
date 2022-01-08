@@ -1,5 +1,5 @@
-import React from "../../_snowpack/pkg/react.js";
-import {BrowserRouter as Router, Route, Routes} from "../../_snowpack/pkg/react-router-dom.js";
+import React from "../../../_snowpack/pkg/react.js";
+import {BrowserRouter as Router, Route, Routes} from "../../../_snowpack/pkg/react-router-dom.js";
 import HomePage from "../pages/HomePage.js";
 import SearchPage from "../pages/SearchPage.js";
 import HomeContentPage from "../pages/HomeContentPage.js";

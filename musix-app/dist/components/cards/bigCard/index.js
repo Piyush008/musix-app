@@ -1,6 +1,6 @@
-import React from "../../../../_snowpack/pkg/react.js";
-import {Box, Image} from "../../../../_snowpack/pkg/@chakra-ui/react.js";
-import {useState} from "../../../../_snowpack/pkg/react.js";
+import React from "../../../../../_snowpack/pkg/react.js";
+import {Box, Image} from "../../../../../_snowpack/pkg/@chakra-ui/react.js";
+import {useState} from "../../../../../_snowpack/pkg/react.js";
 import {pxToAll} from "../../../utils/theme.utils.js";
 function BigCard({
   imageSource,
