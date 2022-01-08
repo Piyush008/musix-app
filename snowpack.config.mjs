@@ -2,8 +2,8 @@
 export default {
   exclude: ["**/node_modules/**/*", ".vscode"],
   mount: {
-    public: { url: "/" },
-    src: { url: "/dist" },
+    public: { url: "/musix-app/" },
+    src: { url: "/musix-app/dist" },
   },
   plugins: [
     /* ... */
@@ -12,7 +12,7 @@ export default {
     {
       match: "routes",
       src: ".*",
-      dest: "/index.html",
+      dest: "/musix-app/index.html",
     },
   ],
   optimize: {
@@ -23,7 +23,7 @@ export default {
     /* ... */
   },
   devOptions: {
-    /* ... */
+    openUrl: "/musix-app/",
   },
   buildOptions: {
     clean: true,
