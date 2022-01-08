@@ -9,7 +9,7 @@ import {
 } from "../../../_snowpack/pkg/react-icons/md.js";
 import {useLocation, useNavigate, useParams} from "../../../_snowpack/pkg/react-router-dom.js";
 import ROUTER from "../../utils/constants/router.constants.js";
-import {pxToRem} from "../../utils/theme.utils.js";
+import {pxToAll, pxToRem} from "../../utils/theme.utils.js";
 import CustomItem from "../util/CustomItem.js";
 export default function MobileSideBar() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function MobileSideBar() {
   };
   return /* @__PURE__ */ React.createElement(HStack, {
     justify: "space-evenly",
-    height: pxToRem(120),
+    height: pxToAll(100),
     pos: "fixed",
     bottom: "0",
     w: "100%",

@@ -36,8 +36,8 @@ export default function Header() {
     zIndex: "1",
     right: "0",
     bg: "brand.primary",
-    px: pxToRem(30),
-    py: pxToRem(20)
+    px: pxToAll(30),
+    py: pxToAll(20)
   }, /* @__PURE__ */ React.createElement(AgentDetect, {
     mobileComponent: /* @__PURE__ */ React.createElement(Logo, null),
     desktopComponent: /* @__PURE__ */ React.createElement(HStack, null, /* @__PURE__ */ React.createElement(Circle, {

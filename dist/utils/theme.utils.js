@@ -22,15 +22,8 @@ export const pxToRemXl = (px) => {
   const remValue = (px * 100) / (1440 + 596 + 298);
   return `${remValue}rem`;
 };
-const funcArr = (px) => [
-  pxToRemSm(px),
-  pxToRemMd(px),
-  pxToRemLg(px),
-  pxToRemXl(px),
-];
+const funcArr = (px) => [pxToRemSm(px / 2), null, pxToRem(px)];
 
 export const pxToAll = (px, defaultValue = 2) => {
-  const a = funcArr(px).slice(0, defaultValue);
-  a.push(pxToRem(px));
-  return a;
+  return funcArr(px);
 };

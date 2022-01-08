@@ -6,8 +6,8 @@ import {pxToAll, pxToRem} from "../utils/theme.utils.js";
 export default function HomeContentPage() {
   return /* @__PURE__ */ React.createElement(Flex, {
     direction: "column",
-    py: pxToRem(20),
-    px: pxToRem(30)
+    py: pxToAll(20),
+    px: pxToAll(30)
   }, /* @__PURE__ */ React.createElement(Text, {
     textStyle: "h4",
     color: "text.secondary"
