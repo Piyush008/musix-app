@@ -1,5 +1,5 @@
 import { c as createCommonjsModule, r as react, a as commonjsGlobal } from '../common/index-210ebed7.js';
-import { _ as _extends$a } from '../common/extends-7477639a.js';
+import { _ as _extends$c } from '../common/extends-7477639a.js';
 import '../common/index-86457145.js';
 
 /*
@@ -1313,7 +1313,7 @@ var getTheme = function getTheme(outerTheme, theme) {
     return mergedTheme;
   }
 
-  return _extends$a({}, outerTheme, theme);
+  return _extends$c({}, outerTheme, theme);
 };
 
 var createCacheWithTheme = /* #__PURE__ */weakMemoize(function (outerTheme) {
@@ -3705,6 +3705,9 @@ var isBrowser$1 = canUseDOM();
 var dataAttr = function dataAttr(condition) {
   return condition ? "" : undefined;
 };
+var ariaAttr = function ariaAttr(condition) {
+  return condition ? true : undefined;
+};
 var cx = function cx() {
   for (var _len = arguments.length, classNames = new Array(_len), _key = 0; _key < _len; _key++) {
     classNames[_key] = arguments[_key];
@@ -3720,6 +3723,18 @@ function runIfFn(valueOrFn) {
   }
 
   return isFunction(valueOrFn) ? valueOrFn.apply(void 0, args) : valueOrFn;
+}
+function callAllHandlers() {
+  for (var _len2 = arguments.length, fns = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+    fns[_key2] = arguments[_key2];
+  }
+
+  return function func(event) {
+    fns.some(function (fn) {
+      fn == null ? void 0 : fn(event);
+      return event == null ? void 0 : event.defaultPrevented;
+    });
+  };
 }
 function once(fn) {
   var result;
@@ -6560,7 +6575,7 @@ var createStyled = function createStyled(tag, options) {
     });
 
     Styled.withComponent = function (nextTag, nextOptions) {
-      return createStyled(nextTag, _extends$a({}, options, nextOptions, {
+      return createStyled(nextTag, _extends$c({}, options, nextOptions, {
         shouldForwardProp: composeShouldForwardProps(Styled, nextOptions, true)
       })).apply(void 0, styles);
     };
@@ -12989,6 +13004,375 @@ function _objectWithoutPropertiesLoose$7(source, excluded) {
   return target;
 }
 
+var _createContext$4 = createContext({
+  strict: false,
+  name: "FormControlContext"
+}),
+    useFormControlContext = _createContext$4[1];
+
+var _excluded$1$3 = ["isDisabled", "isInvalid", "isReadOnly", "isRequired"],
+    _excluded2$3 = ["id", "disabled", "readOnly", "required", "isRequired", "isInvalid", "isReadOnly", "isDisabled", "onFocus", "onBlur"];
+
+/**
+ * React hook that provides the props that should be spread on to
+ * input fields (`input`, `select`, `textarea`, etc.).
+ *
+ * It provides a convenient way to control a form fields, validation
+ * and helper text.
+ *
+ * @internal
+ */
+function useFormControl(props) {
+  var _useFormControlProps = useFormControlProps(props),
+      isDisabled = _useFormControlProps.isDisabled,
+      isInvalid = _useFormControlProps.isInvalid,
+      isReadOnly = _useFormControlProps.isReadOnly,
+      isRequired = _useFormControlProps.isRequired,
+      rest = _objectWithoutPropertiesLoose$7(_useFormControlProps, _excluded$1$3);
+
+  return _extends$9({}, rest, {
+    disabled: isDisabled,
+    readOnly: isReadOnly,
+    required: isRequired,
+    "aria-invalid": ariaAttr(isInvalid),
+    "aria-required": ariaAttr(isRequired),
+    "aria-readonly": ariaAttr(isReadOnly)
+  });
+}
+/**
+ * @internal
+ */
+
+function useFormControlProps(props) {
+  var _ref, _ref2, _ref3;
+
+  var field = useFormControlContext();
+
+  var id = props.id,
+      disabled = props.disabled,
+      readOnly = props.readOnly,
+      required = props.required,
+      isRequired = props.isRequired,
+      isInvalid = props.isInvalid,
+      isReadOnly = props.isReadOnly,
+      isDisabled = props.isDisabled,
+      onFocus = props.onFocus,
+      onBlur = props.onBlur,
+      rest = _objectWithoutPropertiesLoose$7(props, _excluded2$3);
+
+  var labelIds = props["aria-describedby"] ? [props["aria-describedby"]] : []; // Error message must be described first in all scenarios.
+
+  if (field != null && field.hasFeedbackText && field != null && field.isInvalid) {
+    labelIds.push(field.feedbackId);
+  }
+
+  if (field != null && field.hasHelpText) {
+    labelIds.push(field.helpTextId);
+  }
+
+  return _extends$9({}, rest, {
+    "aria-describedby": labelIds.join(" ") || undefined,
+    id: id != null ? id : field == null ? void 0 : field.id,
+    isDisabled: (_ref = disabled != null ? disabled : isDisabled) != null ? _ref : field == null ? void 0 : field.isDisabled,
+    isReadOnly: (_ref2 = readOnly != null ? readOnly : isReadOnly) != null ? _ref2 : field == null ? void 0 : field.isReadOnly,
+    isRequired: (_ref3 = required != null ? required : isRequired) != null ? _ref3 : field == null ? void 0 : field.isRequired,
+    isInvalid: isInvalid != null ? isInvalid : field == null ? void 0 : field.isInvalid,
+    onFocus: callAllHandlers(field == null ? void 0 : field.onFocus, onFocus),
+    onBlur: callAllHandlers(field == null ? void 0 : field.onBlur, onBlur)
+  });
+}
+
+function _extends$a() {
+  _extends$a = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$a.apply(this, arguments);
+}
+
+/**
+ * Input
+ *
+ * Element that allows users enter single valued data.
+ */
+var Input$1 = /*#__PURE__*/forwardRef(function (props, ref) {
+  var styles = useMultiStyleConfig("Input", props);
+  var ownProps = omitThemingProps(props);
+  var input = useFormControl(ownProps);
+
+  var _className = cx("chakra-input", props.className);
+
+  return /*#__PURE__*/react.createElement(chakra.input, _extends$a({}, input, {
+    __css: styles.field,
+    ref: ref,
+    className: _className
+  }));
+});
+
+
+Input$1.id = "Input";
+
+function _objectWithoutPropertiesLoose$8(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+var _excluded$2$2 = ["placement"];
+var placements = {
+  left: {
+    marginEnd: "-1px",
+    borderEndRadius: 0,
+    borderEndColor: "transparent"
+  },
+  right: {
+    marginStart: "-1px",
+    borderStartRadius: 0,
+    borderStartColor: "transparent"
+  }
+};
+var StyledAddon = chakra("div", {
+  baseStyle: {
+    flex: "0 0 auto",
+    width: "auto",
+    display: "flex",
+    alignItems: "center",
+    whiteSpace: "nowrap"
+  }
+});
+
+/**
+ * InputAddon
+ *
+ * Element to append or prepend to an input
+ */
+var InputAddon = /*#__PURE__*/forwardRef(function (props, ref) {
+  var _placements$placement;
+
+  var _props$placement = props.placement,
+      placement = _props$placement === void 0 ? "left" : _props$placement,
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded$2$2);
+
+  var placementStyles = (_placements$placement = placements[placement]) != null ? _placements$placement : {};
+  var styles = useStyles();
+  return /*#__PURE__*/react.createElement(StyledAddon, _extends$a({
+    ref: ref
+  }, rest, {
+    __css: _extends$a({}, styles.addon, placementStyles)
+  }));
+});
+/**
+ * InputLeftAddon
+ *
+ * Element to append to the left of an input
+ */
+
+
+var InputLeftAddon = /*#__PURE__*/forwardRef(function (props, ref) {
+  return /*#__PURE__*/react.createElement(InputAddon, _extends$a({
+    ref: ref,
+    placement: "left"
+  }, props, {
+    className: cx("chakra-input__left-addon", props.className)
+  }));
+});
+
+
+InputLeftAddon.id = "InputLeftAddon";
+/**
+ * InputRightAddon
+ *
+ * Element to append to the right of an input
+ */
+
+var InputRightAddon = /*#__PURE__*/forwardRef(function (props, ref) {
+  return /*#__PURE__*/react.createElement(InputAddon, _extends$a({
+    ref: ref,
+    placement: "right"
+  }, props, {
+    className: cx("chakra-input__right-addon", props.className)
+  }));
+});
+
+
+InputRightAddon.id = "InputRightAddon";
+
+var _excluded$1$4 = ["children", "className"];
+var InputGroup = /*#__PURE__*/forwardRef(function (props, ref) {
+  var styles = useMultiStyleConfig("Input", props);
+
+  var _omitThemingProps = omitThemingProps(props),
+      children = _omitThemingProps.children,
+      className = _omitThemingProps.className,
+      rest = _objectWithoutPropertiesLoose$8(_omitThemingProps, _excluded$1$4);
+
+  var _className = cx("chakra-input__group", className);
+
+  var groupStyles = {};
+  var validChildren = getValidChildren(children);
+  var input = styles.field;
+  validChildren.forEach(function (child) {
+    if (!styles) return;
+
+    if (input && child.type.id === "InputLeftElement") {
+      var _input$height;
+
+      groupStyles.paddingStart = (_input$height = input.height) != null ? _input$height : input.h;
+    }
+
+    if (input && child.type.id === "InputRightElement") {
+      var _input$height2;
+
+      groupStyles.paddingEnd = (_input$height2 = input.height) != null ? _input$height2 : input.h;
+    }
+
+    if (child.type.id === "InputRightAddon") {
+      groupStyles.borderEndRadius = 0;
+    }
+
+    if (child.type.id === "InputLeftAddon") {
+      groupStyles.borderStartRadius = 0;
+    }
+  });
+  var clones = validChildren.map(function (child) {
+    var _child$props, _child$props2;
+
+    /**
+     * Make it possible to override the size and variant from `Input`
+     */
+    var theming = filterUndefined({
+      size: ((_child$props = child.props) == null ? void 0 : _child$props.size) || props.size,
+      variant: ((_child$props2 = child.props) == null ? void 0 : _child$props2.variant) || props.variant
+    });
+    return child.type.id !== "Input" ? /*#__PURE__*/react.cloneElement(child, theming) : /*#__PURE__*/react.cloneElement(child, Object.assign(theming, groupStyles, child.props));
+  });
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
+    className: _className,
+    ref: ref,
+    __css: {
+      width: "100%",
+      display: "flex",
+      position: "relative"
+    }
+  }, rest), /*#__PURE__*/react.createElement(StylesProvider, {
+    value: styles
+  }, clones));
+});
+
+var _excluded$7 = ["placement"],
+    _excluded2$4 = ["className"],
+    _excluded3 = ["className"];
+var StyledElement = chakra("div", {
+  baseStyle: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: "0",
+    zIndex: 2
+  }
+});
+var InputElement = /*#__PURE__*/forwardRef(function (props, ref) {
+  var _input$height, _input$height2, _elementStyles;
+
+  var _props$placement = props.placement,
+      placement = _props$placement === void 0 ? "left" : _props$placement,
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded$7);
+
+  var styles = useStyles();
+  var input = styles.field;
+  var attr = placement === "left" ? "insetStart" : "insetEnd";
+  var elementStyles = (_elementStyles = {}, _elementStyles[attr] = "0", _elementStyles.width = (_input$height = input == null ? void 0 : input.height) != null ? _input$height : input == null ? void 0 : input.h, _elementStyles.height = (_input$height2 = input == null ? void 0 : input.height) != null ? _input$height2 : input == null ? void 0 : input.h, _elementStyles.fontSize = input == null ? void 0 : input.fontSize, _elementStyles);
+  return /*#__PURE__*/react.createElement(StyledElement, _extends$a({
+    ref: ref,
+    __css: elementStyles
+  }, rest));
+}); // This is used in `input-group.tsx`
+
+InputElement.id = "InputElement";
+
+var InputLeftElement = /*#__PURE__*/forwardRef(function (props, ref) {
+  var className = props.className,
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded2$4);
+
+  var _className = cx("chakra-input__left-element", className);
+
+  return /*#__PURE__*/react.createElement(InputElement, _extends$a({
+    ref: ref,
+    placement: "left",
+    className: _className
+  }, rest));
+}); // This is used in `input-group.tsx`
+
+InputLeftElement.id = "InputLeftElement";
+
+var InputRightElement = /*#__PURE__*/forwardRef(function (props, ref) {
+  var className = props.className,
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded3);
+
+  var _className = cx("chakra-input__right-element", className);
+
+  return /*#__PURE__*/react.createElement(InputElement, _extends$a({
+    ref: ref,
+    placement: "right",
+    className: _className
+  }, rest));
+}); // This is used in `input-group.tsx`
+
+InputRightElement.id = "InputRightElement";
+
+function _extends$b() {
+  _extends$b = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$b.apply(this, arguments);
+}
+
+function _objectWithoutPropertiesLoose$9(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
 var _excluded$f = ["size", "centerContent"],
     _excluded2$5 = ["size"];
 
@@ -13009,17 +13393,17 @@ var Square = /*#__PURE__*/forwardRef(function (props, ref) {
   var size = props.size,
       _props$centerContent = props.centerContent,
       centerContent = _props$centerContent === void 0 ? true : _props$centerContent,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded$f);
+      rest = _objectWithoutPropertiesLoose$9(props, _excluded$f);
 
   var styles = centerContent ? {
     display: "flex",
     alignItems: "center",
     justifyContent: "center"
   } : {};
-  return /*#__PURE__*/react.createElement(Box, _extends$9({
+  return /*#__PURE__*/react.createElement(Box, _extends$b({
     ref: ref,
     boxSize: size,
-    __css: _extends$9({}, styles, {
+    __css: _extends$b({}, styles, {
       flexShrink: 0,
       flexGrow: 0
     })
@@ -13028,9 +13412,9 @@ var Square = /*#__PURE__*/forwardRef(function (props, ref) {
 
 var Circle = /*#__PURE__*/forwardRef(function (props, ref) {
   var size = props.size,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded2$5);
+      rest = _objectWithoutPropertiesLoose$9(props, _excluded2$5);
 
-  return /*#__PURE__*/react.createElement(Square, _extends$9({
+  return /*#__PURE__*/react.createElement(Square, _extends$b({
     size: size,
     ref: ref,
     borderRadius: "9999px"
@@ -13052,7 +13436,7 @@ var Center = chakra("div", {
 });
 
 var _excluded$b = ["borderLeftWidth", "borderBottomWidth", "borderTopWidth", "borderRightWidth", "borderWidth", "borderStyle", "borderColor"],
-    _excluded2$4 = ["className", "orientation", "__css"];
+    _excluded2$4$1 = ["className", "orientation", "__css"];
 /**
  * Layout component used to visually separate content in a list or group.
  * It display a thin horizontal or vertical line, and renders a `hr` tag.
@@ -13069,14 +13453,14 @@ var Divider$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       borderWidth = _useStyleConfig.borderWidth,
       borderStyle = _useStyleConfig.borderStyle,
       borderColor = _useStyleConfig.borderColor,
-      styles = _objectWithoutPropertiesLoose$7(_useStyleConfig, _excluded$b);
+      styles = _objectWithoutPropertiesLoose$9(_useStyleConfig, _excluded$b);
 
   var _omitThemingProps = omitThemingProps(props),
       className = _omitThemingProps.className,
       _omitThemingProps$ori = _omitThemingProps.orientation,
       orientation = _omitThemingProps$ori === void 0 ? "horizontal" : _omitThemingProps$ori,
       __css = _omitThemingProps.__css,
-      rest = _objectWithoutPropertiesLoose$7(_omitThemingProps, _excluded2$4);
+      rest = _objectWithoutPropertiesLoose$9(_omitThemingProps, _excluded2$4$1);
 
   var dividerStyles = {
     vertical: {
@@ -13088,11 +13472,11 @@ var Divider$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       width: "100%"
     }
   };
-  return /*#__PURE__*/react.createElement(chakra.hr, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.hr, _extends$b({
     ref: ref,
     "aria-orientation": orientation
   }, rest, {
-    __css: _extends$9({}, styles, {
+    __css: _extends$b({}, styles, {
       border: "0",
       borderColor: borderColor,
       borderStyle: borderStyle
@@ -13119,7 +13503,7 @@ var Flex = /*#__PURE__*/forwardRef(function (props, ref) {
       basis = props.basis,
       grow = props.grow,
       shrink = props.shrink,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded$a);
+      rest = _objectWithoutPropertiesLoose$9(props, _excluded$a);
 
   var styles = {
     display: "flex",
@@ -13131,14 +13515,14 @@ var Flex = /*#__PURE__*/forwardRef(function (props, ref) {
     flexGrow: grow,
     flexShrink: shrink
   };
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     __css: styles
   }, rest));
 });
 
 var _excluded$9 = ["area", "templateAreas", "gap", "rowGap", "columnGap", "column", "row", "autoFlow", "autoRows", "templateRows", "autoColumns", "templateColumns"],
-    _excluded2$3 = ["colSpan", "colStart", "colEnd", "rowEnd", "rowSpan", "rowStart"];
+    _excluded2$3$1 = ["colSpan", "colStart", "colEnd", "rowEnd", "rowSpan", "rowStart"];
 
 /**
  * React component used to create grid layouts.
@@ -13161,7 +13545,7 @@ var Grid = /*#__PURE__*/forwardRef(function (props, ref) {
       templateRows = props.templateRows,
       autoColumns = props.autoColumns,
       templateColumns = props.templateColumns,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded$9);
+      rest = _objectWithoutPropertiesLoose$9(props, _excluded$9);
 
   var styles = {
     display: "grid",
@@ -13178,7 +13562,7 @@ var Grid = /*#__PURE__*/forwardRef(function (props, ref) {
     gridTemplateRows: templateRows,
     gridTemplateColumns: templateColumns
   };
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     __css: styles
   }, rest));
@@ -13197,7 +13581,7 @@ var GridItem = /*#__PURE__*/forwardRef(function (props, ref) {
       rowEnd = props.rowEnd,
       rowSpan = props.rowSpan,
       rowStart = props.rowStart,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded2$3);
+      rest = _objectWithoutPropertiesLoose$9(props, _excluded2$3$1);
 
   var styles = filterUndefined({
     gridColumn: spanFn(colSpan),
@@ -13207,7 +13591,7 @@ var GridItem = /*#__PURE__*/forwardRef(function (props, ref) {
     gridRowStart: rowStart,
     gridRowEnd: rowEnd
   });
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     __css: styles
   }, rest));
@@ -13231,7 +13615,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       styleType = _omitThemingProps$sty === void 0 ? "none" : _omitThemingProps$sty,
       stylePosition = _omitThemingProps.stylePosition,
       spacing = _omitThemingProps.spacing,
-      rest = _objectWithoutPropertiesLoose$7(_omitThemingProps, _excluded$5$1);
+      rest = _objectWithoutPropertiesLoose$9(_omitThemingProps, _excluded$5$1);
 
   var validChildren = getValidChildren(children);
   var selector = "& > *:not(style) ~ *:not(style)";
@@ -13240,7 +13624,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
   }, _ref) : {};
   return /*#__PURE__*/react.createElement(StylesProvider, {
     value: styles
-  }, /*#__PURE__*/react.createElement(chakra.ul, _extends$9({
+  }, /*#__PURE__*/react.createElement(chakra.ul, _extends$b({
     ref: ref,
     listStyleType: styleType,
     listStylePosition: stylePosition
@@ -13250,7 +13634,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
      */
     ,
     role: "list",
-    __css: _extends$9({}, styles.container, spacingStyle)
+    __css: _extends$b({}, styles.container, spacingStyle)
   }, rest), validChildren));
 });
 /**
@@ -13262,7 +13646,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
 
 var ListIcon = /*#__PURE__*/forwardRef(function (props, ref) {
   var styles = useStyles();
-  return /*#__PURE__*/react.createElement(Icon, _extends$9({
+  return /*#__PURE__*/react.createElement(Icon, _extends$b({
     ref: ref,
     role: "presentation"
   }, props, {
@@ -13364,10 +13748,10 @@ function getDividerStyles(options) {
 
 var _excluded$3$2 = ["isInline", "direction", "align", "justify", "spacing", "wrap", "children", "divider", "className", "shouldWrapChildren"];
 var StackItem = function StackItem(props) {
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     className: "chakra-stack__item"
   }, props, {
-    __css: _extends$9({
+    __css: _extends$b({
       display: "inline-block",
       flex: "0 0 auto",
       minWidth: 0
@@ -13400,7 +13784,7 @@ var Stack = /*#__PURE__*/forwardRef(function (props, ref) {
       divider = props.divider,
       className = props.className,
       shouldWrapChildren = props.shouldWrapChildren,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded$3$2);
+      rest = _objectWithoutPropertiesLoose$9(props, _excluded$3$2);
 
   var direction = isInline ? "row" : directionProp != null ? directionProp : "column";
   var styles = react.useMemo(function () {
@@ -13442,7 +13826,7 @@ var Stack = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-stack", className);
 
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     display: "flex",
     alignItems: align,
@@ -13459,7 +13843,7 @@ var Stack = /*#__PURE__*/forwardRef(function (props, ref) {
 
 
 var HStack = /*#__PURE__*/forwardRef(function (props, ref) {
-  return /*#__PURE__*/react.createElement(Stack, _extends$9({
+  return /*#__PURE__*/react.createElement(Stack, _extends$b({
     align: "center"
   }, props, {
     direction: "row",
@@ -13467,7 +13851,7 @@ var HStack = /*#__PURE__*/forwardRef(function (props, ref) {
   }));
 });
 
-var _excluded$2$2 = ["className", "align", "decoration", "casing"];
+var _excluded$2$3 = ["className", "align", "decoration", "casing"];
 
 /**
  * Used to render texts or paragraphs.
@@ -13478,14 +13862,14 @@ var Text = /*#__PURE__*/forwardRef(function (props, ref) {
   var styles = useStyleConfig("Text", props);
 
   var _omitThemingProps = omitThemingProps(props);
-      var rest = _objectWithoutPropertiesLoose$7(_omitThemingProps, _excluded$2$2);
+      var rest = _objectWithoutPropertiesLoose$9(_omitThemingProps, _excluded$2$3);
 
   var aliasedProps = filterUndefined({
     textAlign: props.align,
     textDecoration: props.decoration,
     textTransform: props.casing
   });
-  return /*#__PURE__*/react.createElement(chakra.p, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.p, _extends$b({
     ref: ref,
     className: cx("chakra-text", props.className)
   }, aliasedProps, rest, {
@@ -13493,7 +13877,7 @@ var Text = /*#__PURE__*/forwardRef(function (props, ref) {
   }));
 });
 
-var _excluded$1$3 = ["spacing", "children", "justify", "direction", "align", "className", "shouldWrapChildren"],
+var _excluded$1$5 = ["spacing", "children", "justify", "direction", "align", "className", "shouldWrapChildren"],
     _excluded2$1$1 = ["className"];
 
 /**
@@ -13515,7 +13899,7 @@ var Wrap = /*#__PURE__*/forwardRef(function (props, ref) {
       align = props.align,
       className = props.className,
       shouldWrapChildren = props.shouldWrapChildren,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded$1$3);
+      rest = _objectWithoutPropertiesLoose$9(props, _excluded$1$5);
 
   var styles = react.useMemo(function () {
     return {
@@ -13543,7 +13927,7 @@ var Wrap = /*#__PURE__*/forwardRef(function (props, ref) {
       key: index
     }, child);
   }) : children;
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     className: cx("chakra-wrap", className)
   }, rest), /*#__PURE__*/react.createElement(chakra.ul, {
@@ -13554,9 +13938,9 @@ var Wrap = /*#__PURE__*/forwardRef(function (props, ref) {
 
 var WrapItem = /*#__PURE__*/forwardRef(function (props, ref) {
   var className = props.className,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded2$1$1);
+      rest = _objectWithoutPropertiesLoose$9(props, _excluded2$1$1);
 
-  return /*#__PURE__*/react.createElement(chakra.li, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.li, _extends$b({
     ref: ref,
     __css: {
       display: "flex",
@@ -13700,4 +14084,4 @@ function mergeThemeCustomizer(source, override, key, object) {
   return undefined;
 }
 
-export { Avatar$1 as Avatar, Box, Button$1 as Button, ChakraProvider$1 as ChakraProvider, Circle, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, List$1 as List, ListIcon, Text, Wrap, color, extendTheme, useMediaQuery, useStyleConfig };
+export { Avatar$1 as Avatar, Box, Button$1 as Button, ChakraProvider$1 as ChakraProvider, Circle, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftAddon, InputLeftElement, List$1 as List, ListIcon, Text, Wrap, color, extendTheme, useMediaQuery, useStyleConfig };

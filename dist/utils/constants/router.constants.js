@@ -1,6 +1,6 @@
 const ROUTER = {
   HOME: "/",
-  SEARCH: "/search",
+  SEARCH: "search",
 };
 
 export default ROUTER;

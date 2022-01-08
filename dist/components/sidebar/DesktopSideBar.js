@@ -17,9 +17,8 @@ import {
 import {FcLike} from "../../../_snowpack/pkg/react-icons/fc.js";
 import {pxToAll, pxToRem} from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo.js";
-import {useLocation, useNavigate} from "../../../_snowpack/pkg/react-router-dom.js";
+import {useLocation, useNavigate, useParams} from "../../../_snowpack/pkg/react-router-dom.js";
 import ROUTER from "../../utils/constants/router.constants.js";
-import {useEffect} from "../../../_snowpack/pkg/react.js";
 import useAgent from "../../hooks/useAgent.js";
 function CustomItem(props) {
   const {variant, size, ...rest} = props;
@@ -32,6 +31,8 @@ function CustomItem(props) {
 export default function DesktopSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const params = useParams();
+  console.log(params);
   const pathName = location.pathname;
   const isMobile = useAgent();
   const handleNavigate = (path) => {
@@ -59,7 +60,7 @@ export default function DesktopSideBar() {
       textStyle: "iconMd"
     }), "Home"), /* @__PURE__ */ React.createElement(CustomItem, {
       onClick: () => handleNavigate(ROUTER.SEARCH),
-      layerStyle: pathName == ROUTER.SEARCH && "selected"
+      layerStyle: pathName == `/${ROUTER.SEARCH}` && "selected"
     }, /* @__PURE__ */ React.createElement(ListIcon, {
       as: MdSearch,
       textStyle: "iconMd"

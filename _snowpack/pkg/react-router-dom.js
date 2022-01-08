@@ -236,6 +236,20 @@ function useOutlet(context) {
   return outlet;
 }
 /**
+ * Returns an object of key/value pairs of the dynamic params from the current
+ * URL that were matched by the route path.
+ *
+ * @see https://reactrouter.com/docs/en/v6/api#useparams
+ */
+
+function useParams() {
+  let {
+    matches
+  } = react.useContext(RouteContext);
+  let routeMatch = matches[matches.length - 1];
+  return routeMatch ? routeMatch.params : {};
+}
+/**
  * Returns the element of the route that matched the current location, prepared
  * with the correct context to render the remainder of the route tree. Route
  * elements in the tree must render an <Outlet> to render their child route's
@@ -734,4 +748,4 @@ function BrowserRouter(_ref) {
   });
 }
 
-export { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigate };
+export { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigate, useParams };
