@@ -6,6 +6,10 @@ const colors = {
     secondary: "#1D4044",
     hoverPrimary: "rgba(0,0,0,0.5)",
   },
+  brand: {
+    primary: "#2c5282",
+    secondary: "#2d3748",
+  },
   text: {
     primary: "#A0AEC0",
     secondary: "#CBD5E0",

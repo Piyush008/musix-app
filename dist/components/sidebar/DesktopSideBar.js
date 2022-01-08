@@ -20,33 +20,26 @@ import Logo from "../logo/Logo.js";
 import {useLocation, useNavigate, useParams} from "../../../_snowpack/pkg/react-router-dom.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import useAgent from "../../hooks/useAgent.js";
-function CustomItem(props) {
-  const {variant, size, ...rest} = props;
-  const styles = useStyleConfig("CustomItem", {variant, size});
-  return /* @__PURE__ */ React.createElement(Box, {
-    __css: styles,
-    ...rest
-  });
-}
+import AgentDetect from "../util/AgentDetect.js";
+import CustomItem from "../util/CustomItem.js";
 export default function DesktopSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
   console.log(params);
   const pathName = location.pathname;
-  const isMobile = useAgent();
   const handleNavigate = (path) => {
     navigate(path);
   };
-  if (!isMobile)
-    return /* @__PURE__ */ React.createElement(Flex, {
+  return /* @__PURE__ */ React.createElement(AgentDetect, {
+    desktopComponent: /* @__PURE__ */ React.createElement(Flex, {
       direction: "column",
       bg: "shade.primary",
       minW: pxToAll(230),
       pr: pxToAll(10),
-      boxShadow: `0 0 ${pxToRem(5)} rgba(0,0,0, 0.36)`,
-      borderBottomRightRadius: `${pxToRem(10)}`,
-      borderTopRightRadius: `${pxToRem(10)}`
+      boxShadow: `0 0 5px rgba(0,0,0, 0.36)`,
+      borderBottomRightRadius: "10px",
+      borderTopRightRadius: "10px"
     }, /* @__PURE__ */ React.createElement(Box, {
       my: pxToAll(30),
       ml: pxToAll(20)
@@ -57,22 +50,22 @@ export default function DesktopSideBar() {
       layerStyle: pathName == ROUTER.HOME && "selected"
     }, /* @__PURE__ */ React.createElement(ListIcon, {
       as: MdHome,
-      textStyle: "iconMd"
+      textStyle: "icon.md"
     }), "Home"), /* @__PURE__ */ React.createElement(CustomItem, {
       onClick: () => handleNavigate(ROUTER.SEARCH),
       layerStyle: pathName == `/${ROUTER.SEARCH}` && "selected"
     }, /* @__PURE__ */ React.createElement(ListIcon, {
       as: MdSearch,
-      textStyle: "iconMd"
+      textStyle: "icon.md"
     }), "Search"), /* @__PURE__ */ React.createElement(CustomItem, null, /* @__PURE__ */ React.createElement(ListIcon, {
       as: MdLibraryBooks,
-      textStyle: "iconMd"
+      textStyle: "icon.md"
     }), "Library")), /* @__PURE__ */ React.createElement(List, {
       mt: pxToAll(20),
       ml: pxToAll(10)
     }, /* @__PURE__ */ React.createElement(CustomItem, null, /* @__PURE__ */ React.createElement(ListIcon, {
       as: MdPlaylistAdd,
-      textStyle: "iconMd"
+      textStyle: "icon.md"
     }), "Create Playlist"), /* @__PURE__ */ React.createElement(CustomItem, null, /* @__PURE__ */ React.createElement(ListIcon, {
       as: FcLike,
       textStyle: "iconMd"
@@ -82,6 +75,7 @@ export default function DesktopSideBar() {
       ml: pxToAll(10),
       w: "90%",
       mt: pxToAll(20)
-    }));
-  return /* @__PURE__ */ React.createElement(Box, null);
+    })),
+    mobileComponent: /* @__PURE__ */ React.createElement(Box, null)
+  });
 }
