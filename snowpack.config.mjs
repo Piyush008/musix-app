@@ -2,8 +2,8 @@
 export default {
   exclude: ["**/node_modules/**/*", ".vscode"],
   mount: {
-    public: { url: "/musix-app/" },
-    src: { url: "/musix-app/dist" },
+    public: { url: "/" },
+    src: { url: "/dist" },
   },
   plugins: [
     /* ... */
