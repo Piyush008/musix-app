@@ -8,9 +8,10 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path={ROUTER.HOME} element={<HomePage />}>
+        <Route path="/" element={<HomePage />}>
           <Route index element={<HomeContentPage />} />
-          <Route path={ROUTER.SEARCH} element={<SearchPage />} />
+          <Route path="search" element={<SearchPage />} />
+          <Route path="search/:textId" element={<HomeContentPage />} />
         </Route>
         <Route path="*" element={<NoMatchPage />} />
       </Routes>
