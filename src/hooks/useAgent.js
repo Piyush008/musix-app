@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function useAgent() {
-  return navigator.userAgentData.mobile;
+  return React.useMemo(() => navigator.userAgentData.mobile, []);
 }

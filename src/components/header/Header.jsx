@@ -9,15 +9,23 @@ import {
   IconButton,
   Wrap,
   Button,
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  InputLeftElement,
 } from "@chakra-ui/react";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import {
+  MdKeyboardArrowLeft,
+  MdKeyboardArrowRight,
+  MdSearch,
+} from "react-icons/md";
 import { pxToAll } from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo";
 import useAgent from "../../hooks/useAgent.js";
-import { Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
+import ROUTER from "../../utils/constants/router.constants.js";
 
 export default function Header() {
-  // const [width] = useMediaQuery("(min-width:768px)");
   const isMobile = useAgent();
   return (
     <HStack
@@ -26,21 +34,58 @@ export default function Header() {
       alignItems={"center"}
     >
       {!isMobile ? (
-        <Wrap>
-          <Circle size={pxToAll(30)} bg="shade.secondary">
-            <Icon as={MdKeyboardArrowLeft} textStyle={"iconMd"} />
-          </Circle>
-          <Circle size={pxToAll(30)} bg="shade.secondary">
-            <Icon as={MdKeyboardArrowRight} textStyle={"iconMd"} />
-          </Circle>
-        </Wrap>
+        <>
+          <HStack>
+            <Circle size={pxToAll(35)} bg="shade.secondary">
+              <Icon as={MdKeyboardArrowLeft} textStyle={"icon.md"} />
+            </Circle>
+            <Circle size={pxToAll(35)} bg="shade.secondary">
+              <Icon as={MdKeyboardArrowRight} textStyle={"icon.md"} />
+            </Circle>
+            <Routes>
+              <Route
+                path={`${ROUTER.SEARCH}/*`}
+                element={
+                  <InputGroup>
+                    <InputLeftElement
+                      children={<Icon as={MdSearch} textStyle={"icon.md"} />}
+                    />
+                    <Input />
+                  </InputGroup>
+                }
+              />
+            </Routes>
+          </HStack>
+          <Box>
+            <Button>Enter Musix</Button>
+          </Box>
+        </>
       ) : (
-        <Logo />
+        <Routes>
+          <Route
+            path={`${ROUTER.SEARCH}/*`}
+            element={
+              <InputGroup>
+                <InputLeftElement
+                  children={<Icon as={MdSearch} textStyle={"icon.md"} />}
+                />
+                <Input />
+              </InputGroup>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <>
+                <Logo />
+                <Box>
+                  <Button>Enter Musix</Button>
+                </Box>
+              </>
+            }
+          />
+        </Routes>
       )}
-      <Box>
-        {/* <Avatar src="https://bit.ly/broken-link" size="xs" /> */}
-        <Button size={"md"}>Enter Musix</Button>
-      </Box>
     </HStack>
   );
 }

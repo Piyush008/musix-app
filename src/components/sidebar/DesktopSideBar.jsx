@@ -16,9 +16,8 @@ import {
 import { FcLike } from "react-icons/fc";
 import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ROUTER from "../../utils/constants/router.constants.js";
-import { useEffect } from "react";
 import useAgent from "../../hooks/useAgent.js";
 
 function CustomItem(props) {
@@ -30,6 +29,8 @@ function CustomItem(props) {
 export default function DesktopSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const params = useParams();
+  console.log(params);
   const pathName = location.pathname;
   const isMobile = useAgent();
 
@@ -61,7 +62,7 @@ export default function DesktopSideBar() {
           </CustomItem>
           <CustomItem
             onClick={() => handleNavigate(ROUTER.SEARCH)}
-            layerStyle={pathName == ROUTER.SEARCH && "selected"}
+            layerStyle={pathName == `/${ROUTER.SEARCH}` && "selected"}
           >
             <ListIcon as={MdSearch} textStyle={"iconMd"} />
             Search

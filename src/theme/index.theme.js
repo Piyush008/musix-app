@@ -6,6 +6,7 @@ import CustomItem from "./components/CustomItem";
 import Button from "./components/Button";
 import { pxToAll, pxToRem } from "../utils/theme.utils.js";
 import colors from "./foundations/colors";
+import Input from "./components/Input";
 const theme = extendTheme({
   breakpoints,
   ...typography,
@@ -13,6 +14,7 @@ const theme = extendTheme({
   components: {
     CustomItem,
     Button,
+    Input,
   },
   layerStyles: {
     selected: {
@@ -55,8 +57,10 @@ const theme = extendTheme({
       fontWeight: "normal",
       lineHeight: 1.25,
     },
-    iconMd: {
-      fontSize: pxToAll(24),
+    icon: {
+      md: {
+        fontSize: pxToAll(24),
+      },
     },
   },
   config: {

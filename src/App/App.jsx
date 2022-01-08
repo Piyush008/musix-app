@@ -4,16 +4,18 @@ import SearchPage from "../pages/SearchPage";
 import HomeContentPage from "../pages/HomeContentPage";
 import NoMatchPage from "../pages/NoMatchPage";
 import ROUTER from "../utils/constants/router.constants.js";
+import SearchContentPage from "../pages/SearchContentPage";
 export default function App() {
   return (
     <Router basename="/musix-app">
       <Routes>
-        <Route path="/" element={<HomePage />}>
+        <Route path={`${ROUTER.HOME}*`} element={<HomePage />}>
           <Route index element={<HomeContentPage />} />
-          <Route path="search" element={<SearchPage />} />
-          <Route path="search/:textId" element={<HomeContentPage />} />
+          <Route path={ROUTER.SEARCH} element={<SearchPage />}>
+            <Route path=":searchText" element={<SearchContentPage />} />
+          </Route>
+          <Route path="*" element={<NoMatchPage />} />
         </Route>
-        <Route path="*" element={<NoMatchPage />} />
       </Routes>
     </Router>
   );
