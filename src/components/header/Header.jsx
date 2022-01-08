@@ -37,8 +37,8 @@ export default function Header() {
       zIndex={"1"}
       right={"0"}
       bg={"brand.primary"}
-      px={pxToRem(30)}
-      py={pxToRem(20)}
+      px={pxToAll(30)}
+      py={pxToAll(20)}
     >
       <AgentDetect
         mobileComponent={<Logo />}

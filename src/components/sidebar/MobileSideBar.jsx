@@ -8,7 +8,7 @@ import {
 } from "react-icons/md";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ROUTER from "../../utils/constants/router.constants.js";
-import { pxToRem } from "../../utils/theme.utils.js";
+import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 import CustomItem from "../util/CustomItem.jsx";
 
 export default function MobileSideBar() {
@@ -24,7 +24,7 @@ export default function MobileSideBar() {
   return (
     <HStack
       justify={"space-evenly"}
-      height={pxToRem(120)}
+      height={pxToAll(100)}
       pos={"fixed"}
       bottom={"0"}
       w={"100%"}
