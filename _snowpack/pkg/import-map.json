@@ -5,6 +5,7 @@
     "jsrsasign": "./jsrsasign.js",
     "react": "./react.js",
     "react-dom": "./react-dom.js",
+    "react-icons/fa": "./react-icons/fa.js",
     "react-icons/fc": "./react-icons/fc.js",
     "react-icons/md": "./react-icons/md.js",
     "react-router-dom": "./react-router-dom.js",

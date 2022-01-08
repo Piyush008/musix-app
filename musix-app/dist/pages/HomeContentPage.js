@@ -13,6 +13,9 @@ export default function HomeContentPage() {
     width: "100%"
   }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
     imageBorderRadius: e === 3 ? "100%" : "12",
-    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1",
+    title: "Song Title ".repeat(e),
+    isPlaying: e == 3,
+    subtitle: "Song Subtitle ".repeat(e * 2)
   })))));
 }
