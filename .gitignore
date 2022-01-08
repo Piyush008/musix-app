@@ -7,7 +7,7 @@
 node_modules/
 dist/
 build/
-
+.keys
 # Compiled Java class files
 *.class
 
