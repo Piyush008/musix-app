@@ -8,6 +8,7 @@ function BigCard({
   imageBorderRadius,
   title,
   subtitle,
+  cardHeight,
   onClick,
   onPlayClick,
   isPlaying,
@@ -16,7 +17,7 @@ function BigCard({
   return (
     <Box
       width={pxToAll(190)}
-      height={pxToAll(268)}
+      height={cardHeight}
       bgColor="blackAlpha.200"
       borderRadius="4"
       padding="2.5"
@@ -42,6 +43,7 @@ function BigCard({
             padding="8px !important"
             top="-2.2rem"
             left="4rem"
+            color="white"
             _hover={{ bgColor: "blackAlpha.700", transform: "scale(1.2,1.2)" }}
             icon={isPlaying ? <FaPause /> : <FaPlay />}
           />
@@ -65,6 +67,7 @@ function BigCard({
 }
 
 BigCard.defaultProps = {
+  height: pxToAll(268),
   imageBorderRadius: "4",
 };
 

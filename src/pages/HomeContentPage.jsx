@@ -32,6 +32,36 @@ export default function HomeContentPage() {
           />
         ))}
       </HStack>
+      <HStack width="100%">
+        {[1, 2, 3].map((e) => (
+          <BigCard
+            imageBorderRadius={e === 3 ? "100%" : "12"}
+            imageSource={
+              "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+            }
+          />
+        ))}
+      </HStack>
+      <HStack width="100%">
+        {[1, 2, 3].map((e) => (
+          <BigCard
+            imageBorderRadius={e === 3 ? "100%" : "12"}
+            imageSource={
+              "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+            }
+          />
+        ))}
+      </HStack>
+      <HStack width="100%">
+        {[1, 2, 3].map((e) => (
+          <BigCard
+            imageBorderRadius={e === 3 ? "100%" : "12"}
+            imageSource={
+              "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+            }
+          />
+        ))}
+      </HStack>
     </Flex>
   );
 }
