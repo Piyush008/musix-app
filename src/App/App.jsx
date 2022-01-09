@@ -6,6 +6,7 @@ import NoMatchPage from "../pages/NoMatchPage";
 import ROUTER from "../utils/constants/router.constants.js";
 import SearchContentPage from "../pages/SearchContentPage";
 export default function App() {
+  console.log(import.meta.env);
   const basename = import.meta.env.MODE === "development" ? "/" : "/musix-app";
   return (
     <Router basename={"/"}>
