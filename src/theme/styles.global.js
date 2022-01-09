@@ -14,7 +14,7 @@ const styles = {
         bgGradient:
           props.colorMode === "light"
             ? "linear(to-t, green.200, green.500)"
-            : "linear(to-t,gray.700 70%, blue.700 100%)",
+            : "linear(to-t,brand.secondary 70%, brand.primary 100%)",
       },
     };
   },

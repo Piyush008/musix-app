@@ -1,13 +1,13 @@
-import { pxToAll, pxToRem } from "../../utils/theme.utils";
+import { pxToAll } from "../../utils/theme.utils";
 
 const Button = {
   baseStyle: {
     bg: "shade.primary",
-    borderRadius: pxToRem(25),
+    borderRadius: "25px",
   },
   sizes: {
     md: {
-      fontSize: pxToAll(22),
+      fontSize: pxToAll(18),
       lineHeight: 1.25,
       px: pxToAll(15),
       py: pxToAll(10),
@@ -17,7 +17,7 @@ const Button = {
   },
   variants: {
     normal: {
-      boxShadow: `0 0 ${pxToRem(5)} rgba(0,0,0, 0.36)`,
+      boxShadow: `0 0 5px rgba(0,0,0, 0.36)`,
       transitionProperty: "initial",
       _active: {
         px: pxToAll(13.5),

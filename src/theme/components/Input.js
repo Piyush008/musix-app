@@ -24,9 +24,9 @@ const Input = {
     normal: {
       field: {
         bg: "shade.hoverPrimary",
-        borderRadius: pxToRem(25),
+        borderRadius: "25px",
         _focus: {
-          boxShadow: `0 0 ${pxToRem(5)} rgba(0,0,0,0.5)`,
+          boxShadow: `0 0 5px rgba(0,0,0,0.5)`,
         },
       },
     },

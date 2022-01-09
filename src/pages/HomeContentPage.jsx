@@ -5,23 +5,33 @@ import { pxToAll, pxToRem } from "../utils/theme.utils.js";
 
 export default function HomeContentPage() {
   return (
-    <Flex direction={"column"}>
+    <Flex direction={"column"} py={pxToAll(20)} px={pxToAll(30)}>
       <Text textStyle={"h4"} color={"text.secondary"}>
         Good Evening
-        <HStack width="100%">
-          {[1, 2, 3].map((e) => (
-            <BigCard
-              imageBorderRadius={e === 3 ? "100%" : "12"}
-              imageSource={
-                "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
-              }
-              title={"Song Title ".repeat(e)}
-              isPlaying={e == 3}
-              subtitle={"Song Subtitle ".repeat(e * 2)}
-            />
-          ))}
-        </HStack>
       </Text>
+      <HStack width="100%">
+        {[1, 2, 3].map((e) => (
+          <BigCard
+            imageBorderRadius={e === 3 ? "100%" : "12"}
+            imageSource={
+              "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+            }
+            title={"Song Title ".repeat(e)}
+            isPlaying={e == 3}
+            subtitle={"Song Subtitle ".repeat(e * 2)}
+          />
+        ))}
+      </HStack>
+      <HStack width="100%">
+        {[1, 2, 3].map((e) => (
+          <BigCard
+            imageBorderRadius={e === 3 ? "100%" : "12"}
+            imageSource={
+              "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+            }
+          />
+        ))}
+      </HStack>
     </Flex>
   );
 }

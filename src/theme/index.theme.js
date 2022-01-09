@@ -4,7 +4,7 @@ import breakpoints from "./foundations/breakpoints";
 import styles from "./styles.global";
 import CustomItem from "./components/CustomItem";
 import Button from "./components/Button";
-import { pxToAll, pxToRem } from "../utils/theme.utils.js";
+import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
 import colors from "./foundations/colors";
 import Input from "./components/Input";
 const theme = extendTheme({
@@ -19,7 +19,7 @@ const theme = extendTheme({
   layerStyles: {
     selected: {
       bg: "shade.secondary",
-      borderRadius: pxToAll(5),
+      borderRadius: "5px",
       color: "text.secondary",
     },
     iconDisabled: {
@@ -59,6 +59,9 @@ const theme = extendTheme({
     },
     icon: {
       md: {
+        fontSize: pxToAll(24),
+      },
+      sm: {
         fontSize: pxToAll(24),
       },
     },
