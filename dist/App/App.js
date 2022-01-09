@@ -12,7 +12,7 @@ export default function App() {
   console.log(__SNOWPACK_ENV__);
   const basename = __SNOWPACK_ENV__.MODE === "development" ? "/" : "/musix-app";
   return /* @__PURE__ */ React.createElement(Router, {
-    basename: "/"
+    basename
   }, /* @__PURE__ */ React.createElement(Routes, null, /* @__PURE__ */ React.createElement(Route, {
     path: `${ROUTER.HOME}*`,
     element: /* @__PURE__ */ React.createElement(HomePage, null)
