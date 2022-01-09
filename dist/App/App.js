@@ -9,6 +9,7 @@ import NoMatchPage from "../pages/NoMatchPage.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import SearchContentPage from "../pages/SearchContentPage.js";
 export default function App() {
+  console.log(__SNOWPACK_ENV__);
   const basename = __SNOWPACK_ENV__.MODE === "development" ? "/" : "/musix-app";
   return /* @__PURE__ */ React.createElement(Router, {
     basename: "/"
