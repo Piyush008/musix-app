@@ -9,7 +9,7 @@ export default function App() {
   console.log(import.meta.env);
   const basename = import.meta.env.MODE === "development" ? "/" : "/musix-app";
   return (
-    <Router basename={"/"}>
+    <Router basename={basename}>
       <Routes>
         <Route path={`${ROUTER.HOME}*`} element={<HomePage />}>
           <Route index element={<HomeContentPage />} />
