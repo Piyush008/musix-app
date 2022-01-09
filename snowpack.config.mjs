@@ -12,7 +12,7 @@ export default {
     {
       match: "routes",
       src: ".*",
-      dest: "/musix-app/index.html",
+      dest: "/index.html",
     },
   ],
   optimize: {
@@ -22,9 +22,7 @@ export default {
   packageOptions: {
     /* ... */
   },
-  devOptions: {
-    openUrl: "/musix-app/",
-  },
+  devOptions: {},
   buildOptions: {
     clean: true,
     jsxInject: `import React from 'react'`,
