@@ -8,6 +8,7 @@ function BigCard({
   imageBorderRadius,
   title,
   subtitle,
+  cardHeight,
   onClick,
   onPlayClick,
   isPlaying
@@ -15,7 +16,7 @@ function BigCard({
   const [PlayButtonVisble, setPlayButtonVisble] = useState(false);
   return /* @__PURE__ */ React.createElement(Box, {
     width: pxToAll(190),
-    height: pxToAll(268),
+    height: cardHeight,
     bgColor: "blackAlpha.200",
     borderRadius: "4",
     padding: "2.5",
@@ -40,6 +41,7 @@ function BigCard({
     padding: "8px !important",
     top: "-2.2rem",
     left: "4rem",
+    color: "white",
     _hover: {bgColor: "blackAlpha.700", transform: "scale(1.2,1.2)"},
     icon: isPlaying ? /* @__PURE__ */ React.createElement(FaPause, null) : /* @__PURE__ */ React.createElement(FaPlay, null)
   }))), /* @__PURE__ */ React.createElement(Box, {
@@ -56,6 +58,7 @@ function BigCard({
   }, subtitle)));
 }
 BigCard.defaultProps = {
+  height: pxToAll(268),
   imageBorderRadius: "4"
 };
 export default BigCard;

@@ -24,5 +24,20 @@ export default function HomeContentPage() {
   }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
     imageBorderRadius: e === 3 ? "100%" : "12",
     imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+  }))), /* @__PURE__ */ React.createElement(HStack, {
+    width: "100%"
+  }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
+    imageBorderRadius: e === 3 ? "100%" : "12",
+    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+  }))), /* @__PURE__ */ React.createElement(HStack, {
+    width: "100%"
+  }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
+    imageBorderRadius: e === 3 ? "100%" : "12",
+    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
+  }))), /* @__PURE__ */ React.createElement(HStack, {
+    width: "100%"
+  }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
+    imageBorderRadius: e === 3 ? "100%" : "12",
+    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
   }))));
 }

@@ -37,9 +37,7 @@ export default function DesktopSideBar() {
       bg: "shade.primary",
       minW: pxToAll(230),
       pr: pxToAll(10),
-      boxShadow: `0 0 5px rgba(0,0,0, 0.36)`,
-      borderBottomRightRadius: "10px",
-      borderTopRightRadius: "10px"
+      boxShadow: `0 0 5px rgba(0,0,0, 0.36)`
     }, /* @__PURE__ */ React.createElement(Box, {
       my: pxToAll(30),
       ml: pxToAll(20)

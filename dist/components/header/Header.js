@@ -26,16 +26,25 @@ import useAgent from "../../hooks/useAgent.js";
 import {Route, Routes} from "../../../_snowpack/pkg/react-router-dom.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import AgentDetect from "../util/AgentDetect.js";
-export default function Header() {
-  return /* @__PURE__ */ React.createElement(HStack, {
-    justifyContent: "space-between",
+export default function Header({headerOpacity}) {
+  return /* @__PURE__ */ React.createElement(Box, {
     h: pxToAll(80),
-    alignItems: "center",
     pos: "sticky",
     top: "0",
     zIndex: "1",
-    right: "0",
+    right: "0"
+  }, /* @__PURE__ */ React.createElement(Box, {
+    position: "relative"
+  }, /* @__PURE__ */ React.createElement(Box, {
+    position: "absolute",
+    width: "100%",
+    height: pxToAll(80),
     bg: "brand.primary",
+    opacity: headerOpacity,
+    zIndex: "-1"
+  }), /* @__PURE__ */ React.createElement(HStack, {
+    justifyContent: "space-between",
+    alignItems: "center",
     px: pxToAll(30),
     py: pxToAll(20)
   }, /* @__PURE__ */ React.createElement(AgentDetect, {
@@ -61,5 +70,5 @@ export default function Header() {
         })
       }), /* @__PURE__ */ React.createElement(Input, null))
     })))
-  }), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Button, null, "Enter Musix")));
+  }), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Button, null, "Enter Musix")))));
 }
