@@ -5,7 +5,7 @@ const Button = {
     bg: "shade.primary",
     borderRadius: "25px",
     pos: "relative",
-    cursor: "none",
+    cursor: "auto",
   },
   sizes: {
     md: {

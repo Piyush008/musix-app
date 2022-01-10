@@ -15,6 +15,11 @@ const theme = extendTheme({
     CustomItem,
     Button,
     Input,
+    Text: {
+      baseStyle: {
+        userSelect: "none",
+      },
+    },
   },
   layerStyles: {
     selected: {

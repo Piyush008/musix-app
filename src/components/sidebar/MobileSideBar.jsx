@@ -38,9 +38,7 @@ export default function MobileSideBar() {
         onClick={() => handleNavigate(ROUTER.HOME)}
       >
         <Icon as={MdHome} textStyle={"icon.sm"} />
-        <Box>
-          <Text>Home</Text>
-        </Box>
+        <Text>Home</Text>
       </CustomItem>
       <CustomItem
         variant="tab"

@@ -7,7 +7,7 @@ export default function MusixPlayer() {
   return (
     <HStack
       justify={"space-evenly"}
-      height={pxToAll(75)}
+      height={pxToAll(100)}
       pos={"fixed"}
       bottom={isMobile ? pxToAll(75) : "0"}
       w={"100%"}
