@@ -49,7 +49,7 @@ const CustomItem = {
           top: 0,
           bottom: 0,
           opacity: 0,
-          transition: "all 0.5s cubic-bezier(.13,.94,.13,.95)",
+          transition: "all .25s cubic-bezier(.13,.94,.13,.95)",
         },
       },
     },
