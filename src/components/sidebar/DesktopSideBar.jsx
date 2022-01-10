@@ -72,7 +72,7 @@ export default function DesktopSideBar() {
               Create Playlist
             </CustomItem>
             <CustomItem>
-              <ListIcon as={FcLike} textStyle={"iconMd"} />
+              <ListIcon as={FcLike} textStyle={"icon.md"} />
               Liked Songs
             </CustomItem>
           </List>

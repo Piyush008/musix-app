@@ -28,7 +28,7 @@ export default function HomePage() {
           ref={ref}
           direction={"column"}
           width={"100%"}
-          height={`calc(100vh - ${pxToRem(100)})`}
+          height={`calc(100vh - ${pxToRem(75)})`}
           minHeight={"unset"}
           overflow={"auto"}
           onScroll={() =>

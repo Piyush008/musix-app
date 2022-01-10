@@ -24,7 +24,7 @@ export default function MobileSideBar() {
   return (
     <HStack
       justify={"space-evenly"}
-      height={pxToAll(100)}
+      height={pxToAll(75)}
       pos={"fixed"}
       bottom={"0"}
       w={"100%"}
@@ -38,7 +38,9 @@ export default function MobileSideBar() {
         onClick={() => handleNavigate(ROUTER.HOME)}
       >
         <Icon as={MdHome} textStyle={"icon.sm"} />
-        <Text>Home</Text>
+        <Box>
+          <Text>Home</Text>
+        </Box>
       </CustomItem>
       <CustomItem
         variant="tab"

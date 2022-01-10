@@ -22,7 +22,7 @@ export const pxToRemXl = (px) => {
   const remValue = (px * 100) / (1440 + 596 + 298);
   return `${remValue}rem`;
 };
-const funcArr = (px) => [pxToRemSm(px / 2), null, pxToRem(px)];
+const funcArr = (px) => [pxToRemSm(px / 1.5), null, pxToRem(px)];
 
 export const pxToAll = (px, defaultValue = 2) => {
   return funcArr(px);
