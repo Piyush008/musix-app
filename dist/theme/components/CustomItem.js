@@ -2,11 +2,7 @@ import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 
 const CustomItem = {
   baseStyle: {
-    _hover: {
-      transition: "color 0.5s",
-      color: "text.secondary",
-      cursor: "pointer",
-    },
+    pos: "relative",
   },
   sizes: {
     md: {
@@ -15,24 +11,46 @@ const CustomItem = {
       p: pxToAll(10),
     },
     sm: {
-      fontSize: pxToAll(16),
+      fontSize: pxToAll(18),
       fontWeight: "normal",
       lineHeight: 1.25,
+      p: pxToAll(10),
     },
   },
   variants: {
     solid: {
       fontWeight: "bold",
+      cursor: "pointer",
+      _hover: {
+        transition: "color 0.5s",
+        color: "text.secondary",
+      },
     },
     tab: {
       fontWeight: "normal",
-      justifyContent: "center",
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "column",
+      textAlign: "center",
+      _before: {
+        pos: "absolute",
+        overflow: "hidden",
+        top: "50%",
+        left: "50%",
+        bottom: "50%",
+        right: "50%",
+        content: '""',
+        bg: "text.secondary",
+        borderRadius: "50%",
+      },
       _active: {
-        bg: "gray.600",
-        transition: "background 0.5s",
+        transitionProperty: "initial",
+        color: "text.secondary",
+        _before: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          opacity: 0,
+          transition: "all 0.5s cubic-bezier(.13,.94,.13,.95)",
+        },
       },
     },
   },

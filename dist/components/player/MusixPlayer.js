@@ -6,9 +6,9 @@ export default function MusixPlayer() {
   const isMobile = useAgent();
   return /* @__PURE__ */ React.createElement(HStack, {
     justify: "space-evenly",
-    height: pxToAll(100),
+    height: pxToAll(75),
     pos: "fixed",
-    bottom: isMobile ? pxToAll(100) : "0",
+    bottom: isMobile ? pxToAll(75) : "0",
     w: "100%",
     bg: "brand.secondary",
     zIndex: "1",

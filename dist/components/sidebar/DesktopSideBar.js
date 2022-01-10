@@ -66,7 +66,7 @@ export default function DesktopSideBar() {
       textStyle: "icon.md"
     }), "Create Playlist"), /* @__PURE__ */ React.createElement(CustomItem, null, /* @__PURE__ */ React.createElement(ListIcon, {
       as: FcLike,
-      textStyle: "iconMd"
+      textStyle: "icon.md"
     }), "Liked Songs")), /* @__PURE__ */ React.createElement(Divider, {
       orientation: "horizontal",
       colorScheme: "teal",

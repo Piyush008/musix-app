@@ -4,6 +4,8 @@ const Button = {
   baseStyle: {
     bg: "shade.primary",
     borderRadius: "25px",
+    pos: "relative",
+    cursor: "none",
   },
   sizes: {
     md: {
@@ -19,16 +21,34 @@ const Button = {
     normal: {
       boxShadow: `0 0 5px rgba(0,0,0, 0.36)`,
       transitionProperty: "initial",
-      _active: {
-        px: pxToAll(13.5),
-        py: pxToAll(8),
-        boxShadow: "none",
-      },
       _hover: {
         bg: "shade.hoverPrimary",
       },
       _focus: {
         boxShadow: "none",
+      },
+      _before: {
+        pos: "absolute",
+        overflow: "hidden",
+        top: "50%",
+        left: "50%",
+        bottom: "50%",
+        right: "50%",
+        content: '""',
+        bg: "text.secondary",
+        borderRadius: "25px",
+      },
+      _active: {
+        transitionProperty: "initial",
+        color: "text.secondary",
+        _before: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          opacity: 0,
+          transition: "all 0.5s cubic-bezier(.13,.94,.13,.95)",
+        },
       },
     },
   },
