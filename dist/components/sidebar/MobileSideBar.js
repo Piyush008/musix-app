@@ -36,7 +36,7 @@ export default function MobileSideBar() {
   }, /* @__PURE__ */ React.createElement(Icon, {
     as: MdHome,
     textStyle: "icon.sm"
-  }), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Text, null, "Home"))), /* @__PURE__ */ React.createElement(CustomItem, {
+  }), /* @__PURE__ */ React.createElement(Text, null, "Home")), /* @__PURE__ */ React.createElement(CustomItem, {
     variant: "tab",
     size: "sm",
     onClick: () => handleNavigate(ROUTER.SEARCH)
