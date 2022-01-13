@@ -8,16 +8,15 @@ function BigCard({
   imageBorderRadius,
   title,
   subtitle,
-  cardHeight,
   onClick,
   onPlayClick,
   isPlaying,
+  ...otherProps
 }) {
   const [PlayButtonVisble, setPlayButtonVisble] = useState(false);
   return (
     <Box
-      width={pxToAll(190)}
-      height={cardHeight}
+      role="group"
       bgColor="blackAlpha.200"
       borderRadius="4"
       padding="2.5"
@@ -25,6 +24,7 @@ function BigCard({
       _hover={{ bgColor: "whiteAlpha.100" }}
       onMouseEnter={() => setPlayButtonVisble(true)}
       onMouseLeave={() => setPlayButtonVisble(false)}
+      {...otherProps}
     >
       <Box>
         <Image
@@ -32,7 +32,7 @@ function BigCard({
           boxShadow="0 8px 24px rgb(0 0 0 / 50%)"
           src={imageSource}
         />
-        <Box height="0" position="relative">
+        <Box height="0" position="relative" textAlign="right">
           <IconButton
             visibility={PlayButtonVisble ? "visible" : "hidden"}
             fontSize="0.75rem !important"
@@ -41,10 +41,14 @@ function BigCard({
             borderRadius="100%"
             bgColor="green.300"
             padding="8px !important"
-            top="-2.2rem"
-            left="4rem"
+            top={"0rem"}
+            right="0.17rem"
             color="white"
             _hover={{ bgColor: "blackAlpha.700", transform: "scale(1.2,1.2)" }}
+            _groupHover={{
+              top: "-1.75rem",
+              transition: "top 1s visibility 1s",
+            }}
             icon={isPlaying ? <FaPause /> : <FaPlay />}
           />
         </Box>
@@ -67,8 +71,10 @@ function BigCard({
 }
 
 BigCard.defaultProps = {
-  height: pxToAll(268),
   imageBorderRadius: "4",
+  height: "100%",
+  width: "100%",
+  marginTop: "0.7rem",
 };
 
 export default BigCard;
