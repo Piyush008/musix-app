@@ -43,8 +43,11 @@ function BigCard({
     top: "0rem",
     right: "0.17rem",
     color: "white",
-    cursor: "pointer",
-    _hover: {bgColor: "blackAlpha.700", transform: "scale(1.2,1.2)"},
+    _hover: {
+      bgColor: "blackAlpha.700",
+      transform: "scale(1.2,1.2)",
+      cursor: "pointer"
+    },
     _groupHover: {
       top: "-1.75rem",
       transition: "top 1s visibility 1s"
