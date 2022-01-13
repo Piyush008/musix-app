@@ -8,29 +8,30 @@ function BigCard({
   imageBorderRadius,
   title,
   subtitle,
-  cardHeight,
   onClick,
   onPlayClick,
-  isPlaying
+  isPlaying,
+  ...otherProps
 }) {
   const [PlayButtonVisble, setPlayButtonVisble] = useState(false);
   return /* @__PURE__ */ React.createElement(Box, {
-    width: pxToAll(190),
-    height: cardHeight,
+    role: "group",
     bgColor: "blackAlpha.200",
     borderRadius: "4",
     padding: "2.5",
     cursor: "pointer",
     _hover: {bgColor: "whiteAlpha.100"},
     onMouseEnter: () => setPlayButtonVisble(true),
-    onMouseLeave: () => setPlayButtonVisble(false)
+    onMouseLeave: () => setPlayButtonVisble(false),
+    ...otherProps
   }, /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Image, {
     borderRadius: imageBorderRadius,
     boxShadow: "0 8px 24px rgb(0 0 0 / 50%)",
     src: imageSource
   }), /* @__PURE__ */ React.createElement(Box, {
     height: "0",
-    position: "relative"
+    position: "relative",
+    textAlign: "right"
   }, /* @__PURE__ */ React.createElement(IconButton, {
     visibility: PlayButtonVisble ? "visible" : "hidden",
     fontSize: "0.75rem !important",
@@ -39,10 +40,14 @@ function BigCard({
     borderRadius: "100%",
     bgColor: "green.300",
     padding: "8px !important",
-    top: "-2.2rem",
-    left: "4rem",
+    top: "0rem",
+    right: "0.17rem",
     color: "white",
     _hover: {bgColor: "blackAlpha.700", transform: "scale(1.2,1.2)"},
+    _groupHover: {
+      top: "-1.75rem",
+      transition: "top 1s visibility 1s"
+    },
     icon: isPlaying ? /* @__PURE__ */ React.createElement(FaPause, null) : /* @__PURE__ */ React.createElement(FaPlay, null)
   }))), /* @__PURE__ */ React.createElement(Box, {
     paddingTop: pxToAll(16)
@@ -58,7 +63,9 @@ function BigCard({
   }, subtitle)));
 }
 BigCard.defaultProps = {
-  height: pxToAll(268),
-  imageBorderRadius: "4"
+  imageBorderRadius: "4",
+  height: "100%",
+  width: "100%",
+  marginTop: "0.7rem"
 };
 export default BigCard;

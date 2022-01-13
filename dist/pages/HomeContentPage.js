@@ -3,6 +3,7 @@ import {Box, Flex, Grid, GridItem, HStack, Text} from "../../_snowpack/pkg/@chak
 import BigCard from "../components/cards/bigCard/index.js";
 import Header from "../components/header/Header.js";
 import {pxToAll, pxToRem} from "../utils/theme.utils.js";
+import CardRenderer from "../components/cardRenderrer/index.js";
 export default function HomeContentPage() {
   return /* @__PURE__ */ React.createElement(Flex, {
     direction: "column",
@@ -11,33 +12,11 @@ export default function HomeContentPage() {
   }, /* @__PURE__ */ React.createElement(Text, {
     textStyle: "h4",
     color: "text.secondary"
-  }, "Good Evening"), /* @__PURE__ */ React.createElement(HStack, {
-    width: "100%"
-  }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
-    imageBorderRadius: e === 3 ? "100%" : "12",
+  }, "Good Evening"), [1, 2, 3, 4, 5, 6].map((r) => /* @__PURE__ */ React.createElement(CardRenderer, null, [1, 2, 3, 4, 5, 6].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
+    imageBorderRadius: (e + r) % 2 === 1 ? "100%" : "12",
     imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1",
     title: "Song Title ".repeat(e),
-    isPlaying: e == 3,
+    isPlaying: (e + r) % 2 == 1,
     subtitle: "Song Subtitle ".repeat(e * 2)
-  }))), /* @__PURE__ */ React.createElement(HStack, {
-    width: "100%"
-  }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
-    imageBorderRadius: e === 3 ? "100%" : "12",
-    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
-  }))), /* @__PURE__ */ React.createElement(HStack, {
-    width: "100%"
-  }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
-    imageBorderRadius: e === 3 ? "100%" : "12",
-    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
-  }))), /* @__PURE__ */ React.createElement(HStack, {
-    width: "100%"
-  }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
-    imageBorderRadius: e === 3 ? "100%" : "12",
-    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
-  }))), /* @__PURE__ */ React.createElement(HStack, {
-    width: "100%"
-  }, [1, 2, 3].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
-    imageBorderRadius: e === 3 ? "100%" : "12",
-    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
-  }))));
+  })))));
 }
