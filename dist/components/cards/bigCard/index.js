@@ -46,7 +46,8 @@ function BigCard({
     _hover: {bgColor: "blackAlpha.700", transform: "scale(1.2,1.2)"},
     _groupHover: {
       top: "-1.75rem",
-      transition: "top 1s visibility 1s"
+      transition: "top 1s visibility 1s",
+      cursor: "pointer"
     },
     icon: isPlaying ? /* @__PURE__ */ React.createElement(FaPause, null) : /* @__PURE__ */ React.createElement(FaPlay, null)
   }))), /* @__PURE__ */ React.createElement(Box, {
