@@ -48,6 +48,7 @@ function BigCard({
             _groupHover={{
               top: "-1.75rem",
               transition: "top 1s visibility 1s",
+              cursor: "pointer",
             }}
             icon={isPlaying ? <FaPause /> : <FaPlay />}
           />
