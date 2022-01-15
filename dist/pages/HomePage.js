@@ -1,16 +1,33 @@
 import React from "../../_snowpack/pkg/react.js";
-import {Box, Flex, useMediaQuery} from "../../_snowpack/pkg/@chakra-ui/react.js";
+import {Box, Flex, Spinner} from "../../_snowpack/pkg/@chakra-ui/react.js";
 import {useRef, useState} from "../../_snowpack/pkg/react.js";
 import {Outlet} from "../../_snowpack/pkg/react-router-dom.js";
+import {
+  atom,
+  selector,
+  useRecoilCallback,
+  useRecoilValueLoadable
+} from "../../_snowpack/pkg/recoil.js";
 import Header from "../components/header/Header.js";
-import Logo from "../components/logo/Logo.js";
 import MusixPlayer from "../components/player/MusixPlayer.js";
 import DesktopSideBar from "../components/sidebar/DesktopSideBar.js";
 import MobileSideBar from "../components/sidebar/MobileSideBar.js";
 import AgentDetect from "../components/util/AgentDetect.js";
+import CustomSuspense from "../components/util/CustomSuspense.js";
+import {spotifyAuth} from "../utils/spotify.utils.js";
 import {pxToRem} from "../utils/theme.utils.js";
+export const spotifyAuthState = selector({
+  key: "spotifyAuthState",
+  get: async () => {
+    const [token, error] = await spotifyAuth();
+    if (error)
+      throw error;
+    return token;
+  }
+});
 export default function HomePage() {
   const ref = useRef();
+  const spotifyAuthLodableState = useRecoilValueLoadable(spotifyAuthState).state;
   const [headerOpacity, setHeaderOpacity] = useState(0);
   const handleScroll = (scrollTop, scrollHeight) => {
     let opacity = scrollTop / scrollHeight / 0.15;
@@ -20,6 +37,15 @@ export default function HomePage() {
       setHeaderOpacity(1);
     }
   };
+  const spotifyAuthCallback = useRecoilCallback(() => async () => {
+    await spotifyAuth();
+  }, []);
+  React.useEffect(() => {
+    const intervalId = setInterval(spotifyAuthCallback, 3599 * 1e3);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
   return /* @__PURE__ */ React.createElement(Flex, {
     direction: "column",
     wrap: "nowrap"
@@ -49,7 +75,16 @@ export default function HomePage() {
     }
   }, /* @__PURE__ */ React.createElement(Header, {
     headerOpacity
-  }), /* @__PURE__ */ React.createElement(Outlet, null))), /* @__PURE__ */ React.createElement(MusixPlayer, null), /* @__PURE__ */ React.createElement(AgentDetect, {
+  }), /* @__PURE__ */ React.createElement(CustomSuspense, {
+    fallback: /* @__PURE__ */ React.createElement(Box, {
+      pos: "relative",
+      top: "30%",
+      textAlign: "center"
+    }, /* @__PURE__ */ React.createElement(Spinner, {
+      size: "lg"
+    })),
+    state: spotifyAuthLodableState
+  }, /* @__PURE__ */ React.createElement(Outlet, null)))), /* @__PURE__ */ React.createElement(MusixPlayer, null), /* @__PURE__ */ React.createElement(AgentDetect, {
     mobileComponent: /* @__PURE__ */ React.createElement(MobileSideBar, null),
     desktopComponent: /* @__PURE__ */ React.createElement(Box, null)
   }));

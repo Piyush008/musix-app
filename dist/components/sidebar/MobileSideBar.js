@@ -14,9 +14,8 @@ import CustomItem from "../util/CustomItem.js";
 export default function MobileSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const params = useParams();
-  console.log(params);
   const pathName = location.pathname;
+  console.log(pathName);
   const handleNavigate = (path) => {
     navigate(path);
   };
@@ -32,14 +31,16 @@ export default function MobileSideBar() {
   }, /* @__PURE__ */ React.createElement(CustomItem, {
     variant: "tab",
     size: "sm",
-    onClick: () => handleNavigate(ROUTER.HOME)
+    onClick: () => handleNavigate(ROUTER.HOME),
+    layerStyle: pathName == ROUTER.HOME && "iconActive"
   }, /* @__PURE__ */ React.createElement(Icon, {
     as: MdHome,
     textStyle: "icon.sm"
   }), /* @__PURE__ */ React.createElement(Text, null, "Home")), /* @__PURE__ */ React.createElement(CustomItem, {
     variant: "tab",
     size: "sm",
-    onClick: () => handleNavigate(ROUTER.SEARCH)
+    onClick: () => handleNavigate(ROUTER.SEARCH),
+    layerStyle: pathName.includes(`/${ROUTER.SEARCH}`) && "iconActive"
   }, /* @__PURE__ */ React.createElement(Icon, {
     as: MdSearch,
     textStyle: "icon.sm"

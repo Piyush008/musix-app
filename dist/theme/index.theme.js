@@ -33,7 +33,6 @@ const theme = extendTheme({
     },
     iconActive: {
       color: "text.secondary",
-      cursor: "pointer",
     },
   },
   textStyles: {

@@ -1,5 +1,5 @@
 import { c as createCommonjsModule, r as react, a as commonjsGlobal } from '../common/index-210ebed7.js';
-import { _ as _extends$c } from '../common/extends-7477639a.js';
+import { _ as _extends$b } from '../common/extends-7477639a.js';
 import '../common/index-86457145.js';
 
 /*
@@ -1313,7 +1313,7 @@ var getTheme = function getTheme(outerTheme, theme) {
     return mergedTheme;
   }
 
-  return _extends$c({}, outerTheme, theme);
+  return _extends$b({}, outerTheme, theme);
 };
 
 var createCacheWithTheme = /* #__PURE__ */weakMemoize(function (outerTheme) {
@@ -6575,7 +6575,7 @@ var createStyled = function createStyled(tag, options) {
     });
 
     Styled.withComponent = function (nextTag, nextOptions) {
-      return createStyled(nextTag, _extends$c({}, options, nextOptions, {
+      return createStyled(nextTag, _extends$b({}, options, nextOptions, {
         shouldForwardProp: composeShouldForwardProps(Styled, nextOptions, true)
       })).apply(void 0, styles);
     };
@@ -12408,214 +12408,6 @@ var Image$1 = /*#__PURE__*/forwardRef(function (props, ref) {
   }, shared));
 });
 
-function _objectWithoutPropertiesLoose$4(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-
-  return target;
-}
-
-function _extends$6() {
-  _extends$6 = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends$6.apply(this, arguments);
-}
-
-var _excluded$1$1 = ["name", "getInitials"],
-    _excluded2$2 = ["src", "name", "showBorder", "borderRadius", "onError", "getInitials", "icon", "iconLabel", "loading", "children", "borderColor", "ignoreFallback"];
-
-function initials(name) {
-  var _name$split = name.split(" "),
-      firstName = _name$split[0],
-      lastName = _name$split[1];
-
-  return firstName && lastName ? "" + firstName.charAt(0) + lastName.charAt(0) : firstName.charAt(0);
-}
-
-/**
- * The avatar name container
- */
-var AvatarName = function AvatarName(props) {
-  var name = props.name,
-      getInitials = props.getInitials,
-      rest = _objectWithoutPropertiesLoose$4(props, _excluded$1$1);
-
-  var styles = useStyles();
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$6({
-    role: "img",
-    "aria-label": name
-  }, rest, {
-    __css: styles.label
-  }), name ? getInitials == null ? void 0 : getInitials(name) : null);
-};
-/**
- * Fallback avatar react component.
- * This should be a generic svg used to represent an avatar
- */
-
-
-var DefaultIcon = function DefaultIcon(props) {
-  return /*#__PURE__*/react.createElement(chakra.svg, _extends$6({
-    viewBox: "0 0 128 128",
-    color: "#fff",
-    width: "100%",
-    height: "100%",
-    className: "chakra-avatar__svg"
-  }, props), /*#__PURE__*/react.createElement("path", {
-    fill: "currentColor",
-    d: "M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.768 25,101.7892 L25,95.2 C25,86.8096 31.981,80 40.6,80 L87.4,80 C96.019,80 103,86.8096 103,95.2 L103,102.1388 Z"
-  }), /*#__PURE__*/react.createElement("path", {
-    fill: "currentColor",
-    d: "M63.9961647,24 C51.2938136,24 41,34.2938136 41,46.9961647 C41,59.7061864 51.2938136,70 63.9961647,70 C76.6985159,70 87,59.7061864 87,46.9961647 C87,34.2938136 76.6985159,24 63.9961647,24"
-  }));
-};
-
-var baseStyle$E = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  textTransform: "uppercase",
-  fontWeight: "medium",
-  position: "relative",
-  flexShrink: 0
-};
-
-/**
- * Avatar component that renders an user avatar with
- * support for fallback avatar and name-only avatars
- */
-var Avatar$1 = /*#__PURE__*/forwardRef(function (props, ref) {
-  var styles = useMultiStyleConfig("Avatar", props);
-
-  var _omitThemingProps = omitThemingProps(props),
-      src = _omitThemingProps.src,
-      name = _omitThemingProps.name,
-      showBorder = _omitThemingProps.showBorder,
-      _omitThemingProps$bor = _omitThemingProps.borderRadius,
-      borderRadius = _omitThemingProps$bor === void 0 ? "full" : _omitThemingProps$bor,
-      onError = _omitThemingProps.onError,
-      _omitThemingProps$get = _omitThemingProps.getInitials,
-      getInitials = _omitThemingProps$get === void 0 ? initials : _omitThemingProps$get,
-      _omitThemingProps$ico = _omitThemingProps.icon,
-      icon = _omitThemingProps$ico === void 0 ? /*#__PURE__*/react.createElement(DefaultIcon, null) : _omitThemingProps$ico,
-      _omitThemingProps$ico2 = _omitThemingProps.iconLabel,
-      iconLabel = _omitThemingProps$ico2 === void 0 ? " avatar" : _omitThemingProps$ico2,
-      loading = _omitThemingProps.loading,
-      children = _omitThemingProps.children,
-      borderColor = _omitThemingProps.borderColor,
-      ignoreFallback = _omitThemingProps.ignoreFallback,
-      rest = _objectWithoutPropertiesLoose$4(_omitThemingProps, _excluded2$2);
-
-  var avatarStyles = _extends$6({
-    borderRadius: borderRadius,
-    borderWidth: showBorder ? "2px" : undefined
-  }, baseStyle$E, styles.container);
-
-  if (borderColor) {
-    avatarStyles.borderColor = borderColor;
-  }
-
-  return /*#__PURE__*/react.createElement(chakra.span, _extends$6({
-    ref: ref
-  }, rest, {
-    className: cx("chakra-avatar", props.className),
-    __css: avatarStyles
-  }), /*#__PURE__*/react.createElement(StylesProvider, {
-    value: styles
-  }, /*#__PURE__*/react.createElement(AvatarImage, {
-    src: src,
-    loading: loading,
-    onError: onError,
-    getInitials: getInitials,
-    name: name,
-    borderRadius: borderRadius,
-    icon: icon,
-    iconLabel: iconLabel,
-    ignoreFallback: ignoreFallback
-  }), children));
-});
-
-var AvatarImage = function AvatarImage(props) {
-  var src = props.src,
-      onError = props.onError,
-      getInitials = props.getInitials,
-      name = props.name,
-      borderRadius = props.borderRadius,
-      loading = props.loading,
-      iconLabel = props.iconLabel,
-      _props$icon = props.icon,
-      icon = _props$icon === void 0 ? /*#__PURE__*/react.createElement(DefaultIcon, null) : _props$icon,
-      ignoreFallback = props.ignoreFallback;
-  /**
-   * use the image hook to only show the image when it has loaded
-   */
-
-  var status = useImage({
-    src: src,
-    onError: onError,
-    ignoreFallback: ignoreFallback
-  });
-  var hasLoaded = status === "loaded";
-  /**
-   * Fallback avatar applies under 2 conditions:
-   * - If `src` was passed and the image has not loaded or failed to load
-   * - If `src` wasn't passed
-   *
-   * In this case, we'll show either the name avatar or default avatar
-   */
-
-  var showFallback = !src || !hasLoaded;
-
-  if (showFallback) {
-    return name ? /*#__PURE__*/react.createElement(AvatarName, {
-      className: "chakra-avatar__initials",
-      getInitials: getInitials,
-      name: name
-    }) : /*#__PURE__*/react.cloneElement(icon, {
-      role: "img",
-      "aria-label": iconLabel
-    });
-  }
-  /**
-   * If `src` was passed and the image has loaded, we'll show it
-   */
-
-
-  return /*#__PURE__*/react.createElement(chakra.img, {
-    src: src,
-    alt: name,
-    className: "chakra-avatar__img",
-    loading: loading,
-    __css: {
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-      borderRadius: borderRadius
-    }
-  });
-};
-
 /**
  * Styles to visually hide an element
  * but make it accessible to screen-readers
@@ -12650,8 +12442,8 @@ var VisuallyHiddenInput = chakra("input", {
   baseStyle: visuallyHiddenStyle
 });
 
-function _extends$7() {
-  _extends$7 = Object.assign || function (target) {
+function _extends$6() {
+  _extends$6 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12665,10 +12457,10 @@ function _extends$7() {
     return target;
   };
 
-  return _extends$7.apply(this, arguments);
+  return _extends$6.apply(this, arguments);
 }
 
-function _objectWithoutPropertiesLoose$5(source, excluded) {
+function _objectWithoutPropertiesLoose$4(source, excluded) {
   if (source == null) return {};
   var target = {};
   var sourceKeys = Object.keys(source);
@@ -12712,11 +12504,11 @@ var Spinner$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       _omitThemingProps$emp = _omitThemingProps.emptyColor,
       emptyColor = _omitThemingProps$emp === void 0 ? "transparent" : _omitThemingProps$emp,
       className = _omitThemingProps.className,
-      rest = _objectWithoutPropertiesLoose$5(_omitThemingProps, _excluded$5);
+      rest = _objectWithoutPropertiesLoose$4(_omitThemingProps, _excluded$5);
 
   var _className = cx("chakra-spinner", className);
 
-  var spinnerStyles = _extends$7({
+  var spinnerStyles = _extends$6({
     display: "inline-block",
     borderColor: "currentColor",
     borderStyle: "solid",
@@ -12727,14 +12519,14 @@ var Spinner$1 = /*#__PURE__*/forwardRef(function (props, ref) {
     animation: spin + " " + speed + " linear infinite"
   }, styles);
 
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$7({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$6({
     ref: ref,
     __css: spinnerStyles,
     className: _className
   }, rest), label && /*#__PURE__*/react.createElement(VisuallyHidden, null, label));
 });
 
-function _objectWithoutPropertiesLoose$6(source, excluded) {
+function _objectWithoutPropertiesLoose$5(source, excluded) {
   if (source == null) return {};
   var target = {};
   var sourceKeys = Object.keys(source);
@@ -12749,8 +12541,8 @@ function _objectWithoutPropertiesLoose$6(source, excluded) {
   return target;
 }
 
-function _extends$8() {
-  _extends$8 = Object.assign || function (target) {
+function _extends$7() {
+  _extends$7 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12764,7 +12556,7 @@ function _extends$8() {
     return target;
   };
 
-  return _extends$8.apply(this, arguments);
+  return _extends$7.apply(this, arguments);
 }
 
 var _createContext$3 = createContext({
@@ -12786,7 +12578,7 @@ var ButtonSpinner = function ButtonSpinner(props) {
   }) : _props$children,
       className = props.className,
       __css = props.__css,
-      rest = _objectWithoutPropertiesLoose$6(props, _excluded$3$1);
+      rest = _objectWithoutPropertiesLoose$5(props, _excluded$3$1);
 
   var _className = cx("chakra-button__spinner", className);
 
@@ -12794,13 +12586,13 @@ var ButtonSpinner = function ButtonSpinner(props) {
   var spinnerStyles = react.useMemo(function () {
     var _extends2;
 
-    return _extends$8((_extends2 = {
+    return _extends$7((_extends2 = {
       display: "flex",
       alignItems: "center",
       position: label ? "relative" : "absolute"
     }, _extends2[marginProp] = label ? "0.5rem" : 0, _extends2.fontSize = "1em", _extends2.lineHeight = "normal", _extends2), __css);
   }, [__css, label, marginProp]);
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$8({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$7({
     className: _className
   }, rest, {
     __css: spinnerStyles
@@ -12811,7 +12603,7 @@ var _excluded$2$1 = ["children", "className"];
 var ButtonIcon = function ButtonIcon(props) {
   var children = props.children,
       className = props.className,
-      rest = _objectWithoutPropertiesLoose$6(props, _excluded$2$1);
+      rest = _objectWithoutPropertiesLoose$5(props, _excluded$2$1);
 
   var _children = /*#__PURE__*/react.isValidElement(children) ? /*#__PURE__*/react.cloneElement(children, {
     "aria-hidden": true,
@@ -12820,7 +12612,7 @@ var ButtonIcon = function ButtonIcon(props) {
 
   var _className = cx("chakra-button__icon", className);
 
-  return /*#__PURE__*/react.createElement(chakra.span, _extends$8({
+  return /*#__PURE__*/react.createElement(chakra.span, _extends$7({
     display: "inline-flex",
     alignSelf: "center",
     flexShrink: 0
@@ -12845,10 +12637,10 @@ function useButtonType(value) {
   };
 }
 
-var _excluded$1$2 = ["isDisabled", "isLoading", "isActive", "isFullWidth", "children", "leftIcon", "rightIcon", "loadingText", "iconSpacing", "type", "spinner", "spinnerPlacement", "className", "as"];
+var _excluded$1$1 = ["isDisabled", "isLoading", "isActive", "isFullWidth", "children", "leftIcon", "rightIcon", "loadingText", "iconSpacing", "type", "spinner", "spinnerPlacement", "className", "as"];
 var Button$1 = /*#__PURE__*/forwardRef(function (props, ref) {
   var group = useButtonGroup();
-  var styles = useStyleConfig("Button", _extends$8({}, group, props));
+  var styles = useStyleConfig("Button", _extends$7({}, group, props));
 
   var _omitThemingProps = omitThemingProps(props),
       _omitThemingProps$isD = _omitThemingProps.isDisabled,
@@ -12868,7 +12660,7 @@ var Button$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       spinnerPlacement = _omitThemingProps$spi === void 0 ? "start" : _omitThemingProps$spi,
       className = _omitThemingProps.className,
       as = _omitThemingProps.as,
-      rest = _objectWithoutPropertiesLoose$6(_omitThemingProps, _excluded$1$2);
+      rest = _objectWithoutPropertiesLoose$5(_omitThemingProps, _excluded$1$1);
   /**
    * When button is used within ButtonGroup (i.e flushed with sibling buttons),
    * it is important to add a `zIndex` on focus.
@@ -12884,7 +12676,7 @@ var Button$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       zIndex: 1
     });
 
-    return _extends$8({
+    return _extends$7({
       display: "inline-flex",
       appearance: "none",
       alignItems: "center",
@@ -12910,7 +12702,7 @@ var Button$1 = /*#__PURE__*/forwardRef(function (props, ref) {
     iconSpacing: iconSpacing,
     children: children
   };
-  return /*#__PURE__*/react.createElement(chakra.button, _extends$8({
+  return /*#__PURE__*/react.createElement(chakra.button, _extends$7({
     disabled: isDisabled || isLoading,
     ref: useMergeRefs(ref, _ref),
     as: as,
@@ -12950,7 +12742,7 @@ var IconButton = /*#__PURE__*/forwardRef(function (props, ref) {
       children = props.children,
       isRound = props.isRound,
       ariaLabel = props["aria-label"],
-      rest = _objectWithoutPropertiesLoose$6(props, _excluded$6);
+      rest = _objectWithoutPropertiesLoose$5(props, _excluded$6);
   /**
    * Passing the icon as prop or children should work
    */
@@ -12963,7 +12755,7 @@ var IconButton = /*#__PURE__*/forwardRef(function (props, ref) {
     focusable: false
   }) : null;
 
-  return /*#__PURE__*/react.createElement(Button$1, _extends$8({
+  return /*#__PURE__*/react.createElement(Button$1, _extends$7({
     padding: "0",
     borderRadius: isRound ? "full" : undefined,
     ref: ref,
@@ -12971,8 +12763,8 @@ var IconButton = /*#__PURE__*/forwardRef(function (props, ref) {
   }, rest), _children);
 });
 
-function _extends$9() {
-  _extends$9 = Object.assign || function (target) {
+function _extends$8() {
+  _extends$8 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12986,10 +12778,10 @@ function _extends$9() {
     return target;
   };
 
-  return _extends$9.apply(this, arguments);
+  return _extends$8.apply(this, arguments);
 }
 
-function _objectWithoutPropertiesLoose$7(source, excluded) {
+function _objectWithoutPropertiesLoose$6(source, excluded) {
   if (source == null) return {};
   var target = {};
   var sourceKeys = Object.keys(source);
@@ -13010,8 +12802,8 @@ var _createContext$4 = createContext({
 }),
     useFormControlContext = _createContext$4[1];
 
-var _excluded$1$3 = ["isDisabled", "isInvalid", "isReadOnly", "isRequired"],
-    _excluded2$3 = ["id", "disabled", "readOnly", "required", "isRequired", "isInvalid", "isReadOnly", "isDisabled", "onFocus", "onBlur"];
+var _excluded$1$2 = ["isDisabled", "isInvalid", "isReadOnly", "isRequired"],
+    _excluded2$2 = ["id", "disabled", "readOnly", "required", "isRequired", "isInvalid", "isReadOnly", "isDisabled", "onFocus", "onBlur"];
 
 /**
  * React hook that provides the props that should be spread on to
@@ -13028,9 +12820,9 @@ function useFormControl(props) {
       isInvalid = _useFormControlProps.isInvalid,
       isReadOnly = _useFormControlProps.isReadOnly,
       isRequired = _useFormControlProps.isRequired,
-      rest = _objectWithoutPropertiesLoose$7(_useFormControlProps, _excluded$1$3);
+      rest = _objectWithoutPropertiesLoose$6(_useFormControlProps, _excluded$1$2);
 
-  return _extends$9({}, rest, {
+  return _extends$8({}, rest, {
     disabled: isDisabled,
     readOnly: isReadOnly,
     required: isRequired,
@@ -13058,7 +12850,7 @@ function useFormControlProps(props) {
       isDisabled = props.isDisabled,
       onFocus = props.onFocus,
       onBlur = props.onBlur,
-      rest = _objectWithoutPropertiesLoose$7(props, _excluded2$3);
+      rest = _objectWithoutPropertiesLoose$6(props, _excluded2$2);
 
   var labelIds = props["aria-describedby"] ? [props["aria-describedby"]] : []; // Error message must be described first in all scenarios.
 
@@ -13070,7 +12862,7 @@ function useFormControlProps(props) {
     labelIds.push(field.helpTextId);
   }
 
-  return _extends$9({}, rest, {
+  return _extends$8({}, rest, {
     "aria-describedby": labelIds.join(" ") || undefined,
     id: id != null ? id : field == null ? void 0 : field.id,
     isDisabled: (_ref = disabled != null ? disabled : isDisabled) != null ? _ref : field == null ? void 0 : field.isDisabled,
@@ -13082,8 +12874,8 @@ function useFormControlProps(props) {
   });
 }
 
-function _extends$a() {
-  _extends$a = Object.assign || function (target) {
+function _extends$9() {
+  _extends$9 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -13097,7 +12889,7 @@ function _extends$a() {
     return target;
   };
 
-  return _extends$a.apply(this, arguments);
+  return _extends$9.apply(this, arguments);
 }
 
 /**
@@ -13112,7 +12904,7 @@ var Input$1 = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-input", props.className);
 
-  return /*#__PURE__*/react.createElement(chakra.input, _extends$a({}, input, {
+  return /*#__PURE__*/react.createElement(chakra.input, _extends$9({}, input, {
     __css: styles.field,
     ref: ref,
     className: _className
@@ -13122,7 +12914,7 @@ var Input$1 = /*#__PURE__*/forwardRef(function (props, ref) {
 
 Input$1.id = "Input";
 
-function _objectWithoutPropertiesLoose$8(source, excluded) {
+function _objectWithoutPropertiesLoose$7(source, excluded) {
   if (source == null) return {};
   var target = {};
   var sourceKeys = Object.keys(source);
@@ -13170,14 +12962,14 @@ var InputAddon = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _props$placement = props.placement,
       placement = _props$placement === void 0 ? "left" : _props$placement,
-      rest = _objectWithoutPropertiesLoose$8(props, _excluded$2$2);
+      rest = _objectWithoutPropertiesLoose$7(props, _excluded$2$2);
 
   var placementStyles = (_placements$placement = placements[placement]) != null ? _placements$placement : {};
   var styles = useStyles();
-  return /*#__PURE__*/react.createElement(StyledAddon, _extends$a({
+  return /*#__PURE__*/react.createElement(StyledAddon, _extends$9({
     ref: ref
   }, rest, {
-    __css: _extends$a({}, styles.addon, placementStyles)
+    __css: _extends$9({}, styles.addon, placementStyles)
   }));
 });
 /**
@@ -13188,7 +12980,7 @@ var InputAddon = /*#__PURE__*/forwardRef(function (props, ref) {
 
 
 var InputLeftAddon = /*#__PURE__*/forwardRef(function (props, ref) {
-  return /*#__PURE__*/react.createElement(InputAddon, _extends$a({
+  return /*#__PURE__*/react.createElement(InputAddon, _extends$9({
     ref: ref,
     placement: "left"
   }, props, {
@@ -13205,7 +12997,7 @@ InputLeftAddon.id = "InputLeftAddon";
  */
 
 var InputRightAddon = /*#__PURE__*/forwardRef(function (props, ref) {
-  return /*#__PURE__*/react.createElement(InputAddon, _extends$a({
+  return /*#__PURE__*/react.createElement(InputAddon, _extends$9({
     ref: ref,
     placement: "right"
   }, props, {
@@ -13216,14 +13008,14 @@ var InputRightAddon = /*#__PURE__*/forwardRef(function (props, ref) {
 
 InputRightAddon.id = "InputRightAddon";
 
-var _excluded$1$4 = ["children", "className"];
+var _excluded$1$3 = ["children", "className"];
 var InputGroup = /*#__PURE__*/forwardRef(function (props, ref) {
   var styles = useMultiStyleConfig("Input", props);
 
   var _omitThemingProps = omitThemingProps(props),
       children = _omitThemingProps.children,
       className = _omitThemingProps.className,
-      rest = _objectWithoutPropertiesLoose$8(_omitThemingProps, _excluded$1$4);
+      rest = _objectWithoutPropertiesLoose$7(_omitThemingProps, _excluded$1$3);
 
   var _className = cx("chakra-input__group", className);
 
@@ -13265,7 +13057,7 @@ var InputGroup = /*#__PURE__*/forwardRef(function (props, ref) {
     });
     return child.type.id !== "Input" ? /*#__PURE__*/react.cloneElement(child, theming) : /*#__PURE__*/react.cloneElement(child, Object.assign(theming, groupStyles, child.props));
   });
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$9({
     className: _className,
     ref: ref,
     __css: {
@@ -13279,7 +13071,7 @@ var InputGroup = /*#__PURE__*/forwardRef(function (props, ref) {
 });
 
 var _excluded$7 = ["placement"],
-    _excluded2$4 = ["className"],
+    _excluded2$3 = ["className"],
     _excluded3 = ["className"];
 var StyledElement = chakra("div", {
   baseStyle: {
@@ -13296,13 +13088,13 @@ var InputElement = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _props$placement = props.placement,
       placement = _props$placement === void 0 ? "left" : _props$placement,
-      rest = _objectWithoutPropertiesLoose$8(props, _excluded$7);
+      rest = _objectWithoutPropertiesLoose$7(props, _excluded$7);
 
   var styles = useStyles();
   var input = styles.field;
   var attr = placement === "left" ? "insetStart" : "insetEnd";
   var elementStyles = (_elementStyles = {}, _elementStyles[attr] = "0", _elementStyles.width = (_input$height = input == null ? void 0 : input.height) != null ? _input$height : input == null ? void 0 : input.h, _elementStyles.height = (_input$height2 = input == null ? void 0 : input.height) != null ? _input$height2 : input == null ? void 0 : input.h, _elementStyles.fontSize = input == null ? void 0 : input.fontSize, _elementStyles);
-  return /*#__PURE__*/react.createElement(StyledElement, _extends$a({
+  return /*#__PURE__*/react.createElement(StyledElement, _extends$9({
     ref: ref,
     __css: elementStyles
   }, rest));
@@ -13312,11 +13104,11 @@ InputElement.id = "InputElement";
 
 var InputLeftElement = /*#__PURE__*/forwardRef(function (props, ref) {
   var className = props.className,
-      rest = _objectWithoutPropertiesLoose$8(props, _excluded2$4);
+      rest = _objectWithoutPropertiesLoose$7(props, _excluded2$3);
 
   var _className = cx("chakra-input__left-element", className);
 
-  return /*#__PURE__*/react.createElement(InputElement, _extends$a({
+  return /*#__PURE__*/react.createElement(InputElement, _extends$9({
     ref: ref,
     placement: "left",
     className: _className
@@ -13327,11 +13119,11 @@ InputLeftElement.id = "InputLeftElement";
 
 var InputRightElement = /*#__PURE__*/forwardRef(function (props, ref) {
   var className = props.className,
-      rest = _objectWithoutPropertiesLoose$8(props, _excluded3);
+      rest = _objectWithoutPropertiesLoose$7(props, _excluded3);
 
   var _className = cx("chakra-input__right-element", className);
 
-  return /*#__PURE__*/react.createElement(InputElement, _extends$a({
+  return /*#__PURE__*/react.createElement(InputElement, _extends$9({
     ref: ref,
     placement: "right",
     className: _className
@@ -13340,8 +13132,8 @@ var InputRightElement = /*#__PURE__*/forwardRef(function (props, ref) {
 
 InputRightElement.id = "InputRightElement";
 
-function _extends$b() {
-  _extends$b = Object.assign || function (target) {
+function _extends$a() {
+  _extends$a = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -13355,10 +13147,10 @@ function _extends$b() {
     return target;
   };
 
-  return _extends$b.apply(this, arguments);
+  return _extends$a.apply(this, arguments);
 }
 
-function _objectWithoutPropertiesLoose$9(source, excluded) {
+function _objectWithoutPropertiesLoose$8(source, excluded) {
   if (source == null) return {};
   var target = {};
   var sourceKeys = Object.keys(source);
@@ -13393,17 +13185,17 @@ var Square = /*#__PURE__*/forwardRef(function (props, ref) {
   var size = props.size,
       _props$centerContent = props.centerContent,
       centerContent = _props$centerContent === void 0 ? true : _props$centerContent,
-      rest = _objectWithoutPropertiesLoose$9(props, _excluded$f);
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded$f);
 
   var styles = centerContent ? {
     display: "flex",
     alignItems: "center",
     justifyContent: "center"
   } : {};
-  return /*#__PURE__*/react.createElement(Box, _extends$b({
+  return /*#__PURE__*/react.createElement(Box, _extends$a({
     ref: ref,
     boxSize: size,
-    __css: _extends$b({}, styles, {
+    __css: _extends$a({}, styles, {
       flexShrink: 0,
       flexGrow: 0
     })
@@ -13412,9 +13204,9 @@ var Square = /*#__PURE__*/forwardRef(function (props, ref) {
 
 var Circle = /*#__PURE__*/forwardRef(function (props, ref) {
   var size = props.size,
-      rest = _objectWithoutPropertiesLoose$9(props, _excluded2$5);
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded2$5);
 
-  return /*#__PURE__*/react.createElement(Square, _extends$b({
+  return /*#__PURE__*/react.createElement(Square, _extends$a({
     size: size,
     ref: ref,
     borderRadius: "9999px"
@@ -13436,7 +13228,7 @@ var Center = chakra("div", {
 });
 
 var _excluded$b = ["borderLeftWidth", "borderBottomWidth", "borderTopWidth", "borderRightWidth", "borderWidth", "borderStyle", "borderColor"],
-    _excluded2$4$1 = ["className", "orientation", "__css"];
+    _excluded2$4 = ["className", "orientation", "__css"];
 /**
  * Layout component used to visually separate content in a list or group.
  * It display a thin horizontal or vertical line, and renders a `hr` tag.
@@ -13453,14 +13245,14 @@ var Divider$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       borderWidth = _useStyleConfig.borderWidth,
       borderStyle = _useStyleConfig.borderStyle,
       borderColor = _useStyleConfig.borderColor,
-      styles = _objectWithoutPropertiesLoose$9(_useStyleConfig, _excluded$b);
+      styles = _objectWithoutPropertiesLoose$8(_useStyleConfig, _excluded$b);
 
   var _omitThemingProps = omitThemingProps(props),
       className = _omitThemingProps.className,
       _omitThemingProps$ori = _omitThemingProps.orientation,
       orientation = _omitThemingProps$ori === void 0 ? "horizontal" : _omitThemingProps$ori,
       __css = _omitThemingProps.__css,
-      rest = _objectWithoutPropertiesLoose$9(_omitThemingProps, _excluded2$4$1);
+      rest = _objectWithoutPropertiesLoose$8(_omitThemingProps, _excluded2$4);
 
   var dividerStyles = {
     vertical: {
@@ -13472,11 +13264,11 @@ var Divider$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       width: "100%"
     }
   };
-  return /*#__PURE__*/react.createElement(chakra.hr, _extends$b({
+  return /*#__PURE__*/react.createElement(chakra.hr, _extends$a({
     ref: ref,
     "aria-orientation": orientation
   }, rest, {
-    __css: _extends$b({}, styles, {
+    __css: _extends$a({}, styles, {
       border: "0",
       borderColor: borderColor,
       borderStyle: borderStyle
@@ -13503,7 +13295,7 @@ var Flex = /*#__PURE__*/forwardRef(function (props, ref) {
       basis = props.basis,
       grow = props.grow,
       shrink = props.shrink,
-      rest = _objectWithoutPropertiesLoose$9(props, _excluded$a);
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded$a);
 
   var styles = {
     display: "flex",
@@ -13515,7 +13307,7 @@ var Flex = /*#__PURE__*/forwardRef(function (props, ref) {
     flexGrow: grow,
     flexShrink: shrink
   };
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
     ref: ref,
     __css: styles
   }, rest));
@@ -13545,7 +13337,7 @@ var Grid = /*#__PURE__*/forwardRef(function (props, ref) {
       templateRows = props.templateRows,
       autoColumns = props.autoColumns,
       templateColumns = props.templateColumns,
-      rest = _objectWithoutPropertiesLoose$9(props, _excluded$9);
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded$9);
 
   var styles = {
     display: "grid",
@@ -13562,7 +13354,7 @@ var Grid = /*#__PURE__*/forwardRef(function (props, ref) {
     gridTemplateRows: templateRows,
     gridTemplateColumns: templateColumns
   };
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
     ref: ref,
     __css: styles
   }, rest));
@@ -13581,7 +13373,7 @@ var GridItem = /*#__PURE__*/forwardRef(function (props, ref) {
       rowEnd = props.rowEnd,
       rowSpan = props.rowSpan,
       rowStart = props.rowStart,
-      rest = _objectWithoutPropertiesLoose$9(props, _excluded2$3$1);
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded2$3$1);
 
   var styles = filterUndefined({
     gridColumn: spanFn(colSpan),
@@ -13591,7 +13383,7 @@ var GridItem = /*#__PURE__*/forwardRef(function (props, ref) {
     gridRowStart: rowStart,
     gridRowEnd: rowEnd
   });
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
     ref: ref,
     __css: styles
   }, rest));
@@ -13615,7 +13407,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       styleType = _omitThemingProps$sty === void 0 ? "none" : _omitThemingProps$sty,
       stylePosition = _omitThemingProps.stylePosition,
       spacing = _omitThemingProps.spacing,
-      rest = _objectWithoutPropertiesLoose$9(_omitThemingProps, _excluded$5$1);
+      rest = _objectWithoutPropertiesLoose$8(_omitThemingProps, _excluded$5$1);
 
   var validChildren = getValidChildren(children);
   var selector = "& > *:not(style) ~ *:not(style)";
@@ -13624,7 +13416,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
   }, _ref) : {};
   return /*#__PURE__*/react.createElement(StylesProvider, {
     value: styles
-  }, /*#__PURE__*/react.createElement(chakra.ul, _extends$b({
+  }, /*#__PURE__*/react.createElement(chakra.ul, _extends$a({
     ref: ref,
     listStyleType: styleType,
     listStylePosition: stylePosition
@@ -13634,7 +13426,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
      */
     ,
     role: "list",
-    __css: _extends$b({}, styles.container, spacingStyle)
+    __css: _extends$a({}, styles.container, spacingStyle)
   }, rest), validChildren));
 });
 /**
@@ -13646,7 +13438,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
 
 var ListIcon = /*#__PURE__*/forwardRef(function (props, ref) {
   var styles = useStyles();
-  return /*#__PURE__*/react.createElement(Icon, _extends$b({
+  return /*#__PURE__*/react.createElement(Icon, _extends$a({
     ref: ref,
     role: "presentation"
   }, props, {
@@ -13748,10 +13540,10 @@ function getDividerStyles(options) {
 
 var _excluded$3$2 = ["isInline", "direction", "align", "justify", "spacing", "wrap", "children", "divider", "className", "shouldWrapChildren"];
 var StackItem = function StackItem(props) {
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
     className: "chakra-stack__item"
   }, props, {
-    __css: _extends$b({
+    __css: _extends$a({
       display: "inline-block",
       flex: "0 0 auto",
       minWidth: 0
@@ -13784,7 +13576,7 @@ var Stack = /*#__PURE__*/forwardRef(function (props, ref) {
       divider = props.divider,
       className = props.className,
       shouldWrapChildren = props.shouldWrapChildren,
-      rest = _objectWithoutPropertiesLoose$9(props, _excluded$3$2);
+      rest = _objectWithoutPropertiesLoose$8(props, _excluded$3$2);
 
   var direction = isInline ? "row" : directionProp != null ? directionProp : "column";
   var styles = react.useMemo(function () {
@@ -13826,7 +13618,7 @@ var Stack = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-stack", className);
 
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
     ref: ref,
     display: "flex",
     alignItems: align,
@@ -13843,7 +13635,7 @@ var Stack = /*#__PURE__*/forwardRef(function (props, ref) {
 
 
 var HStack = /*#__PURE__*/forwardRef(function (props, ref) {
-  return /*#__PURE__*/react.createElement(Stack, _extends$b({
+  return /*#__PURE__*/react.createElement(Stack, _extends$a({
     align: "center"
   }, props, {
     direction: "row",
@@ -13862,157 +13654,20 @@ var Text = /*#__PURE__*/forwardRef(function (props, ref) {
   var styles = useStyleConfig("Text", props);
 
   var _omitThemingProps = omitThemingProps(props);
-      var rest = _objectWithoutPropertiesLoose$9(_omitThemingProps, _excluded$2$3);
+      var rest = _objectWithoutPropertiesLoose$8(_omitThemingProps, _excluded$2$3);
 
   var aliasedProps = filterUndefined({
     textAlign: props.align,
     textDecoration: props.decoration,
     textTransform: props.casing
   });
-  return /*#__PURE__*/react.createElement(chakra.p, _extends$b({
+  return /*#__PURE__*/react.createElement(chakra.p, _extends$a({
     ref: ref,
     className: cx("chakra-text", props.className)
   }, aliasedProps, rest, {
     __css: styles
   }));
 });
-
-var _excluded$1$5 = ["spacing", "children", "justify", "direction", "align", "className", "shouldWrapChildren"],
-    _excluded2$1$1 = ["className"];
-
-/**
- * Layout component used to stack elements that differ in length
- * and are liable to wrap.
- *
- * Common use cases:
- * - Buttons that appear together at the end of forms
- * - Lists of tags and chips
- *
- * @see Docs https://chakra-ui.com/wrap
- */
-var Wrap = /*#__PURE__*/forwardRef(function (props, ref) {
-  var _props$spacing = props.spacing,
-      spacing = _props$spacing === void 0 ? "0.5rem" : _props$spacing,
-      children = props.children,
-      justify = props.justify,
-      direction = props.direction,
-      align = props.align,
-      className = props.className,
-      shouldWrapChildren = props.shouldWrapChildren,
-      rest = _objectWithoutPropertiesLoose$9(props, _excluded$1$5);
-
-  var styles = react.useMemo(function () {
-    return {
-      "--chakra-wrap-spacing": function chakraWrapSpacing(theme) {
-        return mapResponsive(spacing, function (value) {
-          return tokenToCSSVar("space", value)(theme);
-        });
-      },
-      "--wrap-spacing": "calc(var(--chakra-wrap-spacing) / 2)",
-      display: "flex",
-      flexWrap: "wrap",
-      justifyContent: justify,
-      alignItems: align,
-      flexDirection: direction,
-      listStyleType: "none",
-      padding: "0",
-      margin: "calc(var(--wrap-spacing) * -1)",
-      "& > *:not(style)": {
-        margin: "var(--wrap-spacing)"
-      }
-    };
-  }, [spacing, justify, align, direction]);
-  var childrenToRender = shouldWrapChildren ? react.Children.map(children, function (child, index) {
-    return /*#__PURE__*/react.createElement(WrapItem, {
-      key: index
-    }, child);
-  }) : children;
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
-    ref: ref,
-    className: cx("chakra-wrap", className)
-  }, rest), /*#__PURE__*/react.createElement(chakra.ul, {
-    className: "chakra-wrap__list",
-    __css: styles
-  }, childrenToRender));
-});
-
-var WrapItem = /*#__PURE__*/forwardRef(function (props, ref) {
-  var className = props.className,
-      rest = _objectWithoutPropertiesLoose$9(props, _excluded2$1$1);
-
-  return /*#__PURE__*/react.createElement(chakra.li, _extends$b({
-    ref: ref,
-    __css: {
-      display: "flex",
-      alignItems: "flex-start"
-    },
-    className: cx("chakra-wrap__listitem", className)
-  }, rest));
-});
-
-var useSafeLayoutEffect$1 = isBrowser$1 ? react.useLayoutEffect : react.useEffect;
-/**
- * React hook that tracks state of a CSS media query
- *
- * @param query the media query to match
- */
-
-function useMediaQuery(query) {
-  var env = useEnvironment();
-  var queries = Array.isArray(query) ? query : [query];
-  var isSupported = isBrowser$1 && "matchMedia" in env.window;
-
-  var _React$useState = react.useState(queries.map(function (query) {
-    return isSupported ? !!env.window.matchMedia(query).matches : false;
-  })),
-      matches = _React$useState[0],
-      setMatches = _React$useState[1]; // Specifying matches in the dependency list will cause the event listeners
-  // to unload and then load each time the dependency changes. This causes
-  // Media Query Events to be missed. The event listeners should only be unloaded
-  // when the component unloads.
-
-
-  useSafeLayoutEffect$1(function () {
-    if (!isSupported) return undefined;
-    var mediaQueryList = queries.map(function (query) {
-      return env.window.matchMedia(query);
-    });
-    var listenerList = mediaQueryList.map(function (_, index) {
-      var listener = function listener(mqlEvent) {
-        var queryIndex = mediaQueryList.findIndex(function (mediaQuery) {
-          return mediaQuery.media === mqlEvent.media;
-        }); // As the event listener is on the media query list, any time the
-        // listener is called, we know there is a change. There's no need
-        // to compare the previous matches with current. Using
-        // setMatches(matches => {...}) provides access to the current matches
-        // state.  Trying to access matches outside the setMatches function
-        // would provide data from the the time of instantiation (stale).
-
-        setMatches(function (matches) {
-          var currentMatches = matches.map(function (x) {
-            return x;
-          });
-          currentMatches[queryIndex] = mqlEvent.matches;
-          return currentMatches;
-        });
-      }; // Listening to the 'change' event on the Media Query List Object
-      // is more performant as the callback is only invoked when a specified
-      // media query is matched. Using addEventListener on the window object
-      // to listen for the resize event will call the callback on every
-      // viewport resize.
-
-
-      mediaQueryList[index].addEventListener("change", listener);
-      return listener;
-    });
-    return function () {
-      mediaQueryList.forEach(function (_, index) {
-        mediaQueryList[index].removeEventListener("change", listenerList[index]);
-      });
-    };
-  }, []);
-  return matches;
-}
 
 var ChakraProvider$1 = ChakraProvider;
 ChakraProvider$1.defaultProps = {
@@ -14084,4 +13739,4 @@ function mergeThemeCustomizer(source, override, key, object) {
   return undefined;
 }
 
-export { Avatar$1 as Avatar, Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, Circle, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftAddon, InputLeftElement, List$1 as List, ListIcon, Text, Wrap, color, extendTheme, useMediaQuery, useStyleConfig };
+export { Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, Circle, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, color, extendTheme, useStyleConfig };

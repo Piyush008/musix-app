@@ -1,27 +1,26 @@
 import { spotifyAxios } from "./axios.utils.js";
 import { SPOTIFY_AUTH } from "./constants/privateKey.constants.js";
-
+var spotifyToken = "";
 export async function spotifyAuth() {
-  let data = undefined,
-    error = undefined;
+  let error = undefined;
   try {
     const resp = await spotifyAxios(SPOTIFY_AUTH).post(
-      "https://accounts.spotify.com/api/token?grant_typ=client_credentials",
+      "https://accounts.spotify.com/api/token?grant_type=client_credentials",
       null,
       { baseURL: "" }
     );
-    data = resp.data;
+    spotifyToken = "Bearer " + resp.data.access_token;
   } catch (e) {
     error = e.toString();
   }
-  return [data, error];
+  return [spotifyToken, error];
 }
 
-const createSpotifyAxiosInstance = async (auth, url, query) => {
+const createSpotifyAxiosInstance = async (url, query) => {
   let data = undefined,
     error = undefined;
   try {
-    const resp = await spotifyAxios(auth).get(url, {
+    const resp = await spotifyAxios(spotifyToken).get(url, {
       params: query,
     });
     data = resp.data;
@@ -31,30 +30,29 @@ const createSpotifyAxiosInstance = async (auth, url, query) => {
   return [data, error];
 };
 
-export const getNewReleases = async (auth, query) =>
-  await createSpotifyAxiosInstance(auth, "/browse/new-releases", query);
+export const getNewReleases = async (query) =>
+  await createSpotifyAxiosInstance("/browse/new-releases", query);
 
-export const getAlbums = async (auth, query) =>
-  await createSpotifyAxiosInstance(auth, "/albums", query);
+export const getAlbums = async (query) =>
+  await createSpotifyAxiosInstance("/albums", query);
 
-export const getAlbumTracks = async (auth, id, query) =>
-  await createSpotifyAxiosInstance(auth, `/albums/${id}/tracks`, query);
+export const getAlbumTracks = async (id, query) =>
+  await createSpotifyAxiosInstance(`/albums/${id}/tracks`, query);
 
-export const getArtists = async (auth, query) =>
-  await createSpotifyAxiosInstance(auth, "/artists", query);
+export const getArtists = async (query) =>
+  await createSpotifyAxiosInstance("/artists", query);
 
-export const getArtistAlbums = async (auth, id, query) =>
-  await createSpotifyAxiosInstance(auth, `/artists/${id}/albums`, query);
+export const getArtistAlbums = async (id, query) =>
+  await createSpotifyAxiosInstance(`/artists/${id}/albums`, query);
 
-export const getArtistTopTracks = async (auth, id, query) =>
-  await createSpotifyAxiosInstance(auth, `/artists/${id}/top-tracks`, query);
+export const getArtistTopTracks = async (id, query) =>
+  await createSpotifyAxiosInstance(`/artists/${id}/top-tracks`, query);
 
-export const getRelatedArtists = async (auth, id, query) =>
-  await createSpotifyAxiosInstance(
-    auth,
-    `/artists/${id}/related-artists`,
-    query
-  );
+export const getRelatedArtists = async (id, query) =>
+  await createSpotifyAxiosInstance(`/artists/${id}/related-artists`, query);
 
-export const getTracks = async (auth, query) =>
-  await createSpotifyAxiosInstance(auth, "/tracks", query);
+export const getTracks = async (query) =>
+  await createSpotifyAxiosInstance("/tracks", query);
+
+export const searchItems = async (query) =>
+  await createSpotifyAxiosInstance("/search", query);
