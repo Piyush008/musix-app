@@ -1,12 +1,4 @@
-import {
-  Box,
-  Divider,
-  Flex,
-  List,
-  ListIcon,
-  useMediaQuery,
-  useStyleConfig,
-} from "@chakra-ui/react";
+import { Box, Divider, Flex, List, ListIcon } from "@chakra-ui/react";
 import {
   MdHome,
   MdLibraryBooks,
@@ -14,19 +6,16 @@ import {
   MdSearch,
 } from "react-icons/md";
 import { FcLike } from "react-icons/fc";
-import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
+import { pxToAll } from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ROUTER from "../../utils/constants/router.constants.js";
-import useAgent from "../../hooks/useAgent.js";
 import AgentDetect from "../util/AgentDetect.jsx";
 import CustomItem from "../util/CustomItem.jsx";
 
 export default function DesktopSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const params = useParams();
-  console.log(params);
   const pathName = location.pathname;
 
   const handleNavigate = (path) => {
@@ -56,7 +45,7 @@ export default function DesktopSideBar() {
             </CustomItem>
             <CustomItem
               onClick={() => handleNavigate(ROUTER.SEARCH)}
-              layerStyle={pathName == `/${ROUTER.SEARCH}` && "selected"}
+              layerStyle={pathName.includes(`/${ROUTER.SEARCH}`) && "selected"}
             >
               <ListIcon as={MdSearch} textStyle={"icon.md"} />
               Search

@@ -14,10 +14,9 @@ import CustomItem from "../util/CustomItem.jsx";
 export default function MobileSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const params = useParams();
-  console.log(params);
   const pathName = location.pathname;
 
+  console.log(pathName);
   const handleNavigate = (path) => {
     navigate(path);
   };
@@ -36,6 +35,7 @@ export default function MobileSideBar() {
         variant="tab"
         size="sm"
         onClick={() => handleNavigate(ROUTER.HOME)}
+        layerStyle={pathName == ROUTER.HOME && "iconActive"}
       >
         <Icon as={MdHome} textStyle={"icon.sm"} />
         <Text>Home</Text>
@@ -44,6 +44,7 @@ export default function MobileSideBar() {
         variant="tab"
         size="sm"
         onClick={() => handleNavigate(ROUTER.SEARCH)}
+        layerStyle={pathName.includes(`/${ROUTER.SEARCH}`) && "iconActive"}
       >
         <Icon as={MdSearch} textStyle={"icon.sm"} />
         <Text textStyle={"label"}>Search</Text>

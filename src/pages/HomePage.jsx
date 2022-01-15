@@ -1,16 +1,34 @@
-import { Box, Flex, useMediaQuery } from "@chakra-ui/react";
+import { Box, Flex, Spinner } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
+import {
+  atom,
+  selector,
+  useRecoilCallback,
+  useRecoilValueLoadable,
+} from "recoil";
 import Header from "../components/header/Header";
-import Logo from "../components/logo/Logo";
 import MusixPlayer from "../components/player/MusixPlayer";
 import DesktopSideBar from "../components/sidebar/DesktopSideBar";
 import MobileSideBar from "../components/sidebar/MobileSideBar";
 import AgentDetect from "../components/util/AgentDetect";
+import CustomSuspense from "../components/util/CustomSuspense";
+import { spotifyAuth } from "../utils/spotify.utils.js";
 import { pxToRem } from "../utils/theme.utils.js";
+
+export const spotifyAuthState = selector({
+  key: "spotifyAuthState",
+  get: async () => {
+    const [token, error] = await spotifyAuth();
+    if (error) throw error;
+    return token;
+  },
+});
 
 export default function HomePage() {
   const ref = useRef();
+  const spotifyAuthLodableState =
+    useRecoilValueLoadable(spotifyAuthState).state;
   const [headerOpacity, setHeaderOpacity] = useState(0);
   const handleScroll = (scrollTop, scrollHeight) => {
     let opacity = scrollTop / scrollHeight / 0.15;
@@ -20,6 +38,20 @@ export default function HomePage() {
       setHeaderOpacity(1);
     }
   };
+
+  const spotifyAuthCallback = useRecoilCallback(
+    () => async () => {
+      await spotifyAuth();
+    },
+    []
+  );
+
+  React.useEffect(() => {
+    const intervalId = setInterval(spotifyAuthCallback, 3599 * 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
   return (
     <Flex direction={"column"} wrap={"nowrap"}>
       <Flex direction={"row"} wrap={"nowrap"} h={"100vh"}>
@@ -48,7 +80,16 @@ export default function HomePage() {
           }}
         >
           <Header headerOpacity={headerOpacity} />
-          <Outlet />
+          <CustomSuspense
+            fallback={
+              <Box pos={"relative"} top={"30%"} textAlign={"center"}>
+                <Spinner size={"lg"} />
+              </Box>
+            }
+            state={spotifyAuthLodableState}
+          >
+            <Outlet />
+          </CustomSuspense>
         </Flex>
       </Flex>
       <MusixPlayer />
