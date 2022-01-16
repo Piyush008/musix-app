@@ -1,4 +1,4 @@
-import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
+import { pxToAll } from "../../utils/theme.utils.js";
 
 const tab = (br = "50%", dur = "0.25") => ({
   textAlign: "center",

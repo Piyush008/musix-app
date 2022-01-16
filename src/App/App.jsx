@@ -5,6 +5,7 @@ import HomeContentPage from "../pages/HomeContentPage";
 import NoMatchPage from "../pages/NoMatchPage";
 import ROUTER from "../utils/constants/router.constants.js";
 import SearchContentPage from "../pages/SearchContentPage";
+import SearchTextContentPage from "../pages/SearchTextContentPage";
 export default function App() {
   console.log(import.meta.env);
   const basename = import.meta.env.MODE === "development" ? "/" : "/musix-app";
@@ -14,7 +15,8 @@ export default function App() {
         <Route path={`${ROUTER.HOME}*`} element={<HomePage />}>
           <Route index element={<HomeContentPage />} />
           <Route path={ROUTER.SEARCH} element={<SearchPage />}>
-            <Route path=":searchText" element={<SearchContentPage />} />
+            <Route index element={<SearchContentPage />} />
+            <Route path=":searchText" element={<SearchTextContentPage />} />
           </Route>
           <Route path="*" element={<NoMatchPage />} />
         </Route>

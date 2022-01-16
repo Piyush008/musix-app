@@ -28,7 +28,7 @@ export default function Header({ headerOpacity }) {
           <AgentDetect
             mobileComponent={<Logo />}
             desktopComponent={
-              <HStack>
+              <HStack width={["100%", null, "50%"]}>
                 <Circle size={pxToAll(35)} bg="shade.secondary">
                   <Icon as={MdKeyboardArrowLeft} textStyle={"icon.md"} />
                 </Circle>
@@ -38,7 +38,7 @@ export default function Header({ headerOpacity }) {
                 <Routes>
                   <Route
                     path={`${ROUTER.SEARCH}/*`}
-                    element={<SearchInput />}
+                    element={<SearchInput width={"100%"} />}
                   />
                 </Routes>
               </HStack>
