@@ -54,7 +54,7 @@ export default function HomePage() {
   }, []);
   return (
     <Flex direction={"column"} wrap={"nowrap"}>
-      <Flex direction={"row"} wrap={"nowrap"} h={"100vh"}>
+      <Flex direction={"row"} wrap={"nowrap"}>
         <DesktopSideBar />
         <Flex
           ref={ref}

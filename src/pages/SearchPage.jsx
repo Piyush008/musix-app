@@ -1,9 +1,18 @@
-import { Box, Flex, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Icon,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { MdSearch } from "react-icons/md";
 import { Outlet } from "react-router-dom";
 import { selector, useRecoilValueLoadable } from "recoil";
 import CardRenderer from "../components/cardRenderrer";
 import CategoryCard from "../components/cards/CategoryCard";
-import SearchInput from "../components/Input/SearchInput";
 import AgentDetect from "../components/util/AgentDetect";
 import { getSeveralCategories } from "../utils/spotify.utils.js";
 import { pxToAll } from "../utils/theme.utils.js";
@@ -32,9 +41,12 @@ export default function SearchPage() {
                 Search
               </Text>
             </Box>
-            <Box>
-              <SearchInput />
-            </Box>
+            <InputGroup>
+              <InputLeftElement
+                children={<Icon as={MdSearch} textStyle={"icon.md"} />}
+              />
+              <Input aria-label="search" />
+            </InputGroup>
           </VStack>
         }
       />
