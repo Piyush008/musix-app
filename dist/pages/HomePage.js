@@ -51,8 +51,7 @@ export default function HomePage() {
     wrap: "nowrap"
   }, /* @__PURE__ */ React.createElement(Flex, {
     direction: "row",
-    wrap: "nowrap",
-    h: "100vh"
+    wrap: "nowrap"
   }, /* @__PURE__ */ React.createElement(DesktopSideBar, null), /* @__PURE__ */ React.createElement(Flex, {
     ref,
     direction: "column",

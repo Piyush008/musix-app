@@ -1,10 +1,19 @@
 import React from "../../_snowpack/pkg/react.js";
-import {Box, Flex, Text, VStack} from "../../_snowpack/pkg/@chakra-ui/react.js";
+import {
+  Box,
+  Flex,
+  Icon,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+  VStack
+} from "../../_snowpack/pkg/@chakra-ui/react.js";
+import {MdSearch} from "../../_snowpack/pkg/react-icons/md.js";
 import {Outlet} from "../../_snowpack/pkg/react-router-dom.js";
 import {selector, useRecoilValueLoadable} from "../../_snowpack/pkg/recoil.js";
 import CardRenderer from "../components/cardRenderrer/index.js";
 import CategoryCard from "../components/cards/CategoryCard.js";
-import SearchInput from "../components/Input/SearchInput.js";
 import AgentDetect from "../components/util/AgentDetect.js";
 import {getSeveralCategories} from "../utils/spotify.utils.js";
 import {pxToAll} from "../utils/theme.utils.js";
@@ -32,7 +41,14 @@ export default function SearchPage() {
     }, /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Text, {
       textStyle: "h4",
       color: "text.secondary"
-    }, "Search")), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(SearchInput, null)))
+    }, "Search")), /* @__PURE__ */ React.createElement(InputGroup, null, /* @__PURE__ */ React.createElement(InputLeftElement, {
+      children: /* @__PURE__ */ React.createElement(Icon, {
+        as: MdSearch,
+        textStyle: "icon.md"
+      })
+    }), /* @__PURE__ */ React.createElement(Input, {
+      "aria-label": "search"
+    })))
   }), /* @__PURE__ */ React.createElement(Text, {
     textStyle: "h5",
     color: "text.secondary"

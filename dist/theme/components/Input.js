@@ -10,7 +10,7 @@ const Input = {
     md: {
       field: {
         fontSize: pxToAll(18),
-        h: pxToAll(40),
+        h: pxToAll(50),
         px: pxToAll(15),
         py: pxToAll(15),
       },
