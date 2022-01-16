@@ -8,7 +8,7 @@ export default function HomeContentPage() {
   return /* @__PURE__ */ React.createElement(Flex, {
     direction: "column",
     py: pxToAll(20),
-    px: pxToAll(30)
+    px: pxToAll(20)
   }, /* @__PURE__ */ React.createElement(Text, {
     textStyle: "h4",
     color: "text.secondary"

@@ -1,4 +1,5 @@
 import React from "../../../_snowpack/pkg/react.js";
+import {Box} from "../../../_snowpack/pkg/@chakra-ui/react.js";
 import useAgent from "../../hooks/useAgent.js";
 export default function AgentDetect(props) {
   const isMobileDevice = useAgent();
@@ -8,3 +9,6 @@ export default function AgentDetect(props) {
     ...rest
   });
 }
+AgentDetect.defaultProps = {
+  desktopComponent: /* @__PURE__ */ React.createElement(Box, null)
+};

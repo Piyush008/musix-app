@@ -47,17 +47,17 @@ const theme = extendTheme({
       lineHeight: 1.5,
     },
     h5: {
-      fontSize: pxToAll(28),
+      fontSize: pxToAll(24),
       fontWeight: "bold",
       lineHeight: 1.5,
     },
     h6: {
-      fontSize: pxToAll(24),
+      fontSize: pxToAll(18),
       fontWeight: "normal",
       lineHeight: 1.25,
     },
     p: {
-      fontSize: pxToAll(22),
+      fontSize: pxToAll(14),
       fontWeight: "normal",
       lineHeight: 1.25,
     },

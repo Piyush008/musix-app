@@ -13642,6 +13642,19 @@ var HStack = /*#__PURE__*/forwardRef(function (props, ref) {
     ref: ref
   }));
 });
+/**
+ * A view that arranges its children in a vertical line.
+ */
+
+
+var VStack = /*#__PURE__*/forwardRef(function (props, ref) {
+  return /*#__PURE__*/react.createElement(Stack, _extends$a({
+    align: "center"
+  }, props, {
+    direction: "column",
+    ref: ref
+  }));
+});
 
 var _excluded$2$3 = ["className", "align", "decoration", "casing"];
 
@@ -13739,4 +13752,4 @@ function mergeThemeCustomizer(source, override, key, object) {
   return undefined;
 }
 
-export { Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, Circle, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, color, extendTheme, useStyleConfig };
+export { Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, Circle, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };

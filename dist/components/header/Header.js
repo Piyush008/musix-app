@@ -1,15 +1,6 @@
 import React from "../../../_snowpack/pkg/react.js";
-import {
-  Box,
-  Circle,
-  HStack,
-  Icon,
-  Button
-} from "../../../_snowpack/pkg/@chakra-ui/react.js";
-import {
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight
-} from "../../../_snowpack/pkg/react-icons/md.js";
+import {Box, Circle, HStack, Icon, Button} from "../../../_snowpack/pkg/@chakra-ui/react.js";
+import {MdKeyboardArrowLeft, MdKeyboardArrowRight} from "../../../_snowpack/pkg/react-icons/md.js";
 import {pxToAll} from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo.js";
 import {Route, Routes} from "../../../_snowpack/pkg/react-router-dom.js";
@@ -35,7 +26,7 @@ export default function Header({headerOpacity}) {
   }), /* @__PURE__ */ React.createElement(HStack, {
     justifyContent: "space-between",
     alignItems: "center",
-    px: pxToAll(30),
+    px: pxToAll(20),
     py: pxToAll(20)
   }, /* @__PURE__ */ React.createElement(AgentDetect, {
     mobileComponent: /* @__PURE__ */ React.createElement(Logo, null),
