@@ -8,6 +8,7 @@ import HomeContentPage from "../pages/HomeContentPage.js";
 import NoMatchPage from "../pages/NoMatchPage.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import SearchContentPage from "../pages/SearchContentPage.js";
+import SearchTextContentPage from "../pages/SearchTextContentPage.js";
 export default function App() {
   console.log(__SNOWPACK_ENV__);
   const basename = __SNOWPACK_ENV__.MODE === "development" ? "/" : "/musix-app";
@@ -23,8 +24,11 @@ export default function App() {
     path: ROUTER.SEARCH,
     element: /* @__PURE__ */ React.createElement(SearchPage, null)
   }, /* @__PURE__ */ React.createElement(Route, {
-    path: ":searchText",
+    index: true,
     element: /* @__PURE__ */ React.createElement(SearchContentPage, null)
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: ":searchText",
+    element: /* @__PURE__ */ React.createElement(SearchTextContentPage, null)
   })), /* @__PURE__ */ React.createElement(Route, {
     path: "*",
     element: /* @__PURE__ */ React.createElement(NoMatchPage, null)

@@ -1,4 +1,4 @@
-import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
+import { pxToAll } from "../../utils/theme.utils.js";
 
 const Input = {
   baseStyle: {
@@ -13,10 +13,6 @@ const Input = {
         h: pxToAll(50),
         px: pxToAll(15),
         py: pxToAll(15),
-      },
-      element: {
-        px: pxToAll(5),
-        top: "25%",
       },
     },
   },

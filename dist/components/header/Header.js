@@ -30,7 +30,9 @@ export default function Header({headerOpacity}) {
     py: pxToAll(20)
   }, /* @__PURE__ */ React.createElement(AgentDetect, {
     mobileComponent: /* @__PURE__ */ React.createElement(Logo, null),
-    desktopComponent: /* @__PURE__ */ React.createElement(HStack, null, /* @__PURE__ */ React.createElement(Circle, {
+    desktopComponent: /* @__PURE__ */ React.createElement(HStack, {
+      width: ["100%", null, "50%"]
+    }, /* @__PURE__ */ React.createElement(Circle, {
       size: pxToAll(35),
       bg: "shade.secondary"
     }, /* @__PURE__ */ React.createElement(Icon, {
@@ -44,7 +46,9 @@ export default function Header({headerOpacity}) {
       textStyle: "icon.md"
     })), /* @__PURE__ */ React.createElement(Routes, null, /* @__PURE__ */ React.createElement(Route, {
       path: `${ROUTER.SEARCH}/*`,
-      element: /* @__PURE__ */ React.createElement(SearchInput, null)
+      element: /* @__PURE__ */ React.createElement(SearchInput, {
+        width: "100%"
+      })
     })))
   }), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Button, null, "Enter Musix")))));
 }
