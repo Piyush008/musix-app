@@ -6,7 +6,7 @@ import CardRenderer from "./../components/cardRenderrer/index";
 
 export default function HomeContentPage() {
   return (
-    <Flex direction={"column"} py={pxToAll(20)} px={pxToAll(30)}>
+    <Flex direction={"column"} py={pxToAll(20)} px={pxToAll(20)}>
       <Text textStyle={"h4"} color={"text.secondary"}>
         Good Evening
       </Text>

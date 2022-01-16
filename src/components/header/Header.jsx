@@ -1,14 +1,5 @@
-import {
-  Box,
-  Circle,
-  HStack,
-  Icon,
-  Button,
-} from "@chakra-ui/react";
-import {
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight,
-} from "react-icons/md";
+import { Box, Circle, HStack, Icon, Button } from "@chakra-ui/react";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { pxToAll } from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo";
 import { Route, Routes } from "react-router-dom";
@@ -31,7 +22,7 @@ export default function Header({ headerOpacity }) {
         <HStack
           justifyContent={"space-between"}
           alignItems={"center"}
-          px={pxToAll(30)}
+          px={pxToAll(20)}
           py={pxToAll(20)}
         >
           <AgentDetect
@@ -47,9 +38,7 @@ export default function Header({ headerOpacity }) {
                 <Routes>
                   <Route
                     path={`${ROUTER.SEARCH}/*`}
-                    element={
-                      <SearchInput/>
-                    }
+                    element={<SearchInput />}
                   />
                 </Routes>
               </HStack>

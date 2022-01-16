@@ -1,3 +1,4 @@
+import { Box } from "@chakra-ui/react";
 import useAgent from "../../hooks/useAgent";
 
 export default function AgentDetect(props) {
@@ -10,3 +11,7 @@ export default function AgentDetect(props) {
     />
   );
 }
+
+AgentDetect.defaultProps = {
+  desktopComponent: <Box />,
+};
