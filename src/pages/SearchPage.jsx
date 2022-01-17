@@ -15,7 +15,7 @@ import { pxToAll } from "../utils/theme.utils.js";
 
 export default function SearchPage() {
   return (
-    <Flex direction={"column"} p={pxToAll(20)}>
+    <Flex direction={"column"} p={pxToAll(20)} height={"100%"}>
       <AgentDetect
         mobileComponent={
           <VStack mb={pxToAll(10)}>

@@ -1,5 +1,4 @@
-import { Box, Circle, HStack, Icon, Button } from "@chakra-ui/react";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { Box, HStack, Button } from "@chakra-ui/react";
 import { pxToAll } from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo";
 import { Route, Routes } from "react-router-dom";
