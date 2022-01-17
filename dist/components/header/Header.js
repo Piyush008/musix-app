@@ -30,20 +30,8 @@ export default function Header({headerOpacity}) {
   }, /* @__PURE__ */ React.createElement(AgentDetect, {
     mobileComponent: /* @__PURE__ */ React.createElement(Logo, null),
     desktopComponent: /* @__PURE__ */ React.createElement(HStack, {
-      width: ["100%", null, "50%"]
-    }, /* @__PURE__ */ React.createElement(Circle, {
-      size: pxToAll(35),
-      bg: "shade.secondary"
-    }, /* @__PURE__ */ React.createElement(Icon, {
-      as: MdKeyboardArrowLeft,
-      textStyle: "icon.md"
-    })), /* @__PURE__ */ React.createElement(Circle, {
-      size: pxToAll(35),
-      bg: "shade.secondary"
-    }, /* @__PURE__ */ React.createElement(Icon, {
-      as: MdKeyboardArrowRight,
-      textStyle: "icon.md"
-    })), /* @__PURE__ */ React.createElement(Routes, null, /* @__PURE__ */ React.createElement(Route, {
+      width: ["100%", null, "40%"]
+    }, /* @__PURE__ */ React.createElement(Routes, null, /* @__PURE__ */ React.createElement(Route, {
       path: `${ROUTER.SEARCH}/*`,
       element: /* @__PURE__ */ React.createElement(SearchInput, {
         width: "100%"
