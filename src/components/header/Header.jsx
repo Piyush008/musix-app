@@ -27,13 +27,13 @@ export default function Header({ headerOpacity }) {
           <AgentDetect
             mobileComponent={<Logo />}
             desktopComponent={
-              <HStack width={["100%", null, "50%"]}>
-                <Circle size={pxToAll(35)} bg="shade.secondary">
+              <HStack width={["100%", null, "40%"]}>
+                {/* <Circle size={pxToAll(35)} bg="shade.secondary">
                   <Icon as={MdKeyboardArrowLeft} textStyle={"icon.md"} />
                 </Circle>
                 <Circle size={pxToAll(35)} bg="shade.secondary">
                   <Icon as={MdKeyboardArrowRight} textStyle={"icon.md"} />
-                </Circle>
+                </Circle> */}
                 <Routes>
                   <Route
                     path={`${ROUTER.SEARCH}/*`}
