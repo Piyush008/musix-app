@@ -1,6 +1,5 @@
 import React from "../../../_snowpack/pkg/react.js";
-import {Box, Circle, HStack, Icon, Button} from "../../../_snowpack/pkg/@chakra-ui/react.js";
-import {MdKeyboardArrowLeft, MdKeyboardArrowRight} from "../../../_snowpack/pkg/react-icons/md.js";
+import {Box, HStack, Button} from "../../../_snowpack/pkg/@chakra-ui/react.js";
 import {pxToAll} from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo.js";
 import {Route, Routes} from "../../../_snowpack/pkg/react-router-dom.js";

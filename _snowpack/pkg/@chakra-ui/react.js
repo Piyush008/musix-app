@@ -13165,9 +13165,6 @@ function _objectWithoutPropertiesLoose$8(source, excluded) {
   return target;
 }
 
-var _excluded$f = ["size", "centerContent"],
-    _excluded2$5 = ["size"];
-
 /**
  * Box is the most abstract component on top of which other chakra
  * components are built. It renders a `div` element by default.
@@ -13175,43 +13172,6 @@ var _excluded$f = ["size", "centerContent"],
  * @see Docs https://chakra-ui.com/box
  */
 var Box = chakra("div");
-/**
- * As a constraint, you can't pass size related props
- * Only `size` would be allowed
- */
-
-
-var Square = /*#__PURE__*/forwardRef(function (props, ref) {
-  var size = props.size,
-      _props$centerContent = props.centerContent,
-      centerContent = _props$centerContent === void 0 ? true : _props$centerContent,
-      rest = _objectWithoutPropertiesLoose$8(props, _excluded$f);
-
-  var styles = centerContent ? {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  } : {};
-  return /*#__PURE__*/react.createElement(Box, _extends$a({
-    ref: ref,
-    boxSize: size,
-    __css: _extends$a({}, styles, {
-      flexShrink: 0,
-      flexGrow: 0
-    })
-  }, rest));
-});
-
-var Circle = /*#__PURE__*/forwardRef(function (props, ref) {
-  var size = props.size,
-      rest = _objectWithoutPropertiesLoose$8(props, _excluded2$5);
-
-  return /*#__PURE__*/react.createElement(Square, _extends$a({
-    size: size,
-    ref: ref,
-    borderRadius: "9999px"
-  }, rest));
-});
 
 /**
  * React component used to horizontally and vertically center its child.
@@ -13752,4 +13712,4 @@ function mergeThemeCustomizer(source, override, key, object) {
   return undefined;
 }
 
-export { Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, Circle, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };
+export { Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };

@@ -9,7 +9,8 @@ export default function CategoryCard(props) {
     variant: "card"
   }, /* @__PURE__ */ React.createElement(Image, {
     src: icons[0].url,
-    alt: name
+    alt: name,
+    borderRadius: "10%"
   }), /* @__PURE__ */ React.createElement(Text, {
     mt: pxToAll(10)
   }, name));

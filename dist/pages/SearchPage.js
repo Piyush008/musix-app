@@ -16,7 +16,8 @@ import {pxToAll} from "../utils/theme.utils.js";
 export default function SearchPage() {
   return /* @__PURE__ */ React.createElement(Flex, {
     direction: "column",
-    p: pxToAll(20)
+    p: pxToAll(20),
+    height: "100%"
   }, /* @__PURE__ */ React.createElement(AgentDetect, {
     mobileComponent: /* @__PURE__ */ React.createElement(VStack, {
       mb: pxToAll(10)
