@@ -13273,8 +13273,7 @@ var Flex = /*#__PURE__*/forwardRef(function (props, ref) {
   }, rest));
 });
 
-var _excluded$9 = ["area", "templateAreas", "gap", "rowGap", "columnGap", "column", "row", "autoFlow", "autoRows", "templateRows", "autoColumns", "templateColumns"],
-    _excluded2$3$1 = ["colSpan", "colStart", "colEnd", "rowEnd", "rowSpan", "rowStart"];
+var _excluded$9 = ["area", "templateAreas", "gap", "rowGap", "columnGap", "column", "row", "autoFlow", "autoRows", "templateRows", "autoColumns", "templateColumns"];
 
 /**
  * React component used to create grid layouts.
@@ -13314,35 +13313,6 @@ var Grid = /*#__PURE__*/forwardRef(function (props, ref) {
     gridTemplateRows: templateRows,
     gridTemplateColumns: templateColumns
   };
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
-    ref: ref,
-    __css: styles
-  }, rest));
-});
-
-function spanFn(span) {
-  return mapResponsive(span, function (value) {
-    return value === "auto" ? "auto" : "span " + value + "/span " + value;
-  });
-}
-
-var GridItem = /*#__PURE__*/forwardRef(function (props, ref) {
-  var colSpan = props.colSpan,
-      colStart = props.colStart,
-      colEnd = props.colEnd,
-      rowEnd = props.rowEnd,
-      rowSpan = props.rowSpan,
-      rowStart = props.rowStart,
-      rest = _objectWithoutPropertiesLoose$8(props, _excluded2$3$1);
-
-  var styles = filterUndefined({
-    gridColumn: spanFn(colSpan),
-    gridRow: spanFn(rowSpan),
-    gridColumnStart: colStart,
-    gridColumnEnd: colEnd,
-    gridRowStart: rowStart,
-    gridRowEnd: rowEnd
-  });
   return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
     ref: ref,
     __css: styles
@@ -13712,4 +13682,4 @@ function mergeThemeCustomizer(source, override, key, object) {
   return undefined;
 }
 
-export { Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };
+export { Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, ColorModeScript, Divider$1 as Divider, Flex, Grid, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };

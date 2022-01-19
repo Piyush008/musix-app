@@ -1,22 +1,24 @@
 import React from "../../_snowpack/pkg/react.js";
-import {Box, Flex, Grid, GridItem, HStack, Text} from "../../_snowpack/pkg/@chakra-ui/react.js";
-import BigCard from "../components/cards/bigCard/index.js";
-import Header from "../components/header/Header.js";
-import {pxToAll, pxToRem} from "../utils/theme.utils.js";
-import CardRenderer from "../components/cardRenderrer/index.js";
+import {Flex} from "../../_snowpack/pkg/@chakra-ui/react.js";
+import {selector, useRecoilValueLoadable} from "../../_snowpack/pkg/recoil.js";
+import ContentWrapper from "../components/ContentWrapper/ContentWrapper.js";
+import {showContentConversionUtil} from "../utils/conversion.utils.js";
+import {pxToAll} from "../utils/theme.utils.js";
+const showContentState = selector({
+  key: "showContentState",
+  get: () => {
+    return showContentConversionUtil();
+  }
+});
 export default function HomeContentPage() {
+  const showContentsLoadable = useRecoilValueLoadable(showContentState);
+  const showContents = showContentsLoadable.contents;
   return /* @__PURE__ */ React.createElement(Flex, {
     direction: "column",
     py: pxToAll(20),
     px: pxToAll(20)
-  }, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h4",
-    color: "text.secondary"
-  }, "Good Evening"), [1, 2, 3, 4, 5, 6].map((r) => /* @__PURE__ */ React.createElement(CardRenderer, null, [1, 2, 3, 4, 5, 6].map((e) => /* @__PURE__ */ React.createElement(BigCard, {
-    imageBorderRadius: (e + r) % 2 === 1 ? "100%" : "12",
-    imageSource: "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1",
-    title: "Song Title ".repeat(e),
-    isPlaying: (e + r) % 2 == 1,
-    subtitle: "Song Subtitle ".repeat(e * 2)
-  })))));
+  }, showContents.map(({...rest}, idx) => /* @__PURE__ */ React.createElement(ContentWrapper, {
+    key: idx,
+    ...rest
+  })));
 }
