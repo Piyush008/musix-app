@@ -21,7 +21,7 @@ function CardRenderer({
 }
 
 CardRenderer.defaultProps = {
-  minCardWidth: "160px",
+  minCardWidth: "180px",
   noOfRows: 1,
   columnGap: "0.7rem",
   overflowX: "auto",

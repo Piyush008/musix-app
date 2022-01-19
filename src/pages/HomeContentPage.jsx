@@ -1,29 +1,23 @@
-import { Box, Flex, Grid, GridItem, HStack, Text } from "@chakra-ui/react";
-import BigCard from "../components/cards/bigCard";
-import Header from "../components/header/Header";
-import { pxToAll, pxToRem } from "../utils/theme.utils.js";
-import CardRenderer from "./../components/cardRenderrer/index";
+import { Flex } from "@chakra-ui/react";
+import { selector, useRecoilValueLoadable } from "recoil";
+import ContentWrapper from "../components/ContentWrapper/ContentWrapper";
+import { showContentConversionUtil } from "../utils/conversion.utils.js";
+import { pxToAll } from "../utils/theme.utils.js";
+
+const showContentState = selector({
+  key: "showContentState",
+  get: () => {
+    return showContentConversionUtil();
+  },
+});
 
 export default function HomeContentPage() {
+  const showContentsLoadable = useRecoilValueLoadable(showContentState);
+  const showContents = showContentsLoadable.contents;
   return (
     <Flex direction={"column"} py={pxToAll(20)} px={pxToAll(20)}>
-      <Text textStyle={"h4"} color={"text.secondary"}>
-        Good Evening
-      </Text>
-      {[1, 2, 3, 4, 5, 6].map((r) => (
-        <CardRenderer>
-          {[1, 2, 3, 4, 5, 6].map((e) => (
-            <BigCard
-              imageBorderRadius={(e + r) % 2 === 1 ? "100%" : "12"}
-              imageSource={
-                "https://i.scdn.co/image/ab67616d00001e02badc10f3684a57f23c26f6c1"
-              }
-              title={"Song Title ".repeat(e)}
-              isPlaying={(e + r) % 2 == 1}
-              subtitle={"Song Subtitle ".repeat(e * 2)}
-            />
-          ))}
-        </CardRenderer>
+      {showContents.map(({ ...rest }, idx) => (
+        <ContentWrapper key={idx} {...rest} />
       ))}
     </Flex>
   );

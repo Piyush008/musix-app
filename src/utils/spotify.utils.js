@@ -36,6 +36,15 @@ export const getNewReleases = async (query) =>
 export const getSeveralCategories = async (query) =>
   await createSpotifyAxiosInstance("/browse/categories", query);
 
+export const getCategoryDetails = async (id, query) =>
+  await createSpotifyAxiosInstance(`/browse/categories/${id}`, query);
+
+export const getFeaturedPlayList = async (query) =>
+  await createSpotifyAxiosInstance("/browse/featured-playlists", query);
+
+export const getCategoryPlayList = async (id, query) =>
+  await createSpotifyAxiosInstance(`/browse/categories/${id}/playlists`, query);
+
 export const getAlbums = async (query) =>
   await createSpotifyAxiosInstance("/albums", query);
 
