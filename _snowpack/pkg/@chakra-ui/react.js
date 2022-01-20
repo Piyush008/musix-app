@@ -13682,4 +13682,4 @@ function mergeThemeCustomizer(source, override, key, object) {
   return undefined;
 }
 
-export { Box, Button$1 as Button, Center, ChakraProvider$1 as ChakraProvider, ColorModeScript, Divider$1 as Divider, Flex, Grid, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };
+export { Box, Button$1 as Button, ChakraProvider$1 as ChakraProvider, ColorModeScript, Divider$1 as Divider, Flex, Grid, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };

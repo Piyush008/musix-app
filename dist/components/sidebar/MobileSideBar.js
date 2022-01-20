@@ -1,20 +1,19 @@
 import React from "../../../_snowpack/pkg/react.js";
-import {Box, Center, HStack, Icon, Text} from "../../../_snowpack/pkg/@chakra-ui/react.js";
+import {HStack, Icon, Text} from "../../../_snowpack/pkg/@chakra-ui/react.js";
 import {FcLike} from "../../../_snowpack/pkg/react-icons/fc.js";
-import {
-  MdHome,
-  MdLibraryBooks,
-  MdPlaylistAdd,
-  MdSearch
-} from "../../../_snowpack/pkg/react-icons/md.js";
-import {useLocation, useNavigate, useParams} from "../../../_snowpack/pkg/react-router-dom.js";
+import {MdHome, MdLibraryBooks, MdSearch} from "../../../_snowpack/pkg/react-icons/md.js";
+import {useLocation, useNavigate} from "../../../_snowpack/pkg/react-router-dom.js";
 import ROUTER from "../../utils/constants/router.constants.js";
-import {pxToAll, pxToRem} from "../../utils/theme.utils.js";
+import {pxToAll} from "../../utils/theme.utils.js";
 import CustomItem from "../util/CustomItem.js";
 export default function MobileSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const pathName = location.pathname;
+  let pathName = location.pathname;
+  const state = location.state;
+  if (pathName.includes(`/${ROUTER.GENRE}`)) {
+    pathName = state?.urlFrom ?? ROUTER.HOME;
+  }
   console.log(pathName);
   const handleNavigate = (path) => {
     navigate(path);

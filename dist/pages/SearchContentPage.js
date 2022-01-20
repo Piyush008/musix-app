@@ -36,6 +36,7 @@ export default function SearchContentPage() {
     autoRows: "auto"
   }, items.map(({id, ...rest}) => /* @__PURE__ */ React.createElement(CategoryCard, {
     key: id,
-    ...rest
+    ...rest,
+    property: id
   })))));
 }

@@ -87,7 +87,7 @@ export default function ContentWrapper(props) {
   const isMobile = useAgent();
   const showAllContent = () => {
     navigate(`${ROUTER.GENRE}/${property}`, {
-      state: {as, property, limit: 20}
+      state: {as, property, limit: 20, urlFrom: ROUTER.HOME}
     });
   };
   return /* @__PURE__ */ React.createElement(Flex, {
