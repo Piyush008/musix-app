@@ -26,9 +26,7 @@ export default function SearchContentPage() {
       pos: "relative",
       top: "30%",
       textAlign: "center"
-    }, /* @__PURE__ */ React.createElement(Spinner, {
-      size: "lg"
-    })),
+    }, /* @__PURE__ */ React.createElement(Spinner, null)),
     state: categoryLoadable.state
   }, /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Text, {
     textStyle: "h5",

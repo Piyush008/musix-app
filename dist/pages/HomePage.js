@@ -79,9 +79,7 @@ export default function HomePage() {
       pos: "relative",
       top: "30%",
       textAlign: "center"
-    }, /* @__PURE__ */ React.createElement(Spinner, {
-      size: "lg"
-    })),
+    }, /* @__PURE__ */ React.createElement(Spinner, null)),
     state: spotifyAuthLodableState
   }, /* @__PURE__ */ React.createElement(Outlet, null)))), /* @__PURE__ */ React.createElement(MusixPlayer, null), /* @__PURE__ */ React.createElement(AgentDetect, {
     mobileComponent: /* @__PURE__ */ React.createElement(MobileSideBar, null),

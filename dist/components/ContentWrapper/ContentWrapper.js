@@ -1,6 +1,9 @@
 import React from "../../../_snowpack/pkg/react.js";
-import {Box, Flex, HStack, Spinner, Text} from "../../../_snowpack/pkg/@chakra-ui/react.js";
-import {selector, selectorFamily, useRecoilValueLoadable} from "../../../_snowpack/pkg/recoil.js";
+import {Box, Flex, HStack, Text} from "../../../_snowpack/pkg/@chakra-ui/react.js";
+import {useNavigate} from "../../../_snowpack/pkg/react-router-dom.js";
+import {selectorFamily} from "../../../_snowpack/pkg/recoil.js";
+import useAgent from "../../hooks/useAgent.js";
+import ROUTER from "../../utils/constants/router.constants.js";
 import {
   getCategoryDetails,
   getCategoryPlayList,
@@ -11,11 +14,10 @@ import {pxToAll} from "../../utils/theme.utils.js";
 import CardRenderer from "../cardRenderrer/index.js";
 import BigCard from "../cards/bigCard/index.js";
 import CustomItem from "../util/CustomItem.js";
-import CustomSuspense from "../util/CustomSuspense.js";
 const categoryState = selectorFamily({
   key: "categoryState",
-  get: (id) => async () => {
-    const [data, error] = await getCategoryDetails(id, {
+  get: ({property}) => async () => {
+    const [data, error] = await getCategoryDetails(property, {
       country: "IN",
       locale: "en_IN"
     });
@@ -26,8 +28,8 @@ const categoryState = selectorFamily({
 });
 const categoryPlayListState = selectorFamily({
   key: "categoryPlayListState",
-  get: (id, limit = 5) => async () => {
-    const [data, error] = await getCategoryPlayList(id, {
+  get: ({property, limit}) => async () => {
+    const [data, error] = await getCategoryPlayList(property, {
       country: "IN",
       limit
     });
@@ -38,7 +40,7 @@ const categoryPlayListState = selectorFamily({
 });
 const featuredPlayListState = selectorFamily({
   key: "featuredPlayListState",
-  get: (limit = 5) => async () => {
+  get: ({limit}) => async () => {
     const [data, error] = await getFeaturedPlayList({
       country: "IN",
       locale: "en_IN",
@@ -52,61 +54,67 @@ const featuredPlayListState = selectorFamily({
 });
 const newReleasesState = selectorFamily({
   key: "newReleasesState",
-  get: (limit = 5) => async () => {
+  get: ({limit}) => async () => {
     const [data, error] = await getNewReleases({
       country: "IN",
       limit
     });
     if (error)
       throw error;
-    return data;
+    return {message: "Popular new releases", ...data};
   }
 });
-const contentWrapperState = selectorFamily({
+export const contentWrapperState = selectorFamily({
   key: "contentWrapperState",
   get: (params) => async ({get}) => {
-    const {as, property} = params;
+    const {as, ...rest} = params;
     if (as == "category") {
-      const catPlayListDetails = get(categoryPlayListState(property));
-      const catDetails = get(categoryState(property));
+      const catPlayListDetails = get(categoryPlayListState(rest));
+      const catDetails = get(categoryState(rest));
       return {...catPlayListDetails, message: catDetails};
     } else if (as == "release") {
-      return get(newReleasesState());
+      return get(newReleasesState(rest));
     } else if (as == "featured") {
-      return get(featuredPlayListState());
+      return get(featuredPlayListState(rest));
     }
   }
 });
 export default function ContentWrapper(props) {
-  const contentWrapperLoadable = useRecoilValueLoadable(contentWrapperState(props));
-  const contentWrapper = contentWrapperLoadable.contents;
-  const items = contentWrapper?.playlists?.items || contentWrapper?.albums?.items || [];
-  const title = contentWrapper?.message?.name || contentWrapper?.message || "Popular new Releases";
-  return /* @__PURE__ */ React.createElement(CustomSuspense, {
-    fallback: /* @__PURE__ */ React.createElement(Box, null),
-    state: contentWrapperLoadable.state
-  }, /* @__PURE__ */ React.createElement(Flex, {
+  const {as, property, autoRows, seeAll} = props;
+  const items = props?.playlists?.items || props?.albums?.items || [];
+  const title = props?.message?.name || props?.message || "";
+  const navigate = useNavigate();
+  const isMobile = useAgent();
+  const showAllContent = () => {
+    navigate(`${ROUTER.GENRE}/${property}`, {
+      state: {as, property, limit: 20}
+    });
+  };
+  return /* @__PURE__ */ React.createElement(Flex, {
     direction: "column",
-    mb: pxToAll(20)
+    py: pxToAll(20)
   }, /* @__PURE__ */ React.createElement(HStack, {
     justifyContent: "space-between"
   }, /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h4",
+    textStyle: "h5",
     color: "text.secondary"
-  }, title)), /* @__PURE__ */ React.createElement(CustomItem, {
-    variant: "card"
+  }, title)), seeAll && /* @__PURE__ */ React.createElement(CustomItem, {
+    variant: "card",
+    onClick: () => showAllContent({as, property, limit: 20}),
+    cursor: isMobile ? "auto" : "pointer"
   }, /* @__PURE__ */ React.createElement(Text, {
     fontWeight: "bold",
-    textStyle: "p",
-    color: "text.disabled"
-  }, "SEE ALL"))), /* @__PURE__ */ React.createElement(CardRenderer, null, items.map(({id, ...rest}) => /* @__PURE__ */ React.createElement(BigCardWrapper, {
+    textStyle: "p"
+  }, "SEE ALL"))), /* @__PURE__ */ React.createElement(CardRenderer, {
+    autoRows
+  }, items.map(({id, ...rest}) => /* @__PURE__ */ React.createElement(BigCardWrapper, {
     ...rest,
     key: id
-  })))));
+  }))));
 }
 function BigCardWrapper(props) {
-  const title = props?.name;
-  const subtitle = props?.description || props?.artists[0]?.name;
+  const title = props?.name ?? "";
+  const subtitle = props?.description || props?.artists[0]?.name || "";
   const imageSource = props?.images[0].url;
   return /* @__PURE__ */ React.createElement(BigCard, {
     imageBorderRadius: "10px",
@@ -115,3 +123,7 @@ function BigCardWrapper(props) {
     subtitle
   });
 }
+ContentWrapper.defaultProps = {
+  autoRows: 0,
+  seeAll: true
+};

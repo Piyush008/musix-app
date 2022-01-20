@@ -54,16 +54,16 @@ function BigCard({
     },
     icon: isPlaying ? /* @__PURE__ */ React.createElement(FaPause, null) : /* @__PURE__ */ React.createElement(FaPlay, null)
   }))), /* @__PURE__ */ React.createElement(Box, {
-    paddingTop: pxToAll(16)
+    paddingTop: pxToAll(15)
   }, /* @__PURE__ */ React.createElement(Text, {
     isTruncated: true,
-    fontSize: pxToAll(16),
-    fontWeight: "bold"
+    textStyle: "h6",
+    fontWeight: "bold",
+    color: "text.secondary"
   }, title), /* @__PURE__ */ React.createElement(Text, {
     noOfLines: 2,
-    fontSize: pxToAll(14),
-    lineHeight: pxToAll(16),
-    fontWeight: "light"
+    textStyle: "p",
+    mt: pxToAll(5)
   }, subtitle)));
 }
 BigCard.defaultProps = {
