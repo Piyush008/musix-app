@@ -1,20 +1,19 @@
-import { Box, Center, HStack, Icon, Text } from "@chakra-ui/react";
+import { HStack, Icon, Text } from "@chakra-ui/react";
 import { FcLike } from "react-icons/fc";
-import {
-  MdHome,
-  MdLibraryBooks,
-  MdPlaylistAdd,
-  MdSearch,
-} from "react-icons/md";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { MdHome, MdLibraryBooks, MdSearch } from "react-icons/md";
+import { useLocation, useNavigate } from "react-router-dom";
 import ROUTER from "../../utils/constants/router.constants.js";
-import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
+import { pxToAll } from "../../utils/theme.utils.js";
 import CustomItem from "../util/CustomItem.jsx";
 
 export default function MobileSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const pathName = location.pathname;
+  let pathName = location.pathname;
+  const state = location.state;
+  if (pathName.includes(`/${ROUTER.GENRE}`)) {
+    pathName = state?.urlFrom ?? ROUTER.HOME;
+  }
 
   console.log(pathName);
   const handleNavigate = (path) => {

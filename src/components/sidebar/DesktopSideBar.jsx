@@ -16,8 +16,11 @@ import CustomItem from "../util/CustomItem.jsx";
 export default function DesktopSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const pathName = location.pathname;
-
+  let pathName = location.pathname;
+  const state = location.state;
+  if (pathName.includes(`/${ROUTER.GENRE}`)) {
+    pathName = state?.urlFrom ?? ROUTER.HOME;
+  }
   const handleNavigate = (path) => {
     navigate(path);
   };

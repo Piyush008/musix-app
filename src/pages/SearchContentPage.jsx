@@ -38,7 +38,7 @@ export default function SearchContentPage() {
         </Text>
         <CardRenderer minCardWidth={"155px"} autoRows={"auto"}>
           {items.map(({ id, ...rest }) => (
-            <CategoryCard key={id} {...rest} />
+            <CategoryCard key={id} {...rest} property={id} />
           ))}
         </CardRenderer>
       </Box>
