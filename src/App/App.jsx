@@ -6,6 +6,7 @@ import NoMatchPage from "../pages/NoMatchPage";
 import ROUTER from "../utils/constants/router.constants.js";
 import SearchContentPage from "../pages/SearchContentPage";
 import SearchTextContentPage from "../pages/SearchTextContentPage";
+import GenrePage from "../pages/GenrePage";
 export default function App() {
   console.log(import.meta.env);
   const basename = import.meta.env.MODE === "development" ? "/" : "/musix-app";
@@ -18,6 +19,7 @@ export default function App() {
             <Route index element={<SearchContentPage />} />
             <Route path=":searchText" element={<SearchTextContentPage />} />
           </Route>
+          <Route path={`${ROUTER.GENRE}/:property`} element={<GenrePage />} />
           <Route path="*" element={<NoMatchPage />} />
         </Route>
       </Routes>

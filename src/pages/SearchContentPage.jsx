@@ -27,7 +27,7 @@ export default function SearchContentPage() {
     <CustomSuspense
       fallback={
         <Box pos={"relative"} top={"30%"} textAlign={"center"}>
-          <Spinner size={"lg"} />
+          <Spinner />
         </Box>
       }
       state={categoryLoadable.state}

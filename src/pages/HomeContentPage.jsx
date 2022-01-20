@@ -1,24 +1,41 @@
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex, Spinner } from "@chakra-ui/react";
 import { selector, useRecoilValueLoadable } from "recoil";
-import ContentWrapper from "../components/ContentWrapper/ContentWrapper";
+import ContentWrapper, {
+  contentWrapperState,
+} from "../components/ContentWrapper/ContentWrapper";
+import CustomSuspense from "../components/util/CustomSuspense";
 import { showContentConversionUtil } from "../utils/conversion.utils.js";
 import { pxToAll } from "../utils/theme.utils.js";
 
 const showContentState = selector({
   key: "showContentState",
-  get: () => {
-    return showContentConversionUtil();
+  get: ({ get }) => {
+    const metaData = showContentConversionUtil();
+    const data = metaData.map((content) => ({
+      ...content,
+      ...get(contentWrapperState({ ...content, limit: 6 })),
+    }));
+    return { data };
   },
 });
 
 export default function HomeContentPage() {
   const showContentsLoadable = useRecoilValueLoadable(showContentState);
-  const showContents = showContentsLoadable.contents;
+  const showContents = showContentsLoadable.contents?.data ?? [];
   return (
-    <Flex direction={"column"} py={pxToAll(20)} px={pxToAll(20)}>
-      {showContents.map(({ ...rest }, idx) => (
-        <ContentWrapper key={idx} {...rest} />
-      ))}
-    </Flex>
+    <CustomSuspense
+      fallback={
+        <Box textAlign={"center"} pos={"relative"} height={"100%"} top={"30%"}>
+          <Spinner />
+        </Box>
+      }
+      state={showContentsLoadable.state}
+    >
+      <Flex direction={"column"} px={pxToAll(20)}>
+        {showContents.map(({ ...rest }, idx) => (
+          <ContentWrapper key={idx} {...rest} />
+        ))}
+      </Flex>
+    </CustomSuspense>
   );
 }

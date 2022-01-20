@@ -83,7 +83,7 @@ export default function HomePage() {
           <CustomSuspense
             fallback={
               <Box pos={"relative"} top={"30%"} textAlign={"center"}>
-                <Spinner size={"lg"} />
+                <Spinner />
               </Box>
             }
             state={spotifyAuthLodableState}

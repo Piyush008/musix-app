@@ -1,17 +1,20 @@
 import { Icon } from "@chakra-ui/react";
-import { useEffect } from "react";
-import { spotifyAxios } from "../../utils/axios.utils.js";
-import { SPOTIFY_AUTH } from "../../utils/constants/privateKey.constants.js";
-import { getNewReleases, spotifyAuth } from "../../utils/spotify.utils.js";
+import { useNavigate } from "react-router-dom";
+import useAgent from "../../hooks/useAgent.js";
+import ROUTER from "../../utils/constants/router.constants.js";
 import { pxToAll } from "../../utils/theme.utils.js";
 
 export default function Logo() {
+  const navigate = useNavigate();
+  const isMobile = useAgent();
   return (
     <Icon
       viewBox="0 0 1134 340"
       height={pxToAll(40)}
       maxWidth={pxToAll(131)}
       width={"100%"}
+      cursor={isMobile ? "auto" : "pointer"}
+      onClick={() => navigate(ROUTER.HOME)}
     >
       <title>Musix</title>
       <path

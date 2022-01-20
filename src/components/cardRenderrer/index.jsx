@@ -12,7 +12,8 @@ function CardRenderer({
       templateColumns={`repeat(auto-fill,minmax(${minCardWidth},1fr))`}
       templateRows={`repeat(${noOfRows},1fr)`}
       autoRows={otherProps.overflowY != "hidden" ? undefined : autoRows}
-      rowGap={otherProps.overflowY == "hidden" ? undefined : "0.7rem"}
+      rowGap={"0.7rem"}
+      columnGap={"0.7rem"}
       {...otherProps}
     >
       {children}
