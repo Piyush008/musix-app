@@ -58,9 +58,9 @@ export default function GenrePage() {
             bgImage={contents.message?.icons?.[0]?.url}
             bgSize={"cover"}
             bgRepeat={"no-repeat"}
-            width={isMobile ? ["98%", "98%", `99%`] : `calc(100vw - 9.1rem)`}
+            width={isMobile ? "100%" : `calc(100vw - 9.1rem)`}
             position={"fixed"}
-            height={isMobile ? ["55%", "60%", "70%"] : pxToRemSm(515 / 1.5)}
+            height={pxToRemSm(515 / 1.5)}
           />
         )}
         <Flex
