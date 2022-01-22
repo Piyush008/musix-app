@@ -1,12 +1,7 @@
 import { Box, Flex, Spinner } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
-import {
-  atom,
-  selector,
-  useRecoilCallback,
-  useRecoilValueLoadable,
-} from "recoil";
+import { selector, useRecoilCallback, useRecoilValueLoadable } from "recoil";
 import Header from "../components/header/Header";
 import MusixPlayer from "../components/player/MusixPlayer";
 import DesktopSideBar from "../components/sidebar/DesktopSideBar";
