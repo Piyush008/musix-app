@@ -114,8 +114,8 @@ export default function ContentWrapper(props) {
 }
 function BigCardWrapper(props) {
   const title = props?.name ?? "";
-  const subtitle = props?.description || props?.artists[0]?.name || "";
-  const imageSource = props?.images[0].url;
+  const subtitle = props?.description || props?.artists?.[0]?.name || "";
+  const imageSource = props?.images?.[0]?.url;
   return /* @__PURE__ */ React.createElement(BigCard, {
     imageBorderRadius: "10px",
     imageSource,

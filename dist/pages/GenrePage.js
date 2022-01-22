@@ -54,7 +54,7 @@ export default function GenrePage() {
     bgImage: contents.message?.icons?.[0]?.url,
     bgSize: "cover",
     bgRepeat: "no-repeat",
-    width: isMobile ? "100%" : `calc(100vw - 9.1rem)`,
+    width: isMobile ? ["98%", "98%", `99%`] : `calc(100vw - 9.1rem)`,
     position: "fixed",
     height: pxToRemSm(515 / 1.5)
   }), /* @__PURE__ */ React.createElement(Flex, {
