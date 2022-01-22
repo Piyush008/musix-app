@@ -36,6 +36,11 @@ const theme = extendTheme({
     },
   },
   textStyles: {
+    h1: {
+      fontSize: pxToAll(80),
+      fontWeight: "bold",
+      lineHeight: 2,
+    },
     h3: {
       fontSize: pxToAll(36),
       fontWeight: "bold",

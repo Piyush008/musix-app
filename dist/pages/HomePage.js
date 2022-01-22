@@ -2,12 +2,7 @@ import React from "../../_snowpack/pkg/react.js";
 import {Box, Flex, Spinner} from "../../_snowpack/pkg/@chakra-ui/react.js";
 import {useRef, useState} from "../../_snowpack/pkg/react.js";
 import {Outlet} from "../../_snowpack/pkg/react-router-dom.js";
-import {
-  atom,
-  selector,
-  useRecoilCallback,
-  useRecoilValueLoadable
-} from "../../_snowpack/pkg/recoil.js";
+import {selector, useRecoilCallback, useRecoilValueLoadable} from "../../_snowpack/pkg/recoil.js";
 import Header from "../components/header/Header.js";
 import MusixPlayer from "../components/player/MusixPlayer.js";
 import DesktopSideBar from "../components/sidebar/DesktopSideBar.js";
