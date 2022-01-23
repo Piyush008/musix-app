@@ -24,6 +24,7 @@ function BigCard({
       _hover={{ bgColor: "whiteAlpha.100" }}
       onMouseEnter={() => setPlayButtonVisble(true)}
       onMouseLeave={() => setPlayButtonVisble(false)}
+      onClick={onClick}
       {...otherProps}
     >
       <Box>

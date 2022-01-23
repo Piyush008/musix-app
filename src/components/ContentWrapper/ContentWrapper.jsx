@@ -4,10 +4,12 @@ import { selectorFamily } from "recoil";
 import useAgent from "../../hooks/useAgent.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import {
+  getAlbum,
   getCategoryDetails,
   getCategoryPlayList,
   getFeaturedPlayList,
   getNewReleases,
+  getPlayListDetails,
 } from "../../utils/spotify.utils.js";
 import { pxToAll } from "../../utils/theme.utils.js";
 import CardRenderer from "../cardRenderrer/index.jsx";
@@ -75,7 +77,7 @@ export const contentWrapperState = selectorFamily({
   key: "contentWrapperState",
   get:
     (params) =>
-    async ({ get }) => {
+    ({ get }) => {
       const { as, ...rest } = params;
       if (as == "category") {
         const catPlayListDetails = get(categoryPlayListState(rest));
@@ -89,6 +91,37 @@ export const contentWrapperState = selectorFamily({
     },
 });
 
+const albumState = selectorFamily({
+  key: "albumState",
+  get: (id) => async () => {
+    const [data, error] = await getAlbum(id, { market: "IN" });
+    if (error) throw error;
+    return data;
+  },
+});
+
+const playlistState = selectorFamily({
+  key: "playlistState",
+  get: (id) => async () => {
+    const [data, error] = await getPlayListDetails(id, {
+      id,
+      market: "IN",
+      limit: 20,
+    });
+    if (error) throw error;
+    return data;
+  },
+});
+export const albumPlayListDetailsSate = selectorFamily({
+  key: "albumPlayListDetailsState",
+  get:
+    (params) =>
+    async ({ get }) => {
+      const { type, id } = params;
+      if (type === "album") return get(albumState(id));
+      else if (type === "playlist") return get(playlistState(id));
+    },
+});
 export default function ContentWrapper(props) {
   const { as, property, autoRows, seeAll } = props;
   const items = props?.playlists?.items || props?.albums?.items || [];
@@ -123,7 +156,7 @@ export default function ContentWrapper(props) {
       </HStack>
       <CardRenderer autoRows={autoRows}>
         {items.map(({ id, ...rest }) => (
-          <BigCardWrapper {...rest} key={id} />
+          <BigCardWrapper {...rest} key={id} id={id} />
         ))}
       </CardRenderer>
     </Flex>
@@ -131,15 +164,27 @@ export default function ContentWrapper(props) {
 }
 
 function BigCardWrapper(props) {
+  const navigate = useNavigate();
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
   const imageSource = props?.images?.[0]?.url;
+  const type = props?.type;
+  const id = props?.id;
+  const handleClick = () => {
+    navigate(`/${type}/${id}`, {
+      state: {
+        type,
+        id,
+      },
+    });
+  };
   return (
     <BigCard
       imageBorderRadius={"10px"}
       imageSource={imageSource}
       title={title}
       subtitle={subtitle}
+      onClick={handleClick}
     />
   );
 }
