@@ -5,10 +5,12 @@ import {selectorFamily} from "../../../_snowpack/pkg/recoil.js";
 import useAgent from "../../hooks/useAgent.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import {
+  getAlbum,
   getCategoryDetails,
   getCategoryPlayList,
   getFeaturedPlayList,
-  getNewReleases
+  getNewReleases,
+  getPlayListDetails
 } from "../../utils/spotify.utils.js";
 import {pxToAll} from "../../utils/theme.utils.js";
 import CardRenderer from "../cardRenderrer/index.js";
@@ -66,7 +68,7 @@ const newReleasesState = selectorFamily({
 });
 export const contentWrapperState = selectorFamily({
   key: "contentWrapperState",
-  get: (params) => async ({get}) => {
+  get: (params) => ({get}) => {
     const {as, ...rest} = params;
     if (as == "category") {
       const catPlayListDetails = get(categoryPlayListState(rest));
@@ -77,6 +79,38 @@ export const contentWrapperState = selectorFamily({
     } else if (as == "featured") {
       return get(featuredPlayListState(rest));
     }
+  }
+});
+const albumState = selectorFamily({
+  key: "albumState",
+  get: (id) => async () => {
+    const [data, error] = await getAlbum(id, {market: "IN"});
+    if (error)
+      throw error;
+    return data;
+  }
+});
+const playlistState = selectorFamily({
+  key: "playlistState",
+  get: (id) => async () => {
+    const [data, error] = await getPlayListDetails(id, {
+      id,
+      market: "IN",
+      limit: 20
+    });
+    if (error)
+      throw error;
+    return data;
+  }
+});
+export const albumPlayListDetailsSate = selectorFamily({
+  key: "albumPlayListDetailsState",
+  get: (params) => async ({get}) => {
+    const {type, id} = params;
+    if (type === "album")
+      return get(albumState(id));
+    else if (type === "playlist")
+      return get(playlistState(id));
   }
 });
 export default function ContentWrapper(props) {
@@ -109,18 +143,31 @@ export default function ContentWrapper(props) {
     autoRows
   }, items.map(({id, ...rest}) => /* @__PURE__ */ React.createElement(BigCardWrapper, {
     ...rest,
-    key: id
+    key: id,
+    id
   }))));
 }
 function BigCardWrapper(props) {
+  const navigate = useNavigate();
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
   const imageSource = props?.images?.[0]?.url;
+  const type = props?.type;
+  const id = props?.id;
+  const handleClick = () => {
+    navigate(`/${type}/${id}`, {
+      state: {
+        type,
+        id
+      }
+    });
+  };
   return /* @__PURE__ */ React.createElement(BigCard, {
     imageBorderRadius: "10px",
     imageSource,
     title,
-    subtitle
+    subtitle,
+    onClick: handleClick
   });
 }
 ContentWrapper.defaultProps = {

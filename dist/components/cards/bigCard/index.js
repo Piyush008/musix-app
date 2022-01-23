@@ -23,6 +23,7 @@ function BigCard({
     _hover: {bgColor: "whiteAlpha.100"},
     onMouseEnter: () => setPlayButtonVisble(true),
     onMouseLeave: () => setPlayButtonVisble(false),
+    onClick,
     ...otherProps
   }, /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Image, {
     borderRadius: imageBorderRadius,
