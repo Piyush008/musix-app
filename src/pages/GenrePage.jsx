@@ -1,10 +1,11 @@
 import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   atom,
   selector,
+  useRecoilState,
   useRecoilValueLoadable,
-  useSetRecoilState,
+  useResetRecoilState,
 } from "recoil";
 import ContentWrapper, {
   contentWrapperState,
@@ -14,9 +15,9 @@ import useAgent from "../hooks/useAgent";
 import { showContentConversionUtil } from "../utils/conversion.utils.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
 
-const genreParamState = atom({
+export const genreParamState = atom({
   key: "genreParamState",
-  default: {},
+  default: null,
 });
 const genreContentState = selector({
   key: "genreContentState",
@@ -27,19 +28,20 @@ const genreContentState = selector({
 });
 
 export default function GenrePage() {
-  const location = useLocation();
   const params = useParams().property;
-  const setGenreParam = useSetRecoilState(genreParamState);
+  const [genreParam, setGenreParam] = useRecoilState(genreParamState);
+  const resetGenreParam = useResetRecoilState(genreParamState);
   const isMobile = useAgent();
   React.useEffect(() => {
     let rs = {};
-    if (location.state) {
-      rs = location.state;
-    } else {
+    if (!genreParam) {
       rs = showContentConversionUtil().find((ele) => ele.property === params);
       rs["limit"] = 20;
+      setGenreParam(rs);
     }
-    setGenreParam(rs);
+    return () => {
+      resetGenreParam();
+    };
   }, []);
   const showAllContentLoadable = useRecoilValueLoadable(genreContentState);
   const contents = showAllContentLoadable.contents;

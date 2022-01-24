@@ -1,7 +1,9 @@
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { selectorFamily } from "recoil";
+import { selectorFamily, useSetRecoilState } from "recoil";
 import useAgent from "../../hooks/useAgent.js";
+import { albumPlaylistParamState } from "../../pages/AlbumPlayListPage.jsx";
+import { genreParamState } from "../../pages/GenrePage.jsx";
 import ROUTER from "../../utils/constants/router.constants.js";
 import {
   getAlbum,
@@ -128,10 +130,10 @@ export default function ContentWrapper(props) {
   const title = props?.message?.name || props?.message || "";
   const navigate = useNavigate();
   const isMobile = useAgent();
+  const setGenrePram = useSetRecoilState(genreParamState);
   const showAllContent = () => {
-    navigate(`${ROUTER.GENRE}/${property}`, {
-      state: { as, property, limit: 20, urlFrom: ROUTER.HOME },
-    });
+    setGenrePram({ as, property, limit: 20, urlFrom: ROUTER.HOME });
+    navigate(`${ROUTER.GENRE}/${property}`);
   };
 
   return (
@@ -170,13 +172,10 @@ function BigCardWrapper(props) {
   const imageSource = props?.images?.[0]?.url;
   const type = props?.type;
   const id = props?.id;
+  const setAlbumPlaylistParam = useSetRecoilState(albumPlaylistParamState);
   const handleClick = () => {
-    navigate(`/${type}/${id}`, {
-      state: {
-        type,
-        id,
-      },
-    });
+    setAlbumPlaylistParam({ type, id });
+    navigate(`/${type}/${id}`);
   };
   return (
     <BigCard

@@ -1,13 +1,18 @@
-import { Box, Flex, Image, Spinner, Text } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import { useLocation, useParams } from "react-router-dom";
-import { atom, useRecoilState, useRecoilValueLoadable } from "recoil";
+import {
+  atom,
+  useRecoilState,
+  useRecoilValueLoadable,
+  useResetRecoilState,
+} from "recoil";
 import { albumPlayListDetailsSate } from "../components/ContentWrapper/ContentWrapper";
 import CustomSuspense from "../components/util/CustomSuspense";
 import ROUTER from "../utils/constants/router.constants.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
-const albumPlaylistParamState = atom({
+export const albumPlaylistParamState = atom({
   key: "albumPlaylistParamState",
-  default: {},
+  default: null,
 });
 
 export default function AlbumPlayListPage() {
@@ -16,10 +21,9 @@ export default function AlbumPlayListPage() {
   const [albumPlaylistParam, setAlbumPlaylistParam] = useRecoilState(
     albumPlaylistParamState
   );
+  const resetParam = useResetRecoilState(albumPlaylistParamState);
   React.useEffect(() => {
-    if (location.state) {
-      setAlbumPlaylistParam(location.state);
-    } else {
+    if (!albumPlaylistParam) {
       if (location.pathname.includes(`${ROUTER.PLAYLIST}`))
         setAlbumPlaylistParam({
           type: ROUTER.PLAYLIST,
@@ -31,6 +35,9 @@ export default function AlbumPlayListPage() {
           id: params["albumId"],
         });
     }
+    return () => {
+      resetParam();
+    };
   }, []);
   if (albumPlaylistParam?.type === "playlist") return <PlayListPage />;
   else if (albumPlaylistParam?.type === "album") return <AlbumPage />;
