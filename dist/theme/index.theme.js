@@ -37,7 +37,7 @@ const theme = extendTheme({
   },
   textStyles: {
     h2: {
-      fontSize: pxToAll(80),
+      fontSize: pxToRem(80),
       fontWeight: "bold",
       lineHeight: 2,
       letterSpacing: "tighter",

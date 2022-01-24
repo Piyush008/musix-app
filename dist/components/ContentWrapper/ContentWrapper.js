@@ -1,8 +1,10 @@
 import React from "../../../_snowpack/pkg/react.js";
 import {Box, Flex, HStack, Text} from "../../../_snowpack/pkg/@chakra-ui/react.js";
 import {useNavigate} from "../../../_snowpack/pkg/react-router-dom.js";
-import {selectorFamily} from "../../../_snowpack/pkg/recoil.js";
+import {selectorFamily, useSetRecoilState} from "../../../_snowpack/pkg/recoil.js";
 import useAgent from "../../hooks/useAgent.js";
+import {albumPlaylistParamState} from "../../pages/AlbumPlayListPage.js";
+import {genreParamState} from "../../pages/GenrePage.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import {
   getAlbum,
@@ -119,10 +121,10 @@ export default function ContentWrapper(props) {
   const title = props?.message?.name || props?.message || "";
   const navigate = useNavigate();
   const isMobile = useAgent();
+  const setGenrePram = useSetRecoilState(genreParamState);
   const showAllContent = () => {
-    navigate(`${ROUTER.GENRE}/${property}`, {
-      state: {as, property, limit: 20, urlFrom: ROUTER.HOME}
-    });
+    setGenrePram({as, property, limit: 20, urlFrom: ROUTER.HOME});
+    navigate(`${ROUTER.GENRE}/${property}`);
   };
   return /* @__PURE__ */ React.createElement(Flex, {
     direction: "column",
@@ -154,13 +156,10 @@ function BigCardWrapper(props) {
   const imageSource = props?.images?.[0]?.url;
   const type = props?.type;
   const id = props?.id;
+  const setAlbumPlaylistParam = useSetRecoilState(albumPlaylistParamState);
   const handleClick = () => {
-    navigate(`/${type}/${id}`, {
-      state: {
-        type,
-        id
-      }
-    });
+    setAlbumPlaylistParam({type, id});
+    navigate(`/${type}/${id}`);
   };
   return /* @__PURE__ */ React.createElement(BigCard, {
     imageBorderRadius: "10px",

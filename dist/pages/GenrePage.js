@@ -1,11 +1,12 @@
 import React from "../../_snowpack/pkg/react.js";
 import {Box, Flex, Spinner, Text} from "../../_snowpack/pkg/@chakra-ui/react.js";
-import {useLocation, useParams} from "../../_snowpack/pkg/react-router-dom.js";
+import {useParams} from "../../_snowpack/pkg/react-router-dom.js";
 import {
   atom,
   selector,
+  useRecoilState,
   useRecoilValueLoadable,
-  useSetRecoilState
+  useResetRecoilState
 } from "../../_snowpack/pkg/recoil.js";
 import ContentWrapper, {
   contentWrapperState
@@ -14,9 +15,9 @@ import CustomSuspense from "../components/util/CustomSuspense.js";
 import useAgent from "../hooks/useAgent.js";
 import {showContentConversionUtil} from "../utils/conversion.utils.js";
 import {pxToAll, pxToRem, pxToRemSm} from "../utils/theme.utils.js";
-const genreParamState = atom({
+export const genreParamState = atom({
   key: "genreParamState",
-  default: {}
+  default: null
 });
 const genreContentState = selector({
   key: "genreContentState",
@@ -26,19 +27,20 @@ const genreContentState = selector({
   }
 });
 export default function GenrePage() {
-  const location = useLocation();
   const params = useParams().property;
-  const setGenreParam = useSetRecoilState(genreParamState);
+  const [genreParam, setGenreParam] = useRecoilState(genreParamState);
+  const resetGenreParam = useResetRecoilState(genreParamState);
   const isMobile = useAgent();
   React.useEffect(() => {
     let rs = {};
-    if (location.state) {
-      rs = location.state;
-    } else {
+    if (!genreParam) {
       rs = showContentConversionUtil().find((ele) => ele.property === params);
       rs["limit"] = 20;
+      setGenreParam(rs);
     }
-    setGenreParam(rs);
+    return () => {
+      resetGenreParam();
+    };
   }, []);
   const showAllContentLoadable = useRecoilValueLoadable(genreContentState);
   const contents = showAllContentLoadable.contents;

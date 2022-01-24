@@ -1,23 +1,27 @@
 import React from "../../_snowpack/pkg/react.js";
-import {Box, Flex, Image, Spinner, Text} from "../../_snowpack/pkg/@chakra-ui/react.js";
+import {Box, Flex, Spinner, Text} from "../../_snowpack/pkg/@chakra-ui/react.js";
 import {useLocation, useParams} from "../../_snowpack/pkg/react-router-dom.js";
-import {atom, useRecoilState, useRecoilValueLoadable} from "../../_snowpack/pkg/recoil.js";
+import {
+  atom,
+  useRecoilState,
+  useRecoilValueLoadable,
+  useResetRecoilState
+} from "../../_snowpack/pkg/recoil.js";
 import {albumPlayListDetailsSate} from "../components/ContentWrapper/ContentWrapper.js";
 import CustomSuspense from "../components/util/CustomSuspense.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import {pxToAll, pxToRem, pxToRemSm} from "../utils/theme.utils.js";
-const albumPlaylistParamState = atom({
+export const albumPlaylistParamState = atom({
   key: "albumPlaylistParamState",
-  default: {}
+  default: null
 });
 export default function AlbumPlayListPage() {
   const location = useLocation();
   const params = useParams();
   const [albumPlaylistParam, setAlbumPlaylistParam] = useRecoilState(albumPlaylistParamState);
+  const resetParam = useResetRecoilState(albumPlaylistParamState);
   React.useEffect(() => {
-    if (location.state) {
-      setAlbumPlaylistParam(location.state);
-    } else {
+    if (!albumPlaylistParam) {
       if (location.pathname.includes(`${ROUTER.PLAYLIST}`))
         setAlbumPlaylistParam({
           type: ROUTER.PLAYLIST,
@@ -29,6 +33,9 @@ export default function AlbumPlayListPage() {
           id: params["albumId"]
         });
     }
+    return () => {
+      resetParam();
+    };
   }, []);
   if (albumPlaylistParam?.type === "playlist")
     return /* @__PURE__ */ React.createElement(PlayListPage, null);
