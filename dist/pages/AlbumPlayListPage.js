@@ -1,5 +1,15 @@
 import React from "../../_snowpack/pkg/react.js";
-import {Box, Flex, Grid, GridItem, Spinner, Text} from "../../_snowpack/pkg/@chakra-ui/react.js";
+import {
+  Box,
+  Divider,
+  Flex,
+  Grid,
+  GridItem,
+  HStack,
+  Image,
+  Spinner,
+  Text
+} from "../../_snowpack/pkg/@chakra-ui/react.js";
 import {useLocation, useParams} from "../../_snowpack/pkg/react-router-dom.js";
 import {
   atom,
@@ -44,7 +54,8 @@ export default function AlbumPlayListPage() {
 function PlayListPage() {
   const [albumPlaylistParam, setAlbumPlaylistParam] = useRecoilState(albumPlaylistParamState);
   const albumPlayListLoadable = useRecoilValueLoadable(albumPlayListDetailsSate(albumPlaylistParam));
-  const contents = albumPlayListLoadable.contents;
+  const contents = albumPlayListLoadable?.contents;
+  const tracks = contents?.tracks?.items ?? [];
   return /* @__PURE__ */ React.createElement(CustomSuspense, {
     state: albumPlayListLoadable.state,
     fallback: /* @__PURE__ */ React.createElement(Box, {
@@ -63,12 +74,48 @@ function PlayListPage() {
     type: contents?.type,
     name: contents?.name,
     desc: contents?.description
-  })));
+  }), /* @__PURE__ */ React.createElement(Flex, {
+    direction: "column",
+    px: pxToAll(20),
+    overflow: "hidden"
+  }, /* @__PURE__ */ React.createElement(Grid, {
+    templateColumns: [
+      `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(375 / 1.5)}, 2fr) minmax(${pxToRemSm(100 / 1.5)}, 1fr) ${pxToRemSm(80 / 1.5)}`,
+      null,
+      `${pxToRem(25)} minmax(${pxToRem(300)}, 2fr) minmax(${pxToRem(100)}, 1fr) ${pxToRem(80)}`
+    ],
+    gridColumnGap: pxToAll(20),
+    height: pxToAll(40),
+    alignItems: "center",
+    px: pxToAll(20)
+  }, /* @__PURE__ */ React.createElement(GridItem, {
+    justifySelf: "end"
+  }, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label"
+  }, "#")), /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label"
+  }, "TITLE")), /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label",
+    isTruncated: true
+  }, "ALBUM")), /* @__PURE__ */ React.createElement(GridItem, {
+    justifySelf: "end"
+  }, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label"
+  }, "DURATION"))), /* @__PURE__ */ React.createElement(Divider, {
+    orientation: "horizontal",
+    colorScheme: "teal"
+  }), tracks.map(({track: {id, ...rest}}, idx) => /* @__PURE__ */ React.createElement(Track, {
+    ...rest,
+    key: id,
+    id,
+    seq: idx + 1
+  })))));
 }
 function AlbumPage() {
   const [albumPlaylistParam, setAlbumPlaylistParam] = useRecoilState(albumPlaylistParamState);
   const albumPlayListLoadable = useRecoilValueLoadable(albumPlayListDetailsSate(albumPlaylistParam));
   const contents = albumPlayListLoadable.contents;
+  const tracks = contents?.tracks?.items ?? [];
   return /* @__PURE__ */ React.createElement(CustomSuspense, {
     state: albumPlayListLoadable.state,
     fallback: /* @__PURE__ */ React.createElement(Box, {
@@ -87,7 +134,35 @@ function AlbumPage() {
     type: contents?.type,
     name: contents?.name,
     desc: ""
-  })));
+  }), /* @__PURE__ */ React.createElement(Flex, {
+    direction: "column",
+    px: pxToAll(20),
+    overflow: "hidden"
+  }, /* @__PURE__ */ React.createElement(Grid, {
+    templateColumns: "25px minmax(300px, 2fr) 100px",
+    gridColumnGap: pxToAll(20),
+    height: pxToAll(40),
+    alignItems: "center",
+    px: pxToAll(20)
+  }, /* @__PURE__ */ React.createElement(GridItem, {
+    justifySelf: "end"
+  }, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label"
+  }, "#")), /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label"
+  }, "TITLE")), /* @__PURE__ */ React.createElement(GridItem, {
+    justifySelf: "end"
+  }, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label"
+  }, "DURATION"))), /* @__PURE__ */ React.createElement(Divider, {
+    orientation: "horizontal",
+    colorScheme: "teal"
+  }), tracks.map(({id, ...rest}, idx) => /* @__PURE__ */ React.createElement(Track, {
+    ...rest,
+    key: id,
+    id,
+    seq: idx + 1
+  })))));
 }
 function AlbumPlaylistHeaderContent({url, type, name, desc}) {
   return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Box, {
@@ -123,4 +198,56 @@ function AlbumPlaylistHeaderContent({url, type, name, desc}) {
     textStyle: "h6",
     isTruncated: true
   }, desc)));
+}
+function Track(props) {
+  const artists = props?.artists ?? [];
+  const album = props?.album;
+  const imageUrl = album?.images[0]?.url;
+  const artistName = artists.map((artist) => artist.name);
+  return /* @__PURE__ */ React.createElement(Grid, {
+    templateColumns: album ? [
+      `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(375 / 1.5)}, 2fr) minmax(${pxToRemSm(100 / 1.5)}, 1fr) ${pxToRemSm(80 / 1.5)}`,
+      null,
+      `${pxToRem(25)} minmax(${pxToRem(300)}, 2fr) minmax(${pxToRem(100)}, 1fr) ${pxToRem(80)}`
+    ] : "25px minmax(300px, 2fr) 100px",
+    gridColumnGap: pxToAll(20),
+    height: pxToAll(60),
+    mt: pxToAll(10),
+    alignItems: "center",
+    px: pxToAll(20),
+    transition: "all 0.25s",
+    _active: {
+      bg: "brand.primary",
+      borderRadius: "10px",
+      transition: "all 0.25s"
+    }
+  }, /* @__PURE__ */ React.createElement(GridItem, {
+    justifySelf: "end"
+  }, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "h6"
+  }, props.seq)), /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(HStack, null, imageUrl && /* @__PURE__ */ React.createElement(Box, {
+    width: pxToAll(50)
+  }, /* @__PURE__ */ React.createElement(Image, {
+    src: imageUrl
+  })), /* @__PURE__ */ React.createElement(Box, {
+    width: [
+      `calc(100% - ${pxToRemSm(50 / 1.5)} - 0.5rem)`,
+      null,
+      `calc(100% - ${pxToRem(50)} - 0.5rem)`
+    ]
+  }, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "h6",
+    color: "text.secondary",
+    isTruncated: true
+  }, props.name), /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "p",
+    isTruncated: true
+  }, artistName.join())))), album && /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label",
+    isTruncated: true
+  }, album?.name)), /* @__PURE__ */ React.createElement(GridItem, {
+    justifySelf: "end"
+  }, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label"
+  }, props?.duration_ms)));
 }
