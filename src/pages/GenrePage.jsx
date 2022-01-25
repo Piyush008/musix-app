@@ -12,7 +12,6 @@ import ContentWrapper, {
 } from "../components/ContentWrapper/ContentWrapper";
 import CustomSuspense from "../components/util/CustomSuspense";
 import useAgent from "../hooks/useAgent";
-import { showContentConversionUtil } from "../utils/conversion.utils.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
 
 export const genreParamState = atom({
@@ -28,17 +27,14 @@ const genreContentState = selector({
 });
 
 export default function GenrePage() {
-  const params = useParams().property;
+  const property = useParams().property;
   const [genreParam, setGenreParam] = useRecoilState(genreParamState);
   const resetGenreParam = useResetRecoilState(genreParamState);
   const isMobile = useAgent();
   React.useEffect(() => {
-    let rs = {};
-    if (!genreParam) {
-      rs = showContentConversionUtil().find((ele) => ele.property === params);
-      rs["limit"] = 20;
-      setGenreParam(rs);
-    }
+    if (property === "featured" || property === "release")
+      setGenreParam({ as: property, property, limit: 20 });
+    else setGenreParam({ as: "category", property, limit: 20 });
     return () => {
       resetGenreParam();
     };
@@ -101,7 +97,12 @@ export default function GenrePage() {
                 : "none"
             }
           >
-            <ContentWrapper {...contents} autoRows={"auto"} seeAll={false} />
+            <ContentWrapper
+              {...contents}
+              autoRows={"auto"}
+              seeAll={false}
+              noOfChildren={"auto-fill"}
+            />
           </Box>
         </Flex>
       </React.Fragment>

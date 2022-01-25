@@ -1,9 +1,7 @@
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { selectorFamily, useSetRecoilState } from "recoil";
+import { selectorFamily } from "recoil";
 import useAgent from "../../hooks/useAgent.js";
-import { albumPlaylistParamState } from "../../pages/AlbumPlayListPage.jsx";
-import { genreParamState } from "../../pages/GenrePage.jsx";
 import ROUTER from "../../utils/constants/router.constants.js";
 import {
   getAlbum,
@@ -125,14 +123,12 @@ export const albumPlayListDetailsSate = selectorFamily({
     },
 });
 export default function ContentWrapper(props) {
-  const { as, property, autoRows, seeAll } = props;
+  const { property, autoRows, seeAll, noOfChildren } = props;
   const items = props?.playlists?.items || props?.albums?.items || [];
   const title = props?.message?.name || props?.message || "";
   const navigate = useNavigate();
   const isMobile = useAgent();
-  const setGenrePram = useSetRecoilState(genreParamState);
   const showAllContent = () => {
-    setGenrePram({ as, property, limit: 20, urlFrom: ROUTER.HOME });
     navigate(`${ROUTER.GENRE}/${property}`);
   };
 
@@ -147,7 +143,7 @@ export default function ContentWrapper(props) {
         {seeAll && (
           <CustomItem
             variant="card"
-            onClick={() => showAllContent({ as, property, limit: 20 })}
+            onClick={() => showAllContent()}
             cursor={isMobile ? "auto" : "pointer"}
           >
             <Text fontWeight={"bold"} textStyle={"p"}>
@@ -156,7 +152,7 @@ export default function ContentWrapper(props) {
           </CustomItem>
         )}
       </HStack>
-      <CardRenderer autoRows={autoRows}>
+      <CardRenderer autoRows={autoRows} noOfChildren={noOfChildren}>
         {items.map(({ id, ...rest }) => (
           <BigCardWrapper {...rest} key={id} id={id} />
         ))}
@@ -172,9 +168,7 @@ function BigCardWrapper(props) {
   const imageSource = props?.images?.[0]?.url;
   const type = props?.type;
   const id = props?.id;
-  const setAlbumPlaylistParam = useSetRecoilState(albumPlaylistParamState);
   const handleClick = () => {
-    setAlbumPlaylistParam({ type, id });
     navigate(`/${type}/${id}`);
   };
   return (
@@ -191,4 +185,5 @@ function BigCardWrapper(props) {
 ContentWrapper.defaultProps = {
   autoRows: 0,
   seeAll: true,
+  noOfChildren: 6,
 };

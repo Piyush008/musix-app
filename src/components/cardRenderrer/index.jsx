@@ -1,4 +1,5 @@
 import { Grid } from "@chakra-ui/react";
+import { pxToRem, pxToRemSm } from "../../utils/theme.utils.js";
 import AgentDetect from "../util/AgentDetect";
 
 function CardRenderer({
@@ -13,7 +14,9 @@ function CardRenderer({
     <AgentDetect
       desktopComponent={
         <Grid
-          templateColumns={`repeat(auto-fill,minmax(${minCardWidth},1fr))`}
+          templateColumns={`repeat(auto-fill,minmax(${pxToRem(
+            minCardWidth
+          )},1fr))`}
           templateRows={`repeat(${noOfRows},1fr)`}
           autoRows={otherProps.overflowY != "hidden" ? undefined : autoRows}
           rowGap={"0.7rem"}
@@ -25,7 +28,9 @@ function CardRenderer({
       }
       mobileComponent={
         <Grid
-          templateColumns={`repeat(${noOfChildren},40vw)`}
+          templateColumns={`repeat(${noOfChildren},minmax(${pxToRemSm(
+            minCardWidth / 1.5
+          )},1fr))`}
           templateRows={`repeat(${noOfRows},1fr)`}
           autoRows={otherProps.overflowY != "hidden" ? undefined : autoRows}
           rowGap={"0.7rem"}
@@ -45,7 +50,7 @@ function CardRenderer({
 }
 
 CardRenderer.defaultProps = {
-  minCardWidth: "180px",
+  minCardWidth: "200",
   noOfRows: 1,
   columnGap: "0.7rem",
   overflowX: "auto",

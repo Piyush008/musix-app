@@ -4,6 +4,7 @@ import ContentWrapper, {
   contentWrapperState,
 } from "../components/ContentWrapper/ContentWrapper";
 import CustomSuspense from "../components/util/CustomSuspense";
+import useAgent from "../hooks/useAgent";
 import { showContentConversionUtil } from "../utils/conversion.utils.js";
 import { pxToAll } from "../utils/theme.utils.js";
 
@@ -22,6 +23,7 @@ const showContentState = selector({
 export default function HomeContentPage() {
   const showContentsLoadable = useRecoilValueLoadable(showContentState);
   const showContents = showContentsLoadable.contents?.data ?? [];
+  const isMobile = useAgent();
   return (
     <CustomSuspense
       fallback={
@@ -31,9 +33,9 @@ export default function HomeContentPage() {
       }
       state={showContentsLoadable.state}
     >
-      <Flex direction={"column"} px={pxToAll(20)}>
+      <Flex direction={"column"} pl={pxToAll(20)}>
         {showContents.map(({ ...rest }, idx) => (
-          <ContentWrapper key={idx} {...rest} />
+          <ContentWrapper key={idx} {...rest} seeAll={!isMobile} />
         ))}
       </Flex>
     </CustomSuspense>

@@ -36,7 +36,7 @@ export default function SearchContentPage() {
         <Text textStyle={"h5"} color={"text.secondary"}>
           Browse all
         </Text>
-        <CardRenderer minCardWidth={"155px"} autoRows={"auto"}>
+        <CardRenderer autoRows={"auto"} noOfChildren={"auto-fill"}>
           {items.map(({ id, ...rest }) => (
             <CategoryCard key={id} {...rest} property={id} />
           ))}

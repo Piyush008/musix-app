@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import { Box, Flex, Grid, GridItem, Spinner, Text } from "@chakra-ui/react";
 import { useLocation, useParams } from "react-router-dom";
 import {
   atom,
@@ -23,18 +23,16 @@ export default function AlbumPlayListPage() {
   );
   const resetParam = useResetRecoilState(albumPlaylistParamState);
   React.useEffect(() => {
-    if (!albumPlaylistParam) {
-      if (location.pathname.includes(`${ROUTER.PLAYLIST}`))
-        setAlbumPlaylistParam({
-          type: ROUTER.PLAYLIST,
-          id: params["playlistId"],
-        });
-      else if (location.pathname.includes(`${ROUTER.ALBUM}`))
-        setAlbumPlaylistParam({
-          type: ROUTER.ALBUM,
-          id: params["albumId"],
-        });
-    }
+    if (location.pathname.includes(`${ROUTER.PLAYLIST}`))
+      setAlbumPlaylistParam({
+        type: ROUTER.PLAYLIST,
+        id: params["playlistId"],
+      });
+    else if (location.pathname.includes(`${ROUTER.ALBUM}`))
+      setAlbumPlaylistParam({
+        type: ROUTER.ALBUM,
+        id: params["albumId"],
+      });
     return () => {
       resetParam();
     };
