@@ -1,5 +1,6 @@
 import React from "../../../_snowpack/pkg/react.js";
 import {Grid} from "../../../_snowpack/pkg/@chakra-ui/react.js";
+import {pxToRem, pxToRemSm} from "../../utils/theme.utils.js";
 import AgentDetect from "../util/AgentDetect.js";
 function CardRenderer({
   minCardWidth,
@@ -11,7 +12,7 @@ function CardRenderer({
 }) {
   return /* @__PURE__ */ React.createElement(AgentDetect, {
     desktopComponent: /* @__PURE__ */ React.createElement(Grid, {
-      templateColumns: `repeat(auto-fill,minmax(${minCardWidth},1fr))`,
+      templateColumns: `repeat(auto-fill,minmax(${pxToRem(minCardWidth)},1fr))`,
       templateRows: `repeat(${noOfRows},1fr)`,
       autoRows: otherProps.overflowY != "hidden" ? void 0 : autoRows,
       rowGap: "0.7rem",
@@ -19,7 +20,7 @@ function CardRenderer({
       ...otherProps
     }, children),
     mobileComponent: /* @__PURE__ */ React.createElement(Grid, {
-      templateColumns: `repeat(${noOfChildren},40vw)`,
+      templateColumns: `repeat(${noOfChildren},minmax(${pxToRemSm(minCardWidth / 1.5)},1fr))`,
       templateRows: `repeat(${noOfRows},1fr)`,
       autoRows: otherProps.overflowY != "hidden" ? void 0 : autoRows,
       rowGap: "0.7rem",
@@ -34,7 +35,7 @@ function CardRenderer({
   });
 }
 CardRenderer.defaultProps = {
-  minCardWidth: "180px",
+  minCardWidth: "200",
   noOfRows: 1,
   columnGap: "0.7rem",
   overflowX: "auto",
