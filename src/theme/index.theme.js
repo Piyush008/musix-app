@@ -62,6 +62,11 @@ const theme = extendTheme({
       fontWeight: "normal",
       lineHeight: 1.25,
     },
+    label: {
+      fontSize: pxToAll(16),
+      fontWeight: "normal",
+      lineHeight: 1.25,
+    },
     p: {
       fontSize: pxToAll(14),
       fontWeight: "normal",

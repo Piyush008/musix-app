@@ -1,4 +1,14 @@
-import { Box, Flex, Grid, GridItem, Spinner, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Divider,
+  Flex,
+  Grid,
+  GridItem,
+  HStack,
+  Image,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import { useLocation, useParams } from "react-router-dom";
 import {
   atom,
@@ -49,7 +59,8 @@ function PlayListPage() {
   const albumPlayListLoadable = useRecoilValueLoadable(
     albumPlayListDetailsSate(albumPlaylistParam)
   );
-  const contents = albumPlayListLoadable.contents;
+  const contents = albumPlayListLoadable?.contents;
+  const tracks = contents?.tracks?.items ?? [];
   return (
     <CustomSuspense
       state={albumPlayListLoadable.state}
@@ -70,6 +81,44 @@ function PlayListPage() {
           name={contents?.name}
           desc={contents?.description}
         />
+        <Flex direction={"column"} px={pxToAll(20)} overflow={"hidden"}>
+          <Grid
+            templateColumns={[
+              `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(
+                375 / 1.5
+              )}, 2fr) minmax(${pxToRemSm(100 / 1.5)}, 1fr) ${pxToRemSm(
+                80 / 1.5
+              )}`,
+              null,
+              `${pxToRem(25)} minmax(${pxToRem(300)}, 2fr) minmax(${pxToRem(
+                100
+              )}, 1fr) ${pxToRem(80)}`,
+            ]}
+            gridColumnGap={pxToAll(20)}
+            height={pxToAll(40)}
+            alignItems={"center"}
+            px={pxToAll(20)}
+          >
+            <GridItem justifySelf={"end"}>
+              <Text textStyle={"label"}>#</Text>
+            </GridItem>
+            <GridItem>
+              <Text textStyle={"label"}>TITLE</Text>
+            </GridItem>
+            <GridItem>
+              <Text textStyle={"label"} isTruncated>
+                ALBUM
+              </Text>
+            </GridItem>
+            <GridItem justifySelf={"end"}>
+              <Text textStyle={"label"}>DURATION</Text>
+            </GridItem>
+          </Grid>
+          <Divider orientation="horizontal" colorScheme={"teal"} />
+          {tracks.map(({ track: { id, ...rest } }, idx) => (
+            <Track {...rest} key={id} id={id} seq={idx + 1} />
+          ))}
+        </Flex>
       </Flex>
     </CustomSuspense>
   );
@@ -83,6 +132,7 @@ function AlbumPage() {
     albumPlayListDetailsSate(albumPlaylistParam)
   );
   const contents = albumPlayListLoadable.contents;
+  const tracks = contents?.tracks?.items ?? [];
   return (
     <CustomSuspense
       state={albumPlayListLoadable.state}
@@ -103,6 +153,29 @@ function AlbumPage() {
           name={contents?.name}
           desc={""}
         />
+        <Flex direction={"column"} px={pxToAll(20)} overflow={"hidden"}>
+          <Grid
+            templateColumns={"25px minmax(300px, 2fr) 100px"}
+            gridColumnGap={pxToAll(20)}
+            height={pxToAll(40)}
+            alignItems={"center"}
+            px={pxToAll(20)}
+          >
+            <GridItem justifySelf={"end"}>
+              <Text textStyle={"label"}>#</Text>
+            </GridItem>
+            <GridItem>
+              <Text textStyle={"label"}>TITLE</Text>
+            </GridItem>
+            <GridItem justifySelf={"end"}>
+              <Text textStyle={"label"}>DURATION</Text>
+            </GridItem>
+          </Grid>
+          <Divider orientation="horizontal" colorScheme={"teal"} />
+          {tracks.map(({ id, ...rest }, idx) => (
+            <Track {...rest} key={id} id={id} seq={idx + 1} />
+          ))}
+        </Flex>
       </Flex>
     </CustomSuspense>
   );
@@ -153,5 +226,79 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
         </Text>
       </Flex>
     </React.Fragment>
+  );
+}
+
+function Track(props) {
+  const artists = props?.artists ?? [];
+  const album = props?.album;
+  const imageUrl = album?.images[0]?.url;
+  const artistName = artists.map((artist) => artist.name);
+  return (
+    <Grid
+      templateColumns={
+        album
+          ? [
+              `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(
+                375 / 1.5
+              )}, 2fr) minmax(${pxToRemSm(100 / 1.5)}, 1fr) ${pxToRemSm(
+                80 / 1.5
+              )}`,
+              null,
+              `${pxToRem(25)} minmax(${pxToRem(300)}, 2fr) minmax(${pxToRem(
+                100
+              )}, 1fr) ${pxToRem(80)}`,
+            ]
+          : "25px minmax(300px, 2fr) 100px"
+      }
+      gridColumnGap={pxToAll(20)}
+      height={pxToAll(60)}
+      mt={pxToAll(10)}
+      alignItems={"center"}
+      px={pxToAll(20)}
+      transition="all 0.25s"
+      _active={{
+        bg: "brand.primary",
+        borderRadius: "10px",
+        transition: "all 0.25s",
+      }}
+    >
+      <GridItem justifySelf={"end"}>
+        <Text textStyle={"h6"}>{props.seq}</Text>
+      </GridItem>
+      <GridItem>
+        <HStack>
+          {imageUrl && (
+            <Box width={pxToAll(50)}>
+              <Image src={imageUrl} />
+            </Box>
+          )}
+          <Box
+            width={[
+              `calc(100% - ${pxToRemSm(50 / 1.5)} - 0.5rem)`,
+              null,
+              `calc(100% - ${pxToRem(50)} - 0.5rem)`,
+            ]}
+          >
+            <Text textStyle={"h6"} color={"text.secondary"} isTruncated>
+              {props.name}
+            </Text>
+            <Text textStyle={"p"} isTruncated>
+              {artistName.join()}
+            </Text>
+          </Box>
+        </HStack>
+      </GridItem>
+      {album && (
+        <GridItem>
+          <Text textStyle={"label"} isTruncated>
+            {album?.name}
+          </Text>
+        </GridItem>
+      )}
+      <GridItem justifySelf={"end"}>
+        <Text textStyle={"label"}>{props?.duration_ms}</Text>
+      </GridItem>
+    </Grid>
   );
 }
