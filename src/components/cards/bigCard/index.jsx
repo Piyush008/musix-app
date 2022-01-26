@@ -59,15 +59,10 @@ function BigCard({
         </Box>
       </Box>
       <Box paddingTop={pxToAll(15)}>
-        <Text
-          isTruncated
-          textStyle={"h6"}
-          fontWeight="bold"
-          color={"text.secondary"}
-        >
+        <Text isTruncated textStyle={"h5"} color={"text.secondary"}>
           {title}
         </Text>
-        <Text noOfLines={2} textStyle={"p"} mt={pxToAll(5)}>
+        <Text noOfLines={2} textStyle={"h6"}>
           {subtitle}
         </Text>
       </Box>

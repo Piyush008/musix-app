@@ -252,12 +252,12 @@ function Track(props) {
           : "25px minmax(300px, 2fr) 100px"
       }
       gridColumnGap={pxToAll(20)}
-      height={pxToAll(60)}
+      height={pxToAll(70)}
       mt={pxToAll(10)}
       alignItems={"center"}
       px={pxToAll(20)}
       transition="all 0.25s"
-      _active={{
+      _hover={{
         bg: "brand.primary",
         borderRadius: "10px",
         transition: "all 0.25s",
@@ -269,35 +269,40 @@ function Track(props) {
       <GridItem>
         <HStack>
           {imageUrl && (
-            <Box width={pxToAll(50)}>
+            <Box width={pxToAll(60)}>
               <Image src={imageUrl} />
             </Box>
           )}
           <Box
             width={[
-              `calc(100% - ${pxToRemSm(50 / 1.5)} - 0.5rem)`,
+              `calc(100% - ${pxToRemSm(60 / 1.5)} - 0.5rem)`,
               null,
-              `calc(100% - ${pxToRem(50)} - 0.5rem)`,
+              `calc(100% - ${pxToRem(60)} - 0.5rem)`,
             ]}
           >
-            <Text textStyle={"h6"} color={"text.secondary"} isTruncated>
+            <Text
+              textStyle={"h5"}
+              color={"text.secondary"}
+              isTruncated
+              fontWeight={"normal"}
+            >
               {props.name}
             </Text>
-            <Text textStyle={"p"} isTruncated>
-              {artistName.join()}
+            <Text textStyle={"h6"} isTruncated>
+              {artistName.join(", ")}
             </Text>
           </Box>
         </HStack>
       </GridItem>
       {album && (
         <GridItem>
-          <Text textStyle={"label"} isTruncated>
+          <Text textStyle={"h6"} isTruncated>
             {album?.name}
           </Text>
         </GridItem>
       )}
       <GridItem justifySelf={"end"}>
-        <Text textStyle={"label"}>{props?.duration_ms}</Text>
+        <Text textStyle={"h6"}>{props?.duration_ms}</Text>
       </GridItem>
     </Grid>
   );
