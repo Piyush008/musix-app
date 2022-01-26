@@ -211,12 +211,12 @@ function Track(props) {
       `${pxToRem(25)} minmax(${pxToRem(300)}, 2fr) minmax(${pxToRem(100)}, 1fr) ${pxToRem(80)}`
     ] : "25px minmax(300px, 2fr) 100px",
     gridColumnGap: pxToAll(20),
-    height: pxToAll(60),
+    height: pxToAll(70),
     mt: pxToAll(10),
     alignItems: "center",
     px: pxToAll(20),
     transition: "all 0.25s",
-    _active: {
+    _hover: {
       bg: "brand.primary",
       borderRadius: "10px",
       transition: "all 0.25s"
@@ -226,28 +226,29 @@ function Track(props) {
   }, /* @__PURE__ */ React.createElement(Text, {
     textStyle: "h6"
   }, props.seq)), /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(HStack, null, imageUrl && /* @__PURE__ */ React.createElement(Box, {
-    width: pxToAll(50)
+    width: pxToAll(60)
   }, /* @__PURE__ */ React.createElement(Image, {
     src: imageUrl
   })), /* @__PURE__ */ React.createElement(Box, {
     width: [
-      `calc(100% - ${pxToRemSm(50 / 1.5)} - 0.5rem)`,
+      `calc(100% - ${pxToRemSm(60 / 1.5)} - 0.5rem)`,
       null,
-      `calc(100% - ${pxToRem(50)} - 0.5rem)`
+      `calc(100% - ${pxToRem(60)} - 0.5rem)`
     ]
   }, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h6",
+    textStyle: "h5",
     color: "text.secondary",
-    isTruncated: true
+    isTruncated: true,
+    fontWeight: "normal"
   }, props.name), /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "p",
+    textStyle: "h6",
     isTruncated: true
-  }, artistName.join())))), album && /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "label",
+  }, artistName.join(", "))))), album && /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "h6",
     isTruncated: true
   }, album?.name)), /* @__PURE__ */ React.createElement(GridItem, {
     justifySelf: "end"
   }, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "label"
+    textStyle: "h6"
   }, props?.duration_ms)));
 }
