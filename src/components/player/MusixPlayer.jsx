@@ -14,8 +14,87 @@ import { FaPause, FaPlay } from "react-icons/fa";
 
 export default function MusixPlayer() {
   const isMobile = useAgent();
+  const player = React.useRef();
+
+  const [PlayerState, setPlayerState] = React.useState({
+    track: "http://localhost:3000/youtube.com/watch?v=9iIX4PBplAY",
+    isPlaying: false,
+    isLoading: false,
+    totalDuration: 211.281,
+    currentTime: 0,
+  });
+
+  // Adding onTimeUpdate Event listener to player
+  React.useEffect(() => {
+    if (player.current) {
+      player.current.ontimeupdate = (event) =>
+        setPlayerState((previousState) => ({
+          ...previousState,
+          currentTime: event.srcElement.currentTime,
+        }));
+    }
+  }, [player]);
+
+  React.useEffect(() => {
+    if (player.current) {
+      player.current.src = PlayerState.track;
+      player.current.onstalled = () => console.log("stalled");
+      player.current.onseeked = () =>
+        setPlayerState((previousState) => ({
+          ...previousState,
+          isLoading: false,
+        }));
+      player.current.onseeking = () =>
+        setPlayerState((previousState) => ({
+          ...previousState,
+          isLoading: true,
+        }));
+    }
+  }, [PlayerState.track]);
+
+  React.useEffect(() => {
+    if (player.current) {
+      if (!PlayerState.isPlaying) {
+        player.current.pause();
+      } else {
+        player.current.play();
+      }
+    }
+  }, [PlayerState.isPlaying]);
+
   const secondsToMins = (sec) =>
-    `${Math.floor(sec / 60)}:${("0" + (sec % 60)).slice(-2)}`;
+    `${Math.floor(sec / 60)}:${("0" + (Math.floor(sec) % 60)).slice(-2)}`;
+
+  const getSliderValue = () =>
+    (PlayerState.currentTime / PlayerState.totalDuration) * 100;
+
+  const handlePlayerChange = (value) => {
+    let currentTime = (value * PlayerState.totalDuration) / 100;
+    setPlayerState((previousState) => ({
+      ...previousState,
+      currentTime: currentTime,
+    }));
+    if (player.current) {
+      player.current.currentTime = currentTime;
+    }
+  };
+
+  const handlePlayPauseClick = () => {
+    if (player.current && PlayerState.track) {
+      if (PlayerState.isPlaying) {
+        setPlayerState((previousState) => ({
+          ...previousState,
+          isPlaying: false,
+        }));
+      } else {
+        setPlayerState((previousState) => ({
+          ...previousState,
+          isPlaying: true,
+        }));
+      }
+    }
+  };
+
   return (
     <VStack
       justify={"space-evenly"}
@@ -26,21 +105,23 @@ export default function MusixPlayer() {
       bg={"brand.secondary"}
       zIndex={"1"}
       boxShadow={`0 -5px 25px rgba(0,0,0,0.2)`}
+      px={"6"}
     >
-      <audio display="none" />
-      <Slider aria-label="slider-ex-2" colorScheme="pink" defaultValue={50}>
+      <audio ref={player} />
+      <Slider
+        aria-label="slider-ex-2"
+        colorScheme="pink"
+        defaultValue={0}
+        value={getSliderValue()}
+        onChange={handlePlayerChange}
+        isDisabled={PlayerState.isLoading}
+      >
         <SliderTrack>
           <SliderFilledTrack />
         </SliderTrack>
         <SliderThumb />
       </Slider>
-      <HStack
-        w="100%"
-        justifyContent={"space-between"}
-        paddingLeft={"4"}
-        paddingRight={"4"}
-        paddingBottom={"2"}
-      >
+      <HStack w="100%" justifyContent={"space-between"} paddingBottom={"2"}>
         <Box
           borderRadius={"1rem"}
           borderWidth={"thin"}
@@ -49,7 +130,7 @@ export default function MusixPlayer() {
           boxShadow={"inset 0 0 20px black"}
           borderColor={"blackAlpha.200"}
         >
-          {secondsToMins(0)}
+          {secondsToMins(PlayerState.currentTime)}
         </Box>
         <Box>
           <IconButton
@@ -59,8 +140,10 @@ export default function MusixPlayer() {
             paddingInlineStart={`${pxToRem(18)} !important`}
             paddingInlineEnd={`${pxToRem(18)} !important`}
             borderRadius="100%"
+            onClick={handlePlayPauseClick}
+            isLoading={PlayerState.isLoading}
             isRound={true}
-            icon={<FaPause />}
+            icon={PlayerState.isPlaying ? <FaPause /> : <FaPlay />}
           />
         </Box>
         <Box
@@ -71,7 +154,7 @@ export default function MusixPlayer() {
           boxShadow={"inset 0 0 20px black"}
           borderColor={"blackAlpha.200"}
         >
-          {secondsToMins(500)}
+          {secondsToMins(PlayerState.totalDuration)}
         </Box>
       </HStack>
     </VStack>
