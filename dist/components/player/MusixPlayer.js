@@ -14,7 +14,72 @@ import {pxToAll, pxToRem} from "../../utils/theme.utils.js";
 import {FaPause, FaPlay} from "../../../_snowpack/pkg/react-icons/fa.js";
 export default function MusixPlayer() {
   const isMobile = useAgent();
-  const secondsToMins = (sec) => `${Math.floor(sec / 60)}:${("0" + sec % 60).slice(-2)}`;
+  const player = React.useRef();
+  const [PlayerState, setPlayerState] = React.useState({
+    track: "http://localhost:3000/youtube.com/watch?v=9iIX4PBplAY",
+    isPlaying: false,
+    isLoading: false,
+    totalDuration: 211.281,
+    currentTime: 0
+  });
+  React.useEffect(() => {
+    if (player.current) {
+      player.current.ontimeupdate = (event) => setPlayerState((previousState) => ({
+        ...previousState,
+        currentTime: event.srcElement.currentTime
+      }));
+    }
+  }, [player]);
+  React.useEffect(() => {
+    if (player.current) {
+      player.current.src = PlayerState.track;
+      player.current.onstalled = () => console.log("stalled");
+      player.current.onseeked = () => setPlayerState((previousState) => ({
+        ...previousState,
+        isLoading: false
+      }));
+      player.current.onseeking = () => setPlayerState((previousState) => ({
+        ...previousState,
+        isLoading: true
+      }));
+    }
+  }, [PlayerState.track]);
+  React.useEffect(() => {
+    if (player.current) {
+      if (!PlayerState.isPlaying) {
+        player.current.pause();
+      } else {
+        player.current.play();
+      }
+    }
+  }, [PlayerState.isPlaying]);
+  const secondsToMins = (sec) => `${Math.floor(sec / 60)}:${("0" + Math.floor(sec) % 60).slice(-2)}`;
+  const getSliderValue = () => PlayerState.currentTime / PlayerState.totalDuration * 100;
+  const handlePlayerChange = (value) => {
+    let currentTime = value * PlayerState.totalDuration / 100;
+    setPlayerState((previousState) => ({
+      ...previousState,
+      currentTime
+    }));
+    if (player.current) {
+      player.current.currentTime = currentTime;
+    }
+  };
+  const handlePlayPauseClick = () => {
+    if (player.current && PlayerState.track) {
+      if (PlayerState.isPlaying) {
+        setPlayerState((previousState) => ({
+          ...previousState,
+          isPlaying: false
+        }));
+      } else {
+        setPlayerState((previousState) => ({
+          ...previousState,
+          isPlaying: true
+        }));
+      }
+    }
+  };
   return /* @__PURE__ */ React.createElement(VStack, {
     justify: "space-evenly",
     height: pxToAll(100),
@@ -23,18 +88,20 @@ export default function MusixPlayer() {
     w: "100%",
     bg: "brand.secondary",
     zIndex: "1",
-    boxShadow: `0 -5px 25px rgba(0,0,0,0.2)`
+    boxShadow: `0 -5px 25px rgba(0,0,0,0.2)`,
+    px: "6"
   }, /* @__PURE__ */ React.createElement("audio", {
-    display: "none"
+    ref: player
   }), /* @__PURE__ */ React.createElement(Slider, {
     "aria-label": "slider-ex-2",
     colorScheme: "pink",
-    defaultValue: 50
+    defaultValue: 0,
+    value: getSliderValue(),
+    onChange: handlePlayerChange,
+    isDisabled: PlayerState.isLoading
   }, /* @__PURE__ */ React.createElement(SliderTrack, null, /* @__PURE__ */ React.createElement(SliderFilledTrack, null)), /* @__PURE__ */ React.createElement(SliderThumb, null)), /* @__PURE__ */ React.createElement(HStack, {
     w: "100%",
     justifyContent: "space-between",
-    paddingLeft: "4",
-    paddingRight: "4",
     paddingBottom: "2"
   }, /* @__PURE__ */ React.createElement(Box, {
     borderRadius: "1rem",
@@ -43,15 +110,17 @@ export default function MusixPlayer() {
     fontSize: pxToAll(18),
     boxShadow: "inset 0 0 20px black",
     borderColor: "blackAlpha.200"
-  }, secondsToMins(0)), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(IconButton, {
+  }, secondsToMins(PlayerState.currentTime)), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(IconButton, {
     fontSize: `${pxToRem(24)} !important`,
     paddingTop: `${pxToRem(18)} !important`,
     paddingBottom: `${pxToRem(18)} !important`,
     paddingInlineStart: `${pxToRem(18)} !important`,
     paddingInlineEnd: `${pxToRem(18)} !important`,
     borderRadius: "100%",
+    onClick: handlePlayPauseClick,
+    isLoading: PlayerState.isLoading,
     isRound: true,
-    icon: /* @__PURE__ */ React.createElement(FaPause, null)
+    icon: PlayerState.isPlaying ? /* @__PURE__ */ React.createElement(FaPause, null) : /* @__PURE__ */ React.createElement(FaPlay, null)
   })), /* @__PURE__ */ React.createElement(Box, {
     borderRadius: "1rem",
     borderWidth: "thin",
@@ -59,5 +128,5 @@ export default function MusixPlayer() {
     fontSize: pxToAll(18),
     boxShadow: "inset 0 0 20px black",
     borderColor: "blackAlpha.200"
-  }, secondsToMins(500))));
+  }, secondsToMins(PlayerState.totalDuration))));
 }
