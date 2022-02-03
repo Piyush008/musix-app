@@ -24,7 +24,9 @@ export default function MusixPlayer() {
     bg: "brand.secondary",
     zIndex: "1",
     boxShadow: `0 -5px 25px rgba(0,0,0,0.2)`
-  }, /* @__PURE__ */ React.createElement(Slider, {
+  }, /* @__PURE__ */ React.createElement("audio", {
+    display: "none"
+  }), /* @__PURE__ */ React.createElement(Slider, {
     "aria-label": "slider-ex-2",
     colorScheme: "pink",
     defaultValue: 50
@@ -34,7 +36,7 @@ export default function MusixPlayer() {
     paddingLeft: "4",
     paddingRight: "4",
     paddingBottom: "2"
-  }, /* @__PURE__ */ React.createElement(GoogleLogout, null), /* @__PURE__ */ React.createElement(Box, {
+  }, /* @__PURE__ */ React.createElement(Box, {
     borderRadius: "1rem",
     borderWidth: "thin",
     p: "1.5",
