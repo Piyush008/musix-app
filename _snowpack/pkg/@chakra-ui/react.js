@@ -1,5 +1,5 @@
 import { c as createCommonjsModule, r as react, a as commonjsGlobal } from '../common/index-210ebed7.js';
-import { _ as _extends$b } from '../common/extends-7477639a.js';
+import { _ as _extends$d } from '../common/extends-7477639a.js';
 import '../common/index-86457145.js';
 
 /*
@@ -1313,7 +1313,7 @@ var getTheme = function getTheme(outerTheme, theme) {
     return mergedTheme;
   }
 
-  return _extends$b({}, outerTheme, theme);
+  return _extends$d({}, outerTheme, theme);
 };
 
 var createCacheWithTheme = /* #__PURE__ */weakMemoize(function (outerTheme) {
@@ -1450,6 +1450,128 @@ var CSSReset = function CSSReset() {
   });
 };
 var CSSReset$1 = CSSReset;
+
+var prefix = 'Invariant failed';
+function invariant(condition, message) {
+    if (condition) {
+        return;
+    }
+    {
+        throw new Error(prefix);
+    }
+}
+
+var getRect = function getRect(_ref) {
+  var top = _ref.top,
+      right = _ref.right,
+      bottom = _ref.bottom,
+      left = _ref.left;
+  var width = right - left;
+  var height = bottom - top;
+  var rect = {
+    top: top,
+    right: right,
+    bottom: bottom,
+    left: left,
+    width: width,
+    height: height,
+    x: left,
+    y: top,
+    center: {
+      x: (right + left) / 2,
+      y: (bottom + top) / 2
+    }
+  };
+  return rect;
+};
+var expand = function expand(target, expandBy) {
+  return {
+    top: target.top - expandBy.top,
+    left: target.left - expandBy.left,
+    bottom: target.bottom + expandBy.bottom,
+    right: target.right + expandBy.right
+  };
+};
+var shrink = function shrink(target, shrinkBy) {
+  return {
+    top: target.top + shrinkBy.top,
+    left: target.left + shrinkBy.left,
+    bottom: target.bottom - shrinkBy.bottom,
+    right: target.right - shrinkBy.right
+  };
+};
+
+var noSpacing = {
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0
+};
+var createBox = function createBox(_ref2) {
+  var borderBox = _ref2.borderBox,
+      _ref2$margin = _ref2.margin,
+      margin = _ref2$margin === void 0 ? noSpacing : _ref2$margin,
+      _ref2$border = _ref2.border,
+      border = _ref2$border === void 0 ? noSpacing : _ref2$border,
+      _ref2$padding = _ref2.padding,
+      padding = _ref2$padding === void 0 ? noSpacing : _ref2$padding;
+  var marginBox = getRect(expand(borderBox, margin));
+  var paddingBox = getRect(shrink(borderBox, border));
+  var contentBox = getRect(shrink(paddingBox, padding));
+  return {
+    marginBox: marginBox,
+    borderBox: getRect(borderBox),
+    paddingBox: paddingBox,
+    contentBox: contentBox,
+    margin: margin,
+    border: border,
+    padding: padding
+  };
+};
+
+var parse = function parse(raw) {
+  var value = raw.slice(0, -2);
+  var suffix = raw.slice(-2);
+
+  if (suffix !== 'px') {
+    return 0;
+  }
+
+  var result = Number(value);
+  !!isNaN(result) ?  invariant(false) : void 0;
+  return result;
+};
+var calculateBox = function calculateBox(borderBox, styles) {
+  var margin = {
+    top: parse(styles.marginTop),
+    right: parse(styles.marginRight),
+    bottom: parse(styles.marginBottom),
+    left: parse(styles.marginLeft)
+  };
+  var padding = {
+    top: parse(styles.paddingTop),
+    right: parse(styles.paddingRight),
+    bottom: parse(styles.paddingBottom),
+    left: parse(styles.paddingLeft)
+  };
+  var border = {
+    top: parse(styles.borderTopWidth),
+    right: parse(styles.borderRightWidth),
+    bottom: parse(styles.borderBottomWidth),
+    left: parse(styles.borderLeftWidth)
+  };
+  return createBox({
+    borderBox: borderBox,
+    margin: margin,
+    padding: padding,
+    border: border
+  });
+};
+var getBox = function getBox(el) {
+  var borderBox = el.getBoundingClientRect();
+  var styles = window.getComputedStyle(el);
+  return calculateBox(borderBox, styles);
+};
 
 var lodash_mergewith = createCommonjsModule(function (module, exports) {
 /**
@@ -3431,6 +3553,124 @@ function stubFalse() {
 module.exports = mergeWith;
 });
 
+var defaultTimestep = (1 / 60) * 1000;
+var getCurrentTime = typeof performance !== "undefined"
+    ? function () { return performance.now(); }
+    : function () { return Date.now(); };
+var onNextFrame = typeof window !== "undefined"
+    ? function (callback) {
+        return window.requestAnimationFrame(callback);
+    }
+    : function (callback) {
+        return setTimeout(function () { return callback(getCurrentTime()); }, defaultTimestep);
+    };
+
+function createRenderStep(runNextFrame) {
+    var toRun = [];
+    var toRunNextFrame = [];
+    var numToRun = 0;
+    var isProcessing = false;
+    var toKeepAlive = new WeakSet();
+    var step = {
+        schedule: function (callback, keepAlive, immediate) {
+            if (keepAlive === void 0) { keepAlive = false; }
+            if (immediate === void 0) { immediate = false; }
+            var addToCurrentFrame = immediate && isProcessing;
+            var buffer = addToCurrentFrame ? toRun : toRunNextFrame;
+            if (keepAlive)
+                toKeepAlive.add(callback);
+            if (buffer.indexOf(callback) === -1) {
+                buffer.push(callback);
+                if (addToCurrentFrame && isProcessing)
+                    numToRun = toRun.length;
+            }
+            return callback;
+        },
+        cancel: function (callback) {
+            var index = toRunNextFrame.indexOf(callback);
+            if (index !== -1)
+                toRunNextFrame.splice(index, 1);
+            toKeepAlive.delete(callback);
+        },
+        process: function (frameData) {
+            var _a;
+            isProcessing = true;
+            _a = [toRunNextFrame, toRun], toRun = _a[0], toRunNextFrame = _a[1];
+            toRunNextFrame.length = 0;
+            numToRun = toRun.length;
+            if (numToRun) {
+                for (var i = 0; i < numToRun; i++) {
+                    var callback = toRun[i];
+                    callback(frameData);
+                    if (toKeepAlive.has(callback)) {
+                        step.schedule(callback);
+                        runNextFrame();
+                    }
+                }
+            }
+            isProcessing = false;
+        },
+    };
+    return step;
+}
+
+var maxElapsed = 40;
+var useDefaultElapsed = true;
+var runNextFrame = false;
+var isProcessing = false;
+var frame = {
+    delta: 0,
+    timestamp: 0
+};
+var stepsOrder = ["read", "update", "preRender", "render", "postRender"];
+var steps = /*#__PURE__*/stepsOrder.reduce(function (acc, key) {
+    acc[key] = createRenderStep(function () {
+        return runNextFrame = true;
+    });
+    return acc;
+}, {});
+var sync = /*#__PURE__*/stepsOrder.reduce(function (acc, key) {
+    var step = steps[key];
+    acc[key] = function (process, keepAlive, immediate) {
+        if (keepAlive === void 0) {
+            keepAlive = false;
+        }
+        if (immediate === void 0) {
+            immediate = false;
+        }
+        if (!runNextFrame) startLoop();
+        return step.schedule(process, keepAlive, immediate);
+    };
+    return acc;
+}, {});
+var cancelSync = /*#__PURE__*/stepsOrder.reduce(function (acc, key) {
+    acc[key] = steps[key].cancel;
+    return acc;
+}, {});
+var processStep = function (stepId) {
+    return steps[stepId].process(frame);
+};
+var processFrame = function (timestamp) {
+    runNextFrame = false;
+    frame.delta = useDefaultElapsed ? defaultTimestep : Math.max(Math.min(timestamp - frame.timestamp, maxElapsed), 1);
+    frame.timestamp = timestamp;
+    isProcessing = true;
+    stepsOrder.forEach(processStep);
+    isProcessing = false;
+    if (runNextFrame) {
+        useDefaultElapsed = false;
+        onNextFrame(processFrame);
+    }
+};
+var startLoop = function () {
+    runNextFrame = true;
+    useDefaultElapsed = true;
+    if (!isProcessing) onNextFrame(processFrame);
+};
+var getFrameData = function () {
+    return frame;
+};
+
 function getLastItem(array) {
   var length = array == null ? 0 : array.length;
   return length ? array[length - 1] : undefined;
@@ -3439,6 +3679,9 @@ function getLastItem(array) {
 // Number assertions
 function isNumber(value) {
   return typeof value === "number";
+}
+function isNotNumber(value) {
+  return typeof value !== "number" || Number.isNaN(value) || !Number.isFinite(value);
 }
 
 function isArray(value) {
@@ -3698,6 +3941,30 @@ function analyzeBreakpoints(breakpoints) {
     }
   };
 }
+
+function isElement$1(el) {
+  return el != null && typeof el == "object" && "nodeType" in el && el.nodeType === Node.ELEMENT_NODE;
+}
+function isHTMLElement(el) {
+  var _el$ownerDocument$def;
+
+  if (!isElement$1(el)) {
+    return false;
+  }
+
+  var win = (_el$ownerDocument$def = el.ownerDocument.defaultView) != null ? _el$ownerDocument$def : window;
+  return el instanceof win.HTMLElement;
+}
+function getOwnerDocument(node) {
+  var _node$ownerDocument;
+
+  return isElement$1(node) ? (_node$ownerDocument = node.ownerDocument) != null ? _node$ownerDocument : document : document;
+}
+function getEventWindow(event) {
+  var _view;
+
+  return (_view = event.view) != null ? _view : window;
+}
 function canUseDOM() {
   return !!(typeof window !== "undefined" && window.document && window.document.createElement);
 }
@@ -3715,6 +3982,69 @@ var cx = function cx() {
 
   return classNames.filter(Boolean).join(" ");
 };
+function addDomEvent(target, eventName, handler, options) {
+  target.addEventListener(eventName, handler, options);
+  return function () {
+    target.removeEventListener(eventName, handler, options);
+  };
+}
+/**
+ * Get the normalized event key across all browsers
+ * @param event keyboard event
+ */
+
+function normalizeEventKey(event) {
+  var key = event.key,
+      keyCode = event.keyCode;
+  var isArrowKey = keyCode >= 37 && keyCode <= 40 && key.indexOf("Arrow") !== 0;
+  var eventKey = isArrowKey ? "Arrow" + key : key;
+  return eventKey;
+}
+function isInputElement(element) {
+  return isHTMLElement(element) && element.tagName.toLowerCase() === "input" && "select" in element;
+}
+function isActiveElement(element) {
+  var doc = isHTMLElement(element) ? getOwnerDocument(element) : document;
+  return doc.activeElement === element;
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _createForOfIteratorHelperLoose(o, allowArrayLike) {
+  var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
+  if (it) return (it = it.call(o)).next.bind(it);
+
+  if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+    if (it) o = it;
+    var i = 0;
+    return function () {
+      if (i >= o.length) return {
+        done: true
+      };
+      return {
+        done: false,
+        value: o[i++]
+      };
+    };
+  }
+
+  throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
 
 /* eslint-disable no-nested-ternary */
 function runIfFn(valueOrFn) {
@@ -3774,6 +4104,616 @@ var pipe = function pipe() {
   };
 };
 
+var distance1D = function distance1D(a, b) {
+  return Math.abs(a - b);
+};
+
+var isPoint = function isPoint(point) {
+  return "x" in point && "y" in point;
+};
+
+function distance(a, b) {
+  if (isNumber(a) && isNumber(b)) {
+    return distance1D(a, b);
+  }
+
+  if (isPoint(a) && isPoint(b)) {
+    var xDelta = distance1D(a.x, b.x);
+    var yDelta = distance1D(a.y, b.y);
+    return Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
+  }
+
+  return 0;
+}
+
+function focus(element, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var _options = options,
+      _options$isActive = _options.isActive,
+      isActive = _options$isActive === void 0 ? isActiveElement : _options$isActive,
+      nextTick = _options.nextTick,
+      _options$preventScrol = _options.preventScroll,
+      preventScroll = _options$preventScrol === void 0 ? true : _options$preventScrol,
+      _options$selectTextIf = _options.selectTextIfInput,
+      selectTextIfInput = _options$selectTextIf === void 0 ? true : _options$selectTextIf;
+  if (!element || isActive(element)) return -1;
+
+  function triggerFocus() {
+    if (!element) {
+      warn({
+        condition: true,
+        message: "[chakra-ui]: can't call focus() on `null` or `undefined` element"
+      });
+      return;
+    }
+
+    if (supportsPreventScroll()) {
+      element.focus({
+        preventScroll: preventScroll
+      });
+    } else {
+      element.focus();
+
+      if (preventScroll) {
+        var scrollableElements = getScrollableElements(element);
+        restoreScrollPosition(scrollableElements);
+      }
+    }
+
+    if (isInputElement(element) && selectTextIfInput) {
+      element.select();
+    }
+  }
+
+  if (nextTick) {
+    return requestAnimationFrame(triggerFocus);
+  }
+
+  triggerFocus();
+  return -1;
+}
+var supportsPreventScrollCached = null;
+
+function supportsPreventScroll() {
+  if (supportsPreventScrollCached == null) {
+    supportsPreventScrollCached = false;
+
+    try {
+      var div = document.createElement("div");
+      div.focus({
+        get preventScroll() {
+          supportsPreventScrollCached = true;
+          return true;
+        }
+
+      });
+    } catch (e) {// Ignore
+    }
+  }
+
+  return supportsPreventScrollCached;
+}
+
+function getScrollableElements(element) {
+  var _doc$defaultView;
+
+  var doc = getOwnerDocument(element);
+  var win = (_doc$defaultView = doc.defaultView) != null ? _doc$defaultView : window;
+  var parent = element.parentNode;
+  var scrollableElements = [];
+  var rootScrollingElement = doc.scrollingElement || doc.documentElement;
+
+  while (parent instanceof win.HTMLElement && parent !== rootScrollingElement) {
+    if (parent.offsetHeight < parent.scrollHeight || parent.offsetWidth < parent.scrollWidth) {
+      scrollableElements.push({
+        element: parent,
+        scrollTop: parent.scrollTop,
+        scrollLeft: parent.scrollLeft
+      });
+    }
+
+    parent = parent.parentNode;
+  }
+
+  if (rootScrollingElement instanceof win.HTMLElement) {
+    scrollableElements.push({
+      element: rootScrollingElement,
+      scrollTop: rootScrollingElement.scrollTop,
+      scrollLeft: rootScrollingElement.scrollLeft
+    });
+  }
+
+  return scrollableElements;
+}
+
+function restoreScrollPosition(scrollableElements) {
+  for (var _iterator = _createForOfIteratorHelperLoose(scrollableElements), _step; !(_step = _iterator()).done;) {
+    var _step$value = _step.value,
+        element = _step$value.element,
+        scrollTop = _step$value.scrollTop,
+        scrollLeft = _step$value.scrollLeft;
+    element.scrollTop = scrollTop;
+    element.scrollLeft = scrollLeft;
+  }
+}
+
+function toNumber(value) {
+  var num = parseFloat(value);
+  return isNotNumber(num) ? 0 : num;
+}
+/**
+ * Converts a value to a specific precision (or decimal points).
+ *
+ * Returns a string representing a number in fixed-point notation.
+ *
+ * @param value the value to convert
+ * @param precision the precision or decimal points
+ */
+
+
+function toPrecision(value, precision) {
+  var nextValue = toNumber(value);
+  var scaleFactor = Math.pow(10, precision != null ? precision : 10);
+  nextValue = Math.round(nextValue * scaleFactor) / scaleFactor;
+  return precision ? nextValue.toFixed(precision) : nextValue.toString();
+}
+/**
+ * Counts the number of decimal places a number has
+ *
+ * @param value the decimal value to count
+ */
+
+function countDecimalPlaces(value) {
+  if (!Number.isFinite(value)) return 0;
+  var e = 1;
+  var p = 0;
+
+  while (Math.round(value * e) / e !== value) {
+    e *= 10;
+    p += 1;
+  }
+
+  return p;
+}
+/**
+ * Convert a value to percentage based on lower and upper bound values
+ *
+ * @param value the value in number
+ * @param min the minimum value
+ * @param max the maximum value
+ */
+
+function valueToPercent(value, min, max) {
+  return (value - min) * 100 / (max - min);
+}
+/**
+ * Calculate the value based on percentage, lower and upper bound values
+ *
+ * @param percent the percent value in decimals (e.g 0.6, 0.3)
+ * @param min the minimum value
+ * @param max the maximum value
+ */
+
+function percentToValue(percent, min, max) {
+  return (max - min) * percent + min;
+}
+/**
+ * Rounds a specific value to the next or previous step
+ *
+ * @param value the value to round
+ * @param from the number that stepping started from
+ * @param step the specified step
+ */
+
+function roundValueToStep(value, from, step) {
+  var nextValue = Math.round((value - from) / step) * step + from;
+  var precision = countDecimalPlaces(step);
+  return toPrecision(nextValue, precision);
+}
+/**
+ * Clamps a value to ensure it stays within the min and max range.
+ *
+ * @param value the value to clamp
+ * @param min the minimum value
+ * @param max the maximum value
+ */
+
+function clampValue(value, min, max) {
+  if (value == null) return value;
+  warn({
+    condition: max < min,
+    message: "clamp: max cannot be less than min"
+  });
+  return Math.min(Math.max(value, min), max);
+}
+
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+/**
+ * Credit goes to `framer-motion` of this useful utilities.
+ * License can be found here: https://github.com/framer/motion
+ */
+function isMouseEvent(event) {
+  var win = getEventWindow(event); // PointerEvent inherits from MouseEvent so we can't use a straight instanceof check.
+
+  if (typeof win.PointerEvent !== "undefined" && event instanceof win.PointerEvent) {
+    return !!(event.pointerType === "mouse");
+  }
+
+  return event instanceof win.MouseEvent;
+}
+function isTouchEvent(event) {
+  var hasTouches = !!event.touches;
+  return hasTouches;
+}
+
+/**
+ * Filters out events not attached to the primary pointer (currently left mouse button)
+ * @param eventHandler
+ */
+function filterPrimaryPointer(eventHandler) {
+  return function (event) {
+    var win = getEventWindow(event);
+    var isMouseEvent = event instanceof win.MouseEvent;
+    var isPrimaryPointer = !isMouseEvent || isMouseEvent && event.button === 0;
+
+    if (isPrimaryPointer) {
+      eventHandler(event);
+    }
+  };
+}
+
+var defaultPagePoint = {
+  pageX: 0,
+  pageY: 0
+};
+
+function pointFromTouch(e, pointType) {
+  if (pointType === void 0) {
+    pointType = "page";
+  }
+
+  var primaryTouch = e.touches[0] || e.changedTouches[0];
+  var point = primaryTouch || defaultPagePoint;
+  return {
+    x: point[pointType + "X"],
+    y: point[pointType + "Y"]
+  };
+}
+
+function pointFromMouse(point, pointType) {
+  if (pointType === void 0) {
+    pointType = "page";
+  }
+
+  return {
+    x: point[pointType + "X"],
+    y: point[pointType + "Y"]
+  };
+}
+
+function extractEventInfo(event, pointType) {
+  if (pointType === void 0) {
+    pointType = "page";
+  }
+
+  return {
+    point: isTouchEvent(event) ? pointFromTouch(event, pointType) : pointFromMouse(event, pointType)
+  };
+}
+var wrapPointerEventHandler = function wrapPointerEventHandler(handler, shouldFilterPrimaryPointer) {
+  if (shouldFilterPrimaryPointer === void 0) {
+    shouldFilterPrimaryPointer = false;
+  }
+
+  var listener = function listener(event) {
+    return handler(event, extractEventInfo(event));
+  };
+
+  return shouldFilterPrimaryPointer ? filterPrimaryPointer(listener) : listener;
+}; // We check for event support via functions in case they've been mocked by a testing suite.
+
+var supportsPointerEvents = function supportsPointerEvents() {
+  return isBrowser$1 && window.onpointerdown === null;
+};
+
+var supportsTouchEvents = function supportsTouchEvents() {
+  return isBrowser$1 && window.ontouchstart === null;
+};
+
+var supportsMouseEvents = function supportsMouseEvents() {
+  return isBrowser$1 && window.onmousedown === null;
+};
+
+var mouseEventNames = {
+  pointerdown: "mousedown",
+  pointermove: "mousemove",
+  pointerup: "mouseup",
+  pointercancel: "mousecancel",
+  pointerover: "mouseover",
+  pointerout: "mouseout",
+  pointerenter: "mouseenter",
+  pointerleave: "mouseleave"
+};
+var touchEventNames = {
+  pointerdown: "touchstart",
+  pointermove: "touchmove",
+  pointerup: "touchend",
+  pointercancel: "touchcancel"
+};
+function getPointerEventName(name) {
+  if (supportsPointerEvents()) {
+    return name;
+  }
+
+  if (supportsTouchEvents()) {
+    return touchEventNames[name];
+  }
+
+  if (supportsMouseEvents()) {
+    return mouseEventNames[name];
+  }
+
+  return name;
+}
+function addPointerEvent(target, eventName, handler, options) {
+  return addDomEvent(target, getPointerEventName(eventName), wrapPointerEventHandler(handler, eventName === "pointerdown"), options);
+}
+function isMultiTouchEvent(event) {
+  return isTouchEvent(event) && event.touches.length > 1;
+}
+
+/**
+ * The event information passed to pan event handlers like `onPan`, `onPanStart`.
+ *
+ * It contains information about the current state of the tap gesture such as its
+ * `point`, `delta`, and `offset`
+ */
+
+/**
+ * @internal
+ *
+ * A Pan Session is recognized when the pointer is down
+ * and moved in the allowed direction.
+ */
+var PanSession = /*#__PURE__*/function () {
+  /**
+   * We use this to keep track of the `x` and `y` pan session history
+   * as the pan event happens. It helps to calculate the `offset` and `delta`
+   */
+  // The pointer event that started the pan session
+  // The current pointer event for the pan session
+  // The current pointer event info for the pan session
+
+  /**
+   * Minimal pan distance required before recognizing the pan.
+   * @default "3px"
+   */
+  function PanSession(_event, handlers, threshold) {
+    var _this = this;
+
+    this.history = [];
+    this.startEvent = null;
+    this.lastEvent = null;
+    this.lastEventInfo = null;
+    this.handlers = {};
+    this.removeListeners = noop;
+    this.threshold = 3;
+    this.win = void 0;
+
+    this.updatePoint = function () {
+      if (!(_this.lastEvent && _this.lastEventInfo)) return;
+      var info = getPanInfo(_this.lastEventInfo, _this.history);
+      var isPanStarted = _this.startEvent !== null;
+
+      var isDistancePastThreshold = distance(info.offset, {
+        x: 0,
+        y: 0
+      }) >= _this.threshold;
+
+      if (!isPanStarted && !isDistancePastThreshold) return;
+
+      var _getFrameData = getFrameData(),
+          timestamp = _getFrameData.timestamp;
+
+      _this.history.push(_extends({}, info.point, {
+        timestamp: timestamp
+      }));
+
+      var _this$handlers = _this.handlers,
+          onStart = _this$handlers.onStart,
+          onMove = _this$handlers.onMove;
+
+      if (!isPanStarted) {
+        onStart == null ? void 0 : onStart(_this.lastEvent, info);
+        _this.startEvent = _this.lastEvent;
+      }
+
+      onMove == null ? void 0 : onMove(_this.lastEvent, info);
+    };
+
+    this.onPointerMove = function (event, info) {
+      _this.lastEvent = event;
+      _this.lastEventInfo = info; // Because Safari doesn't trigger mouseup events when it's above a `<select>`
+
+      if (isMouseEvent(event) && event.buttons === 0) {
+        _this.onPointerUp(event, info);
+
+        return;
+      } // Throttle mouse move event to once per frame
+
+
+      sync.update(_this.updatePoint, true);
+    };
+
+    this.onPointerUp = function (event, info) {
+      // notify pan session ended
+      var panInfo = getPanInfo(info, _this.history);
+      var _this$handlers2 = _this.handlers,
+          onEnd = _this$handlers2.onEnd,
+          onSessionEnd = _this$handlers2.onSessionEnd;
+      onSessionEnd == null ? void 0 : onSessionEnd(event, panInfo);
+
+      _this.end(); // if panning never started, no need to call `onEnd`
+      // panning requires a pointermove of at least 3px
+
+
+      if (!onEnd || !_this.startEvent) return;
+      onEnd == null ? void 0 : onEnd(event, panInfo);
+    };
+
+    this.win = getEventWindow(_event); // If we have more than one touch, don't start detecting this gesture
+
+    if (isMultiTouchEvent(_event)) return;
+    this.handlers = handlers;
+
+    if (threshold) {
+      this.threshold = threshold;
+    } // stop default browser behavior
+
+
+    _event.stopPropagation();
+
+    _event.preventDefault(); // get and save the `pointerdown` event info in history
+    // we'll use it to compute the `offset`
+
+
+    var _info = extractEventInfo(_event);
+
+    var _getFrameData2 = getFrameData(),
+        _timestamp = _getFrameData2.timestamp;
+
+    this.history = [_extends({}, _info.point, {
+      timestamp: _timestamp
+    })]; // notify pan session start
+
+    var onSessionStart = handlers.onSessionStart;
+    onSessionStart == null ? void 0 : onSessionStart(_event, getPanInfo(_info, this.history)); // attach event listeners and return a single function to remove them all
+
+    this.removeListeners = pipe(addPointerEvent(this.win, "pointermove", this.onPointerMove), addPointerEvent(this.win, "pointerup", this.onPointerUp), addPointerEvent(this.win, "pointercancel", this.onPointerUp));
+  }
+
+  var _proto = PanSession.prototype;
+
+  _proto.updateHandlers = function updateHandlers(handlers) {
+    this.handlers = handlers;
+  };
+
+  _proto.end = function end() {
+    var _this$removeListeners;
+
+    (_this$removeListeners = this.removeListeners) == null ? void 0 : _this$removeListeners.call(this);
+    cancelSync.update(this.updatePoint);
+  };
+
+  return PanSession;
+}();
+
+function subtractPoint(a, b) {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y
+  };
+}
+
+function startPanPoint(history) {
+  return history[0];
+}
+
+function lastPanPoint(history) {
+  return history[history.length - 1];
+}
+
+function getPanInfo(info, history) {
+  return {
+    point: info.point,
+    delta: subtractPoint(info.point, lastPanPoint(history)),
+    offset: subtractPoint(info.point, startPanPoint(history)),
+    velocity: getVelocity(history, 0.1)
+  };
+}
+
+function lastDevicePoint(history) {
+  return history[history.length - 1];
+}
+
+var toMilliseconds = function toMilliseconds(seconds) {
+  return seconds * 1000;
+};
+
+function getVelocity(history, timeDelta) {
+  if (history.length < 2) {
+    return {
+      x: 0,
+      y: 0
+    };
+  }
+
+  var i = history.length - 1;
+  var timestampedPoint = null;
+  var lastPoint = lastDevicePoint(history);
+
+  while (i >= 0) {
+    timestampedPoint = history[i];
+
+    if (lastPoint.timestamp - timestampedPoint.timestamp > toMilliseconds(timeDelta)) {
+      break;
+    }
+
+    i--;
+  }
+
+  if (!timestampedPoint) {
+    return {
+      x: 0,
+      y: 0
+    };
+  }
+
+  var time = (lastPoint.timestamp - timestampedPoint.timestamp) / 1000;
+
+  if (time === 0) {
+    return {
+      x: 0,
+      y: 0
+    };
+  }
+
+  var currentVelocity = {
+    x: (lastPoint.x - timestampedPoint.x) / time,
+    y: (lastPoint.y - timestampedPoint.y) / time
+  };
+
+  if (currentVelocity.x === Infinity) {
+    currentVelocity.x = 0;
+  }
+
+  if (currentVelocity.y === Infinity) {
+    currentVelocity.y = 0;
+  }
+
+  return currentVelocity;
+}
+
 var breakpoints = Object.freeze(["base", "sm", "md", "lg", "xl", "2xl"]);
 function mapResponsive(prop, mapper) {
   if (isArray(prop)) {
@@ -3827,6 +4767,47 @@ function walkObject(target, predicate) {
 }
 
 /**
+ * Assigns a value to a ref function or object
+ *
+ * @param ref the ref to assign to
+ * @param value the value
+ */
+function assignRef(ref, value) {
+  if (ref == null) return;
+
+  if (isFunction(ref)) {
+    ref(value);
+    return;
+  }
+
+  try {
+    // @ts-ignore
+    ref.current = value;
+  } catch (error) {
+    throw new Error("Cannot assign value '" + value + "' to ref '" + ref + "'");
+  }
+}
+/**
+ * Combine multiple React refs into a single ref function.
+ * This is used mostly when you need to allow consumers forward refs to
+ * internal components
+ *
+ * @param refs refs to assign to value to
+ */
+
+function mergeRefs() {
+  for (var _len = arguments.length, refs = new Array(_len), _key = 0; _key < _len; _key++) {
+    refs[_key] = arguments[_key];
+  }
+
+  return function (node) {
+    refs.forEach(function (ref) {
+      return assignRef(ref, node);
+    });
+  };
+}
+
+/**
  * Creates a named context, provider, and hook.
  *
  * @param options create context options
@@ -3875,6 +4856,38 @@ function getValidChildren(children) {
 }
 
 /**
+ * React hook to manage boolean (on - off) states
+ *
+ * @param initialState the initial boolean state value
+ */
+function useBoolean(initialState) {
+  if (initialState === void 0) {
+    initialState = false;
+  }
+
+  var _useState = react.useState(initialState),
+      value = _useState[0],
+      setValue = _useState[1];
+
+  var on = react.useCallback(function () {
+    setValue(true);
+  }, []);
+  var off = react.useCallback(function () {
+    setValue(false);
+  }, []);
+  var toggle = react.useCallback(function () {
+    setValue(function (prev) {
+      return !prev;
+    });
+  }, []);
+  return [value, {
+    on: on,
+    off: off,
+    toggle: toggle
+  }];
+}
+
+/**
  * useSafeLayoutEffect enables us to safely call `useLayoutEffect` on the browser
  * (for SSR reasons)
  *
@@ -3886,6 +4899,114 @@ function getValidChildren(children) {
  */
 
 var useSafeLayoutEffect = isBrowser$1 ? react.useLayoutEffect : react.useEffect;
+
+/**
+ * React hook to persist any value between renders,
+ * but keeps it up-to-date if it changes.
+ *
+ * @param value the value or function to persist
+ */
+
+function useCallbackRef(fn, deps) {
+  if (deps === void 0) {
+    deps = [];
+  }
+
+  var ref = react.useRef(fn);
+  useSafeLayoutEffect(function () {
+    ref.current = fn;
+  }); // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  return react.useCallback(function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return ref.current == null ? void 0 : ref.current.apply(ref, args);
+  }, deps);
+}
+
+/**
+ * React hook for using controlling component state.
+ * @param props
+ */
+function useControllableState(props) {
+  var valueProp = props.value,
+      defaultValue = props.defaultValue,
+      onChange = props.onChange,
+      _props$shouldUpdate = props.shouldUpdate,
+      shouldUpdate = _props$shouldUpdate === void 0 ? function (prev, next) {
+    return prev !== next;
+  } : _props$shouldUpdate;
+  var onChangeProp = useCallbackRef(onChange);
+  var shouldUpdateProp = useCallbackRef(shouldUpdate);
+
+  var _React$useState = react.useState(defaultValue),
+      valueState = _React$useState[0],
+      setValue = _React$useState[1];
+
+  var isControlled = valueProp !== undefined;
+  var value = isControlled ? valueProp : valueState;
+  var updateValue = react.useCallback(function (next) {
+    var nextValue = runIfFn(next, value);
+
+    if (!shouldUpdateProp(value, nextValue)) {
+      return;
+    }
+
+    if (!isControlled) {
+      setValue(nextValue);
+    }
+
+    onChangeProp(nextValue);
+  }, [isControlled, onChangeProp, value, shouldUpdateProp]);
+  return [value, updateValue];
+}
+
+/**
+ * Reack hook to measure a component's dimensions
+ *
+ * @param ref ref of the component to measure
+ * @param observe if `true`, resize and scroll observers will be turned on
+ */
+
+function useDimensions(ref, observe) {
+  var _React$useState = react.useState(null),
+      dimensions = _React$useState[0],
+      setDimensions = _React$useState[1];
+
+  var rafId = react.useRef();
+  useSafeLayoutEffect(function () {
+    if (!ref.current) return undefined;
+    var node = ref.current;
+
+    function measure() {
+      rafId.current = requestAnimationFrame(function () {
+        var boxModel = getBox(node);
+        setDimensions(boxModel);
+      });
+    }
+
+    measure();
+
+    if (observe) {
+      window.addEventListener("resize", measure);
+      window.addEventListener("scroll", measure);
+    }
+
+    return function () {
+      if (observe) {
+        window.removeEventListener("resize", measure);
+        window.removeEventListener("scroll", measure);
+      }
+
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, [observe]);
+  return dimensions;
+}
 
 // This implementation is heavily inspired by react-aria's implementation
 var defaultIdContext = {
@@ -3907,9 +5028,129 @@ var IdProvider = /*#__PURE__*/react.memo(function (_ref) {
     value: context
   }, children);
 });
+function useId(idProp, prefix) {
+  var context = react.useContext(IdContext);
+  return react.useMemo(function () {
+    return idProp || [prefix, context.prefix, ++context.current].filter(Boolean).join("-");
+  }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  [idProp, prefix]);
+}
+/**
+ * Reack hook to generate ids for use in compound components
+ *
+ * @param idProp the external id passed from the user
+ * @param prefixes array of prefixes to use
+ *
+ * @example
+ *
+ * ```js
+ * const [buttonId, menuId] = useIds("52", "button", "menu")
+ *
+ * // buttonId will be `button-52`
+ * // menuId will be `menu-52`
+ * ```
+ */
+
+function useIds(idProp) {
+  for (var _len = arguments.length, prefixes = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    prefixes[_key - 1] = arguments[_key];
+  }
+
+  var id = useId(idProp);
+  return react.useMemo(function () {
+    return prefixes.map(function (prefix) {
+      return prefix + "-" + id;
+    });
+  }, [id, prefixes]);
+}
+
+/**
+ * React hook to manage browser event listeners
+ *
+ * @param event the event name
+ * @param handler the event handler function to execute
+ * @param doc the dom environment to execute against (defaults to `document`)
+ * @param options the event listener options
+ *
+ * @internal
+ */
+function useEventListener(event, handler, env, options) {
+  var listener = useCallbackRef(handler);
+  react.useEffect(function () {
+    var _runIfFn;
+
+    var node = (_runIfFn = runIfFn(env)) != null ? _runIfFn : document;
+    node.addEventListener(event, listener, options);
+    return function () {
+      node.removeEventListener(event, listener, options);
+    };
+  }, [event, env, options, listener]);
+  return function () {
+    var _runIfFn2;
+
+    var node = (_runIfFn2 = runIfFn(env)) != null ? _runIfFn2 : document;
+    node.removeEventListener(event, listener, options);
+  };
+}
+
+/**
+ * React effect hook that invokes only on update.
+ * It doesn't invoke on mount
+ */
+
+var useUpdateEffect = function useUpdateEffect(effect, deps) {
+  var mounted = react.useRef(false);
+  react.useEffect(function () {
+    if (mounted.current) {
+      return effect();
+    }
+
+    mounted.current = true;
+    return undefined; // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  return mounted.current;
+};
+
+/**
+ * Credit goes to `framer-motion` of this useful utilities.
+ * License can be found here: https://github.com/framer/motion
+ */
+/**
+ * @internal
+ */
+
+function usePointerEvent(env, eventName, handler, options) {
+  return useEventListener(getPointerEventName(eventName), wrapPointerEventHandler(handler, eventName === "pointerdown"), env, options);
+}
+
+function useUnmountEffect(fn, deps) {
+  if (deps === void 0) {
+    deps = [];
+  }
+
+  return react.useEffect(function () {
+    return function () {
+      return fn();
+    };
+  }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  deps);
+}
+
+/**
+ * React hook to persist any value between renders,
+ * but keeps it up-to-date if it changes.
+ *
+ * @param value the value or function to persist
+ */
+
+function useLatestRef(value) {
+  var ref = react.useRef(null);
+  ref.current = value;
+  return ref;
+}
 
 /* eslint-disable react-hooks/exhaustive-deps */
-function assignRef(ref, value) {
+function assignRef$1(ref, value) {
   if (ref == null) return;
 
   if (typeof ref === "function") {
@@ -3951,10 +5192,50 @@ function useMergeRefs() {
 
     return function (node) {
       refs.forEach(function (ref) {
-        if (ref) assignRef(ref, node);
+        if (ref) assignRef$1(ref, node);
       });
     };
   }, refs);
+}
+
+function usePanGesture(ref, props) {
+  var onPan = props.onPan,
+      onPanStart = props.onPanStart,
+      onPanEnd = props.onPanEnd,
+      onPanSessionStart = props.onPanSessionStart,
+      onPanSessionEnd = props.onPanSessionEnd,
+      threshold = props.threshold;
+  var hasPanEvents = Boolean(onPan || onPanStart || onPanEnd || onPanSessionStart || onPanSessionEnd);
+  var panSession = react.useRef(null);
+  var handlers = {
+    onSessionStart: onPanSessionStart,
+    onSessionEnd: onPanSessionEnd,
+    onStart: onPanStart,
+    onMove: onPan,
+    onEnd: function onEnd(event, info) {
+      panSession.current = null;
+      onPanEnd == null ? void 0 : onPanEnd(event, info);
+    }
+  };
+  react.useEffect(function () {
+    var _panSession$current;
+
+    (_panSession$current = panSession.current) == null ? void 0 : _panSession$current.updateHandlers(handlers);
+  });
+
+  function onPointerDown(event) {
+    panSession.current = new PanSession(event, handlers, threshold);
+  }
+
+  usePointerEvent(function () {
+    return ref.current;
+  }, "pointerdown", hasPanEvents ? onPointerDown : noop);
+  useUnmountEffect(function () {
+    var _panSession$current2;
+
+    (_panSession$current2 = panSession.current) == null ? void 0 : _panSession$current2.end();
+    panSession.current = null;
+  });
 }
 
 var _createContext$1 = createContext({
@@ -4405,8 +5686,8 @@ var ColorModeScript = function ColorModeScript(props) {
   });
 };
 
-function _extends() {
-  _extends = Object.assign || function (target) {
+function _extends$1() {
+  _extends$1 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -4420,7 +5701,7 @@ function _extends() {
     return target;
   };
 
-  return _extends.apply(this, arguments);
+  return _extends$1.apply(this, arguments);
 }
 
 var tokenToCSSVar = function tokenToCSSVar(scale, value) {
@@ -4829,7 +6110,7 @@ var t$2 = {
     };
   },
   prop: function prop(property, scale, transform) {
-    return _extends({
+    return _extends$1({
       property: property,
       scale: scale
     }, scale && {
@@ -5438,7 +6719,7 @@ var typography = {
  * Types for typography related CSS properties
  */
 
-function _arrayLikeToArray(arr, len) {
+function _arrayLikeToArray$1(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
 
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
@@ -5446,20 +6727,20 @@ function _arrayLikeToArray(arr, len) {
   return arr2;
 }
 
-function _unsupportedIterableToArray(o, minLen) {
+function _unsupportedIterableToArray$1(o, minLen) {
   if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  if (typeof o === "string") return _arrayLikeToArray$1(o, minLen);
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
   if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$1(o, minLen);
 }
 
-function _createForOfIteratorHelperLoose(o, allowArrayLike) {
+function _createForOfIteratorHelperLoose$1(o, allowArrayLike) {
   var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
   if (it) return (it = it.call(o)).next.bind(it);
 
-  if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+  if (Array.isArray(o) || (it = _unsupportedIterableToArray$1(o)) || allowArrayLike && o && typeof o.length === "number") {
     if (it) o = it;
     var i = 0;
     return function () {
@@ -5775,7 +7056,7 @@ var systemProps = lodash_mergewith({}, background, border, color, flexbox, layou
 var layoutSystem = Object.assign({}, space, layout, flexbox, grid, position);
 var propNames = [].concat(objectKeys(systemProps), pseudoPropNames);
 
-var styleProps = _extends({}, systemProps, pseudoSelectors);
+var styleProps = _extends$1({}, systemProps, pseudoSelectors);
 
 var isStyleProp = function isStyleProp(prop) {
   return prop in styleProps;
@@ -5963,7 +7244,7 @@ function getCss(options) {
       }
 
       if (configProperty && Array.isArray(configProperty)) {
-        for (var _iterator = _createForOfIteratorHelperLoose(configProperty), _step; !(_step = _iterator()).done;) {
+        for (var _iterator = _createForOfIteratorHelperLoose$1(configProperty), _step; !(_step = _iterator()).done;) {
           var property = _step.value;
           computedStyles[property] = rawValue;
         }
@@ -6195,7 +7476,7 @@ var tokenHandlerMap = {
     var varRef = calc.negate(reference);
     return {
       cssVars: properties.cssVars,
-      cssMap: _extends({}, properties.cssMap, (_extends2 = {}, _extends2[negativeLookupKey] = {
+      cssMap: _extends$1({}, properties.cssMap, (_extends2 = {}, _extends2[negativeLookupKey] = {
         value: "" + negativeValue,
         "var": "" + variable,
         varRef: varRef
@@ -6282,7 +7563,7 @@ function toCSSVar(rawTheme) {
     "--chakra-space-y-reverse": "0"
   };
   Object.assign(theme, {
-    __cssVars: _extends({}, defaultCssVars, cssVars),
+    __cssVars: _extends$1({}, defaultCssVars, cssVars),
     __cssMap: cssMap,
     __breakpoints: analyzeBreakpoints(theme.breakpoints)
   });
@@ -6575,7 +7856,7 @@ var createStyled = function createStyled(tag, options) {
     });
 
     Styled.withComponent = function (nextTag, nextOptions) {
-      return createStyled(nextTag, _extends$b({}, options, nextOptions, {
+      return createStyled(nextTag, _extends$d({}, options, nextOptions, {
         shouldForwardProp: composeShouldForwardProps(Styled, nextOptions, true)
       })).apply(void 0, styles);
     };
@@ -6593,8 +7874,8 @@ tags.forEach(function (tagName) {
   newStyled[tagName] = newStyled(tagName);
 });
 
-function _extends$1() {
-  _extends$1 = Object.assign || function (target) {
+function _extends$2() {
+  _extends$2 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -6608,7 +7889,7 @@ function _extends$1() {
     return target;
   };
 
-  return _extends$1.apply(this, arguments);
+  return _extends$2.apply(this, arguments);
 }
 
 var ThemeProvider$1 = function ThemeProvider$1(props) {
@@ -6680,7 +7961,7 @@ function omitThemingProps(props) {
 function useChakra() {
   var colorModeResult = useColorMode();
   var theme = useTheme();
-  return _extends$1({}, colorModeResult, {
+  return _extends$2({}, colorModeResult, {
     theme: theme
   });
 }
@@ -8395,8 +9676,8 @@ function orient(options) {
   return orientation === "vertical" ? vertical : horizontal;
 }
 
-function _extends$2() {
-  _extends$2 = Object.assign || function (target) {
+function _extends$3() {
+  _extends$3 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -8410,7 +9691,7 @@ function _extends$2() {
     return target;
   };
 
-  return _extends$2.apply(this, arguments);
+  return _extends$3.apply(this, arguments);
 }
 
 var createBreakpoints = function createBreakpoints(config) {
@@ -8418,7 +9699,7 @@ var createBreakpoints = function createBreakpoints(config) {
     condition: true,
     message: ["[chakra-ui]: createBreakpoints(...) will be deprecated pretty soon", "simply pass the breakpoints as an object. Remove the createBreakpoint(..) call"].join("")
   });
-  return _extends$2({
+  return _extends$3({
     base: "0em"
   }, config);
 };
@@ -8778,8 +10059,8 @@ var tabsAnatomy = anatomy("tabs").parts("root", "tab", "tablist", "tabpanel", "t
 
 var tagAnatomy = anatomy("tag").parts("container", "label", "closeButton");
 
-function _extends$3() {
-  _extends$3 = Object.assign || function (target) {
+function _extends$4() {
+  _extends$4 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -8793,7 +10074,7 @@ function _extends$3() {
     return target;
   };
 
-  return _extends$3.apply(this, arguments);
+  return _extends$4.apply(this, arguments);
 }
 
 var baseStyleContainer$3 = {
@@ -9003,7 +10284,7 @@ var container = {
   xl: "1280px"
 };
 
-var sizes$l = _extends$3({}, spacing, largeSizes, {
+var sizes$l = _extends$4({}, spacing, largeSizes, {
   container: container
 });
 /**
@@ -9228,7 +10509,7 @@ var variantGhost = function variantGhost(props) {
 var variantOutline$1 = function variantOutline(props) {
   var c = props.colorScheme;
   var borderColor = mode("gray.200", "whiteAlpha.300")(props);
-  return _extends$3({
+  return _extends$4({
     border: "1px solid",
     borderColor: c === "gray" ? borderColor : "currentColor"
   }, variantGhost(props));
@@ -9605,7 +10886,7 @@ var baseStyleDialogContainer$1 = {
 
 var baseStyleDialog$1 = function baseStyleDialog(props) {
   var isFullHeight = props.isFullHeight;
-  return _extends$3({}, isFullHeight && {
+  return _extends$4({}, isFullHeight && {
     height: "100vh"
   }, {
     zIndex: "modal",
@@ -10369,7 +11650,7 @@ function getSize(size) {
   var fontSize = typography$1$1.fontSizes[_fontSize.toString()];
 
   return {
-    field: _extends$3({}, sizeStyle.field, {
+    field: _extends$4({}, sizeStyle.field, {
       paddingInlineEnd: $inputPadding.reference,
       verticalAlign: "top"
     }),
@@ -10403,7 +11684,7 @@ var NumberInput = {
 
 var _Input$variants$unsty$1;
 
-var baseStyle$g = _extends$3({}, Input.baseStyle.field, {
+var baseStyle$g = _extends$4({}, Input.baseStyle.field, {
   textAlign: "center"
 });
 
@@ -10525,7 +11806,7 @@ function filledStyle(props) {
   var bgColor = mode(c + ".500", c + ".200")(props);
   var gradient = "linear-gradient(\n    to right,\n    transparent 0%,\n    " + getColor(t, bgColor) + " 50%,\n    transparent 100%\n  )";
   var addStripe = !isIndeterminate && hasStripe;
-  return _extends$3({}, addStripe && stripeStyle, isIndeterminate ? {
+  return _extends$4({}, addStripe && stripeStyle, isIndeterminate ? {
     bgImage: gradient
   } : {
     bgColor: bgColor
@@ -10546,7 +11827,7 @@ var baseStyleTrack$2 = function baseStyleTrack(props) {
 };
 
 var baseStyleFilledTrack$1 = function baseStyleFilledTrack(props) {
-  return _extends$3({
+  return _extends$4({
     transitionProperty: "common",
     transitionDuration: "slow"
   }, filledStyle(props));
@@ -10598,9 +11879,9 @@ var baseStyleControl = function baseStyleControl(props) {
       _Checkbox$baseStyle$c = _Checkbox$baseStyle.control,
       control = _Checkbox$baseStyle$c === void 0 ? {} : _Checkbox$baseStyle$c;
 
-  return _extends$3({}, control, {
+  return _extends$4({}, control, {
     borderRadius: "full",
-    _checked: _extends$3({}, control["_checked"], {
+    _checked: _extends$4({}, control["_checked"], {
       _before: {
         content: "\"\"",
         display: "inline-block",
@@ -10662,7 +11943,7 @@ var Radio = {
 };
 
 var baseStyleField = function baseStyleField(props) {
-  return _extends$3({}, Input.baseStyle.field, {
+  return _extends$4({}, Input.baseStyle.field, {
     bg: mode("white", "gray.700")(props),
     appearance: "none",
     paddingBottom: "1px",
@@ -10798,7 +12079,7 @@ function thumbOrientation(props) {
 
 var baseStyleContainer$1 = function baseStyleContainer(props) {
   var orientation = props.orientation;
-  return _extends$3({
+  return _extends$4({
     display: "inline-block",
     position: "relative",
     cursor: "pointer",
@@ -10830,7 +12111,7 @@ var baseStyleTrack$1 = function baseStyleTrack(props) {
 };
 
 var baseStyleThumb$1 = function baseStyleThumb(props) {
-  return _extends$3({
+  return _extends$4({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -11116,12 +12397,12 @@ var numericStyles = {
 var variantSimple = function variantSimple(props) {
   var c = props.colorScheme;
   return {
-    th: _extends$3({
+    th: _extends$4({
       color: mode("gray.600", "gray.400")(props),
       borderBottom: "1px",
       borderColor: mode(c + ".100", c + ".700")(props)
     }, numericStyles),
-    td: _extends$3({
+    td: _extends$4({
       borderBottom: "1px",
       borderColor: mode(c + ".100", c + ".700")(props)
     }, numericStyles),
@@ -11143,12 +12424,12 @@ var variantSimple = function variantSimple(props) {
 var variantStripe = function variantStripe(props) {
   var c = props.colorScheme;
   return {
-    th: _extends$3({
+    th: _extends$4({
       color: mode("gray.600", "gray.400")(props),
       borderBottom: "1px",
       borderColor: mode(c + ".100", c + ".700")(props)
     }, numericStyles),
-    td: _extends$3({
+    td: _extends$4({
       borderBottom: "1px",
       borderColor: mode(c + ".100", c + ".700")(props)
     }, numericStyles),
@@ -11557,7 +12838,7 @@ var Tag = {
 
 var _Input$variants$unsty, _Input$sizes$xs$field, _Input$sizes$sm$field, _Input$sizes$md$field, _Input$sizes$lg$field;
 
-var baseStyle$2 = _extends$3({}, Input.baseStyle.field, {
+var baseStyle$2 = _extends$4({}, Input.baseStyle.field, {
   paddingY: "8px",
   minHeight: "80px",
   lineHeight: "short",
@@ -12041,7 +13322,7 @@ var blur = {
 };
 var blur$1 = blur;
 
-var foundations = _extends$3({
+var foundations = _extends$4({
   breakpoints: breakpoints$1$1,
   zIndices: zIndices$1,
   radii: radii$1,
@@ -12097,7 +13378,7 @@ var config = {
   initialColorMode: "light",
   cssVarPrefix: "chakra"
 };
-var theme = _extends$3({
+var theme = _extends$4({
   direction: direction
 }, foundations$1, {
   components: components,
@@ -12105,8 +13386,8 @@ var theme = _extends$3({
   config: config
 });
 
-function _extends$4() {
-  _extends$4 = Object.assign || function (target) {
+function _extends$5() {
+  _extends$5 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12120,7 +13401,7 @@ function _extends$4() {
     return target;
   };
 
-  return _extends$4.apply(this, arguments);
+  return _extends$5.apply(this, arguments);
 }
 
 function _objectWithoutPropertiesLoose$2(source, excluded) {
@@ -12174,7 +13455,7 @@ var Icon = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-icon", className);
 
-  var styles = _extends$4({
+  var styles = _extends$5({
     w: "1em",
     h: "1em",
     display: "inline-block",
@@ -12198,21 +13479,21 @@ var Icon = /*#__PURE__*/forwardRef(function (props, ref) {
 
 
   if (element && typeof element !== "string") {
-    return /*#__PURE__*/react.createElement(chakra.svg, _extends$4({
+    return /*#__PURE__*/react.createElement(chakra.svg, _extends$5({
       as: element
     }, shared, rest));
   }
 
   var _path = children != null ? children : fallbackIcon.path;
 
-  return /*#__PURE__*/react.createElement(chakra.svg, _extends$4({
+  return /*#__PURE__*/react.createElement(chakra.svg, _extends$5({
     verticalAlign: "middle",
     viewBox: _viewBox
   }, shared, rest), _path);
 });
 
-function _extends$5() {
-  _extends$5 = Object.assign || function (target) {
+function _extends$6() {
+  _extends$6 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12226,7 +13507,7 @@ function _extends$5() {
     return target;
   };
 
-  return _extends$5.apply(this, arguments);
+  return _extends$6.apply(this, arguments);
 }
 
 function _objectWithoutPropertiesLoose$3(source, excluded) {
@@ -12342,7 +13623,7 @@ var NativeImage = /*#__PURE__*/react.forwardRef(function (props, ref) {
       alt = props.alt,
       rest = _objectWithoutPropertiesLoose$3(props, _excluded$4);
 
-  return /*#__PURE__*/react.createElement("img", _extends$5({
+  return /*#__PURE__*/react.createElement("img", _extends$6({
     width: htmlWidth,
     height: htmlHeight,
     ref: ref,
@@ -12375,11 +13656,11 @@ var Image$1 = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var shouldIgnore = loading != null || ignoreFallback || fallbackSrc === undefined && fallback === undefined; // if the user doesn't provide any kind of fallback we should ignore it
 
-  var status = useImage(_extends$5({}, props, {
+  var status = useImage(_extends$6({}, props, {
     ignoreFallback: shouldIgnore
   }));
 
-  var shared = _extends$5({
+  var shared = _extends$6({
     ref: ref,
     objectFit: fit,
     objectPosition: align
@@ -12391,14 +13672,14 @@ var Image$1 = /*#__PURE__*/forwardRef(function (props, ref) {
      * let's render it here.
      */
     if (fallback) return fallback;
-    return /*#__PURE__*/react.createElement(chakra.img, _extends$5({
+    return /*#__PURE__*/react.createElement(chakra.img, _extends$6({
       as: NativeImage,
       className: "chakra-image__placeholder",
       src: fallbackSrc
     }, shared));
   }
 
-  return /*#__PURE__*/react.createElement(chakra.img, _extends$5({
+  return /*#__PURE__*/react.createElement(chakra.img, _extends$6({
     as: NativeImage,
     src: src,
     srcSet: srcSet,
@@ -12442,8 +13723,8 @@ var VisuallyHiddenInput = chakra("input", {
   baseStyle: visuallyHiddenStyle
 });
 
-function _extends$6() {
-  _extends$6 = Object.assign || function (target) {
+function _extends$7() {
+  _extends$7 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12457,7 +13738,7 @@ function _extends$6() {
     return target;
   };
 
-  return _extends$6.apply(this, arguments);
+  return _extends$7.apply(this, arguments);
 }
 
 function _objectWithoutPropertiesLoose$4(source, excluded) {
@@ -12508,7 +13789,7 @@ var Spinner$1 = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-spinner", className);
 
-  var spinnerStyles = _extends$6({
+  var spinnerStyles = _extends$7({
     display: "inline-block",
     borderColor: "currentColor",
     borderStyle: "solid",
@@ -12519,7 +13800,7 @@ var Spinner$1 = /*#__PURE__*/forwardRef(function (props, ref) {
     animation: spin + " " + speed + " linear infinite"
   }, styles);
 
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$6({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$7({
     ref: ref,
     __css: spinnerStyles,
     className: _className
@@ -12541,8 +13822,8 @@ function _objectWithoutPropertiesLoose$5(source, excluded) {
   return target;
 }
 
-function _extends$7() {
-  _extends$7 = Object.assign || function (target) {
+function _extends$8() {
+  _extends$8 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12556,7 +13837,7 @@ function _extends$7() {
     return target;
   };
 
-  return _extends$7.apply(this, arguments);
+  return _extends$8.apply(this, arguments);
 }
 
 var _createContext$3 = createContext({
@@ -12586,13 +13867,13 @@ var ButtonSpinner = function ButtonSpinner(props) {
   var spinnerStyles = react.useMemo(function () {
     var _extends2;
 
-    return _extends$7((_extends2 = {
+    return _extends$8((_extends2 = {
       display: "flex",
       alignItems: "center",
       position: label ? "relative" : "absolute"
     }, _extends2[marginProp] = label ? "0.5rem" : 0, _extends2.fontSize = "1em", _extends2.lineHeight = "normal", _extends2), __css);
   }, [__css, label, marginProp]);
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$7({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$8({
     className: _className
   }, rest, {
     __css: spinnerStyles
@@ -12612,7 +13893,7 @@ var ButtonIcon = function ButtonIcon(props) {
 
   var _className = cx("chakra-button__icon", className);
 
-  return /*#__PURE__*/react.createElement(chakra.span, _extends$7({
+  return /*#__PURE__*/react.createElement(chakra.span, _extends$8({
     display: "inline-flex",
     alignSelf: "center",
     flexShrink: 0
@@ -12640,7 +13921,7 @@ function useButtonType(value) {
 var _excluded$1$1 = ["isDisabled", "isLoading", "isActive", "isFullWidth", "children", "leftIcon", "rightIcon", "loadingText", "iconSpacing", "type", "spinner", "spinnerPlacement", "className", "as"];
 var Button$1 = /*#__PURE__*/forwardRef(function (props, ref) {
   var group = useButtonGroup();
-  var styles = useStyleConfig("Button", _extends$7({}, group, props));
+  var styles = useStyleConfig("Button", _extends$8({}, group, props));
 
   var _omitThemingProps = omitThemingProps(props),
       _omitThemingProps$isD = _omitThemingProps.isDisabled,
@@ -12676,7 +13957,7 @@ var Button$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       zIndex: 1
     });
 
-    return _extends$7({
+    return _extends$8({
       display: "inline-flex",
       appearance: "none",
       alignItems: "center",
@@ -12702,7 +13983,7 @@ var Button$1 = /*#__PURE__*/forwardRef(function (props, ref) {
     iconSpacing: iconSpacing,
     children: children
   };
-  return /*#__PURE__*/react.createElement(chakra.button, _extends$7({
+  return /*#__PURE__*/react.createElement(chakra.button, _extends$8({
     disabled: isDisabled || isLoading,
     ref: useMergeRefs(ref, _ref),
     as: as,
@@ -12755,7 +14036,7 @@ var IconButton = /*#__PURE__*/forwardRef(function (props, ref) {
     focusable: false
   }) : null;
 
-  return /*#__PURE__*/react.createElement(Button$1, _extends$7({
+  return /*#__PURE__*/react.createElement(Button$1, _extends$8({
     padding: "0",
     borderRadius: isRound ? "full" : undefined,
     ref: ref,
@@ -12763,8 +14044,8 @@ var IconButton = /*#__PURE__*/forwardRef(function (props, ref) {
   }, rest), _children);
 });
 
-function _extends$8() {
-  _extends$8 = Object.assign || function (target) {
+function _extends$9() {
+  _extends$9 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12778,7 +14059,7 @@ function _extends$8() {
     return target;
   };
 
-  return _extends$8.apply(this, arguments);
+  return _extends$9.apply(this, arguments);
 }
 
 function _objectWithoutPropertiesLoose$6(source, excluded) {
@@ -12822,7 +14103,7 @@ function useFormControl(props) {
       isRequired = _useFormControlProps.isRequired,
       rest = _objectWithoutPropertiesLoose$6(_useFormControlProps, _excluded$1$2);
 
-  return _extends$8({}, rest, {
+  return _extends$9({}, rest, {
     disabled: isDisabled,
     readOnly: isReadOnly,
     required: isRequired,
@@ -12862,7 +14143,7 @@ function useFormControlProps(props) {
     labelIds.push(field.helpTextId);
   }
 
-  return _extends$8({}, rest, {
+  return _extends$9({}, rest, {
     "aria-describedby": labelIds.join(" ") || undefined,
     id: id != null ? id : field == null ? void 0 : field.id,
     isDisabled: (_ref = disabled != null ? disabled : isDisabled) != null ? _ref : field == null ? void 0 : field.isDisabled,
@@ -12874,8 +14155,8 @@ function useFormControlProps(props) {
   });
 }
 
-function _extends$9() {
-  _extends$9 = Object.assign || function (target) {
+function _extends$a() {
+  _extends$a = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -12889,7 +14170,7 @@ function _extends$9() {
     return target;
   };
 
-  return _extends$9.apply(this, arguments);
+  return _extends$a.apply(this, arguments);
 }
 
 /**
@@ -12904,7 +14185,7 @@ var Input$1 = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-input", props.className);
 
-  return /*#__PURE__*/react.createElement(chakra.input, _extends$9({}, input, {
+  return /*#__PURE__*/react.createElement(chakra.input, _extends$a({}, input, {
     __css: styles.field,
     ref: ref,
     className: _className
@@ -12966,10 +14247,10 @@ var InputAddon = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var placementStyles = (_placements$placement = placements[placement]) != null ? _placements$placement : {};
   var styles = useStyles();
-  return /*#__PURE__*/react.createElement(StyledAddon, _extends$9({
+  return /*#__PURE__*/react.createElement(StyledAddon, _extends$a({
     ref: ref
   }, rest, {
-    __css: _extends$9({}, styles.addon, placementStyles)
+    __css: _extends$a({}, styles.addon, placementStyles)
   }));
 });
 /**
@@ -12980,7 +14261,7 @@ var InputAddon = /*#__PURE__*/forwardRef(function (props, ref) {
 
 
 var InputLeftAddon = /*#__PURE__*/forwardRef(function (props, ref) {
-  return /*#__PURE__*/react.createElement(InputAddon, _extends$9({
+  return /*#__PURE__*/react.createElement(InputAddon, _extends$a({
     ref: ref,
     placement: "left"
   }, props, {
@@ -12997,7 +14278,7 @@ InputLeftAddon.id = "InputLeftAddon";
  */
 
 var InputRightAddon = /*#__PURE__*/forwardRef(function (props, ref) {
-  return /*#__PURE__*/react.createElement(InputAddon, _extends$9({
+  return /*#__PURE__*/react.createElement(InputAddon, _extends$a({
     ref: ref,
     placement: "right"
   }, props, {
@@ -13057,7 +14338,7 @@ var InputGroup = /*#__PURE__*/forwardRef(function (props, ref) {
     });
     return child.type.id !== "Input" ? /*#__PURE__*/react.cloneElement(child, theming) : /*#__PURE__*/react.cloneElement(child, Object.assign(theming, groupStyles, child.props));
   });
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$9({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
     className: _className,
     ref: ref,
     __css: {
@@ -13094,7 +14375,7 @@ var InputElement = /*#__PURE__*/forwardRef(function (props, ref) {
   var input = styles.field;
   var attr = placement === "left" ? "insetStart" : "insetEnd";
   var elementStyles = (_elementStyles = {}, _elementStyles[attr] = "0", _elementStyles.width = (_input$height = input == null ? void 0 : input.height) != null ? _input$height : input == null ? void 0 : input.h, _elementStyles.height = (_input$height2 = input == null ? void 0 : input.height) != null ? _input$height2 : input == null ? void 0 : input.h, _elementStyles.fontSize = input == null ? void 0 : input.fontSize, _elementStyles);
-  return /*#__PURE__*/react.createElement(StyledElement, _extends$9({
+  return /*#__PURE__*/react.createElement(StyledElement, _extends$a({
     ref: ref,
     __css: elementStyles
   }, rest));
@@ -13108,7 +14389,7 @@ var InputLeftElement = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-input__left-element", className);
 
-  return /*#__PURE__*/react.createElement(InputElement, _extends$9({
+  return /*#__PURE__*/react.createElement(InputElement, _extends$a({
     ref: ref,
     placement: "left",
     className: _className
@@ -13123,7 +14404,7 @@ var InputRightElement = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-input__right-element", className);
 
-  return /*#__PURE__*/react.createElement(InputElement, _extends$9({
+  return /*#__PURE__*/react.createElement(InputElement, _extends$a({
     ref: ref,
     placement: "right",
     className: _className
@@ -13132,8 +14413,8 @@ var InputRightElement = /*#__PURE__*/forwardRef(function (props, ref) {
 
 InputRightElement.id = "InputRightElement";
 
-function _extends$a() {
-  _extends$a = Object.assign || function (target) {
+function _extends$b() {
+  _extends$b = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -13147,7 +14428,7 @@ function _extends$a() {
     return target;
   };
 
-  return _extends$a.apply(this, arguments);
+  return _extends$b.apply(this, arguments);
 }
 
 function _objectWithoutPropertiesLoose$8(source, excluded) {
@@ -13224,11 +14505,11 @@ var Divider$1 = /*#__PURE__*/forwardRef(function (props, ref) {
       width: "100%"
     }
   };
-  return /*#__PURE__*/react.createElement(chakra.hr, _extends$a({
+  return /*#__PURE__*/react.createElement(chakra.hr, _extends$b({
     ref: ref,
     "aria-orientation": orientation
   }, rest, {
-    __css: _extends$a({}, styles, {
+    __css: _extends$b({}, styles, {
       border: "0",
       borderColor: borderColor,
       borderStyle: borderStyle
@@ -13267,7 +14548,7 @@ var Flex = /*#__PURE__*/forwardRef(function (props, ref) {
     flexGrow: grow,
     flexShrink: shrink
   };
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     __css: styles
   }, rest));
@@ -13314,7 +14595,7 @@ var Grid = /*#__PURE__*/forwardRef(function (props, ref) {
     gridTemplateRows: templateRows,
     gridTemplateColumns: templateColumns
   };
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     __css: styles
   }, rest));
@@ -13343,7 +14624,7 @@ var GridItem = /*#__PURE__*/forwardRef(function (props, ref) {
     gridRowStart: rowStart,
     gridRowEnd: rowEnd
   });
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     __css: styles
   }, rest));
@@ -13376,7 +14657,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
   }, _ref) : {};
   return /*#__PURE__*/react.createElement(StylesProvider, {
     value: styles
-  }, /*#__PURE__*/react.createElement(chakra.ul, _extends$a({
+  }, /*#__PURE__*/react.createElement(chakra.ul, _extends$b({
     ref: ref,
     listStyleType: styleType,
     listStylePosition: stylePosition
@@ -13386,7 +14667,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
      */
     ,
     role: "list",
-    __css: _extends$a({}, styles.container, spacingStyle)
+    __css: _extends$b({}, styles.container, spacingStyle)
   }, rest), validChildren));
 });
 /**
@@ -13398,7 +14679,7 @@ var List$1 = /*#__PURE__*/forwardRef(function (props, ref) {
 
 var ListIcon = /*#__PURE__*/forwardRef(function (props, ref) {
   var styles = useStyles();
-  return /*#__PURE__*/react.createElement(Icon, _extends$a({
+  return /*#__PURE__*/react.createElement(Icon, _extends$b({
     ref: ref,
     role: "presentation"
   }, props, {
@@ -13500,10 +14781,10 @@ function getDividerStyles(options) {
 
 var _excluded$3$2 = ["isInline", "direction", "align", "justify", "spacing", "wrap", "children", "divider", "className", "shouldWrapChildren"];
 var StackItem = function StackItem(props) {
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     className: "chakra-stack__item"
   }, props, {
-    __css: _extends$a({
+    __css: _extends$b({
       display: "inline-block",
       flex: "0 0 auto",
       minWidth: 0
@@ -13578,7 +14859,7 @@ var Stack = /*#__PURE__*/forwardRef(function (props, ref) {
 
   var _className = cx("chakra-stack", className);
 
-  return /*#__PURE__*/react.createElement(chakra.div, _extends$a({
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$b({
     ref: ref,
     display: "flex",
     alignItems: align,
@@ -13595,7 +14876,7 @@ var Stack = /*#__PURE__*/forwardRef(function (props, ref) {
 
 
 var HStack = /*#__PURE__*/forwardRef(function (props, ref) {
-  return /*#__PURE__*/react.createElement(Stack, _extends$a({
+  return /*#__PURE__*/react.createElement(Stack, _extends$b({
     align: "center"
   }, props, {
     direction: "row",
@@ -13608,7 +14889,7 @@ var HStack = /*#__PURE__*/forwardRef(function (props, ref) {
 
 
 var VStack = /*#__PURE__*/forwardRef(function (props, ref) {
-  return /*#__PURE__*/react.createElement(Stack, _extends$a({
+  return /*#__PURE__*/react.createElement(Stack, _extends$b({
     align: "center"
   }, props, {
     direction: "column",
@@ -13634,11 +14915,1293 @@ var Text = /*#__PURE__*/forwardRef(function (props, ref) {
     textDecoration: props.decoration,
     textTransform: props.casing
   });
-  return /*#__PURE__*/react.createElement(chakra.p, _extends$a({
+  return /*#__PURE__*/react.createElement(chakra.p, _extends$b({
     ref: ref,
     className: cx("chakra-text", props.className)
   }, aliasedProps, rest, {
     __css: styles
+  }));
+});
+
+function _extends$c() {
+  _extends$c = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$c.apply(this, arguments);
+}
+
+function _objectWithoutPropertiesLoose$9(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+function getIds(id) {
+  return {
+    root: "slider-root-" + id,
+    getThumb: function getThumb(i) {
+      return "slider-thumb-" + id + "-" + i;
+    },
+    getInput: function getInput(i) {
+      return "slider-input-" + id + "-" + i;
+    },
+    track: "slider-track-" + id,
+    innerTrack: "slider-filled-track-" + id,
+    getMarker: function getMarker(i) {
+      return "slider-marker-" + id + "-" + i;
+    },
+    output: "slider-output-" + id
+  };
+}
+function orient$1(options) {
+  var orientation = options.orientation,
+      vertical = options.vertical,
+      horizontal = options.horizontal;
+  return orientation === "vertical" ? vertical : horizontal;
+}
+var zeroRect = {
+  width: 0,
+  height: 0
+};
+function getStyles(options) {
+  var orientation = options.orientation,
+      thumbPercents = options.thumbPercents,
+      thumbRects = options.thumbRects,
+      isReversed = options.isReversed;
+
+  var getThumbStyle = function getThumbStyle(i) {
+    return _extends$c({
+      position: "absolute",
+      userSelect: "none",
+      WebkitUserSelect: "none",
+      MozUserSelect: "none",
+      msUserSelect: "none",
+      touchAction: "none"
+    }, orient$1({
+      orientation: orientation,
+      vertical: {
+        bottom: "calc(" + thumbPercents[i] + "% - " + thumbRects[i].height / 2 + "px)"
+      },
+      horizontal: {
+        left: "calc(" + thumbPercents[i] + "% - " + thumbRects[i].width / 2 + "px)"
+      }
+    }));
+  };
+
+  var size = orientation === "vertical" ? thumbRects.reduce(function (a, b) {
+    return a.height > b.height ? a : b;
+  }, zeroRect) : thumbRects.reduce(function (a, b) {
+    return a.width > b.width ? a : b;
+  }, zeroRect);
+
+  var rootStyle = _extends$c({
+    position: "relative",
+    touchAction: "none",
+    WebkitTapHighlightColor: "rgba(0,0,0,0)",
+    userSelect: "none",
+    outline: 0
+  }, orient$1({
+    orientation: orientation,
+    vertical: {
+      paddingLeft: size.width / 2,
+      paddingRight: size.width / 2
+    },
+    horizontal: {
+      paddingTop: size.height / 2,
+      paddingBottom: size.height / 2
+    }
+  }));
+
+  var trackStyle = _extends$c({
+    position: "absolute"
+  }, orient$1({
+    orientation: orientation,
+    vertical: {
+      left: "50%",
+      transform: "translateX(-50%)",
+      height: "100%"
+    },
+    horizontal: {
+      top: "50%",
+      transform: "translateY(-50%)",
+      width: "100%"
+    }
+  }));
+
+  var isSingleThumb = thumbPercents.length === 1;
+  var fallback = [0, isReversed ? 100 - thumbPercents[0] : thumbPercents[0]];
+  var range = isSingleThumb ? fallback : thumbPercents;
+  var start = range[0];
+
+  if (!isSingleThumb && isReversed) {
+    start = 100 - start;
+  }
+
+  var percent = Math.abs(range[range.length - 1] - range[0]);
+
+  var innerTrackStyle = _extends$c({}, trackStyle, orient$1({
+    orientation: orientation,
+    vertical: isReversed ? {
+      height: percent + "%",
+      top: start + "%"
+    } : {
+      height: percent + "%",
+      bottom: start + "%"
+    },
+    horizontal: isReversed ? {
+      width: percent + "%",
+      right: start + "%"
+    } : {
+      width: percent + "%",
+      left: start + "%"
+    }
+  }));
+
+  return {
+    trackStyle: trackStyle,
+    innerTrackStyle: innerTrackStyle,
+    rootStyle: rootStyle,
+    getThumbStyle: getThumbStyle
+  };
+}
+function getIsReversed(options) {
+  var isReversed = options.isReversed,
+      direction = options.direction,
+      orientation = options.orientation;
+
+  if (direction === "ltr" || orientation === "vertical") {
+    return isReversed;
+  } // only flip for horizontal RTL
+  // if isReserved 🔜  otherwise  🔚
+
+
+  return !isReversed;
+}
+
+var _excluded$3$3 = ["min", "max", "onChange", "value", "defaultValue", "isReversed", "direction", "orientation", "id", "isDisabled", "isReadOnly", "onChangeStart", "onChangeEnd", "step", "getAriaValueText", "aria-valuetext", "aria-label", "aria-labelledby", "name", "focusThumbOnChange", "minStepsBetweenThumbs"],
+    _excluded2$5 = ["index"],
+    _excluded3$1 = ["value"],
+    _excluded4 = ["index"];
+
+/**
+ * React hook that implements an accessible range slider.
+ *
+ * It is an alternative to `<input type="range" />`, and returns
+ * prop getters for the component parts
+ *
+ * @see Docs     https://chakra-ui.com/docs/form/slider
+ * @see WAI-ARIA https://www.w3.org/TR/wai-aria-practices-1.1/#slider
+ */
+function useRangeSlider(props) {
+  var _props$min = props.min,
+      min = _props$min === void 0 ? 0 : _props$min,
+      _props$max = props.max,
+      max = _props$max === void 0 ? 100 : _props$max,
+      onChange = props.onChange,
+      valueProp = props.value,
+      defaultValue = props.defaultValue,
+      isReversedProp = props.isReversed,
+      _props$direction = props.direction,
+      direction = _props$direction === void 0 ? "ltr" : _props$direction,
+      _props$orientation = props.orientation,
+      orientation = _props$orientation === void 0 ? "horizontal" : _props$orientation,
+      idProp = props.id,
+      isDisabled = props.isDisabled,
+      isReadOnly = props.isReadOnly,
+      onChangeStartProp = props.onChangeStart,
+      onChangeEndProp = props.onChangeEnd,
+      _props$step = props.step,
+      step = _props$step === void 0 ? 1 : _props$step,
+      getAriaValueTextProp = props.getAriaValueText,
+      ariaValueText = props["aria-valuetext"],
+      ariaLabel = props["aria-label"],
+      ariaLabelledBy = props["aria-labelledby"],
+      name = props.name,
+      _props$focusThumbOnCh = props.focusThumbOnChange,
+      focusThumbOnChange = _props$focusThumbOnCh === void 0 ? true : _props$focusThumbOnCh,
+      _props$minStepsBetwee = props.minStepsBetweenThumbs,
+      minStepsBetweenThumbs = _props$minStepsBetwee === void 0 ? 0 : _props$minStepsBetwee,
+      htmlProps = _objectWithoutPropertiesLoose$9(props, _excluded$3$3);
+
+  var onChangeStart = useCallbackRef(onChangeStartProp);
+  var onChangeEnd = useCallbackRef(onChangeEndProp);
+  var getAriaValueText = useCallbackRef(getAriaValueTextProp);
+  var isReversed = getIsReversed({
+    isReversed: isReversedProp,
+    direction: direction,
+    orientation: orientation
+  });
+
+  var _useControllableState = useControllableState({
+    value: valueProp,
+    defaultValue: defaultValue != null ? defaultValue : [25, 75],
+    onChange: onChange
+  }),
+      valueState = _useControllableState[0],
+      setValue = _useControllableState[1];
+
+  if (!Array.isArray(valueState)) {
+    throw new TypeError("[range-slider] You passed an invalid value for `value` or `defaultValue`, expected `Array` but got `" + typeof valueState + "`");
+  }
+
+  var _useBoolean = useBoolean(),
+      isDragging = _useBoolean[0],
+      setDragging = _useBoolean[1];
+
+  var _useBoolean2 = useBoolean(),
+      isFocused = _useBoolean2[0],
+      setFocused = _useBoolean2[1];
+
+  var _useState = react.useState(-1),
+      activeIndex = _useState[0],
+      setActiveIndex = _useState[1];
+
+  var eventSourceRef = react.useRef(null);
+  var isInteractive = !(isDisabled || isReadOnly);
+  var initialValue = react.useRef(valueState);
+  var value = valueState.map(function (val) {
+    return clampValue(val, min, max);
+  });
+  var valueRef = useLatestRef(value);
+  var spacing = minStepsBetweenThumbs * step;
+  var valueBounds = getValueBounds(value, min, max, spacing);
+  var reversedValue = value.map(function (val) {
+    return max - val + min;
+  });
+  var thumbValues = isReversed ? reversedValue : value;
+  var thumbPercents = thumbValues.map(function (val) {
+    return valueToPercent(val, min, max);
+  });
+  var isVertical = orientation === "vertical";
+
+  var _useState2 = react.useState(Array.from({
+    length: value.length
+  }).map(function () {
+    return {
+      width: 0,
+      height: 0
+    };
+  })),
+      thumbRects = _useState2[0],
+      setThumbRects = _useState2[1];
+
+  react.useEffect(function () {
+    var _rootRef$current;
+
+    if (!rootRef.current) return;
+    var thumbs = Array.from((_rootRef$current = rootRef.current) == null ? void 0 : _rootRef$current.querySelectorAll("[role=slider]"));
+    var rects = thumbs.map(function (el) {
+      return {
+        width: el.offsetWidth,
+        height: el.offsetHeight
+      };
+    });
+    if (rects.length) setThumbRects(rects);
+  }, []);
+  /**
+   * Let's keep a reference to the slider track and thumb
+   */
+
+  var trackRef = react.useRef(null);
+  var rootRef = react.useRef(null);
+  var uuid = useId(idProp);
+  var ids = getIds(uuid);
+  var getValueFromPointer = react.useCallback(function (event) {
+    var _event$touches$, _event$touches;
+
+    if (!trackRef.current) return;
+    eventSourceRef.current = "pointer";
+    var rect = trackRef.current.getBoundingClientRect();
+
+    var _ref = (_event$touches$ = (_event$touches = event.touches) == null ? void 0 : _event$touches[0]) != null ? _event$touches$ : event,
+        clientX = _ref.clientX,
+        clientY = _ref.clientY;
+
+    var diff = isVertical ? rect.bottom - clientY : clientX - rect.left;
+    var length = isVertical ? rect.height : rect.width;
+    var percent = diff / length;
+    if (isReversed) percent = 1 - percent;
+    return percentToValue(percent, min, max);
+  }, [isVertical, isReversed, max, min]);
+  var tenSteps = (max - min) / 10;
+  var oneStep = step || (max - min) / 100;
+  var actions = react.useMemo(function () {
+    return {
+      setValueAtIndex: function setValueAtIndex(index, val) {
+        if (!isInteractive) return;
+        var bounds = valueBounds[index];
+        val = parseFloat(roundValueToStep(val, bounds.min, oneStep));
+        val = clampValue(val, bounds.min, bounds.max);
+        var next = [].concat(value);
+        next[index] = val;
+        setValue(next);
+      },
+      setActiveIndex: setActiveIndex,
+      stepUp: function stepUp(index, step) {
+        if (step === void 0) {
+          step = oneStep;
+        }
+
+        var valueAtIndex = value[index];
+        var next = isReversed ? valueAtIndex - step : valueAtIndex + step;
+        actions.setValueAtIndex(index, next);
+      },
+      stepDown: function stepDown(index, step) {
+        if (step === void 0) {
+          step = oneStep;
+        }
+
+        var valueAtIndex = value[index];
+        var next = isReversed ? valueAtIndex + step : valueAtIndex - step;
+        actions.setValueAtIndex(index, next);
+      },
+      reset: function reset() {
+        return setValue(initialValue.current);
+      }
+    };
+  }, [oneStep, value, isReversed, setValue, isInteractive, valueBounds]);
+  /**
+   * Keyboard interaction to ensure users can operate
+   * the slider using only their keyboard.
+   */
+
+  var onKeyDown = react.useCallback(function (event) {
+    var eventKey = normalizeEventKey(event);
+    var keyMap = {
+      ArrowRight: function ArrowRight() {
+        return actions.stepUp(activeIndex);
+      },
+      ArrowUp: function ArrowUp() {
+        return actions.stepUp(activeIndex);
+      },
+      ArrowLeft: function ArrowLeft() {
+        return actions.stepDown(activeIndex);
+      },
+      ArrowDown: function ArrowDown() {
+        return actions.stepDown(activeIndex);
+      },
+      PageUp: function PageUp() {
+        return actions.stepUp(activeIndex, tenSteps);
+      },
+      PageDown: function PageDown() {
+        return actions.stepDown(activeIndex, tenSteps);
+      },
+      Home: function Home() {
+        var value = valueBounds[activeIndex].min;
+        actions.setValueAtIndex(activeIndex, value);
+      },
+      End: function End() {
+        var value = valueBounds[activeIndex].max;
+        actions.setValueAtIndex(activeIndex, value);
+      }
+    };
+    var action = keyMap[eventKey];
+
+    if (action) {
+      event.preventDefault();
+      event.stopPropagation();
+      action(event);
+      eventSourceRef.current = "keyboard";
+    }
+  }, [actions, activeIndex, tenSteps, valueBounds]);
+  /**
+   * Compute styles for all component parts.
+   */
+
+  var _useMemo = react.useMemo(function () {
+    return getStyles({
+      isReversed: isReversed,
+      orientation: orientation,
+      thumbRects: thumbRects,
+      thumbPercents: thumbPercents
+    });
+  }, [isReversed, orientation, thumbPercents, thumbRects]),
+      getThumbStyle = _useMemo.getThumbStyle,
+      rootStyle = _useMemo.rootStyle,
+      trackStyle = _useMemo.trackStyle,
+      innerTrackStyle = _useMemo.innerTrackStyle;
+
+  var focusThumb = react.useCallback(function (index) {
+    var idx = index != null ? index : activeIndex;
+
+    if (idx !== -1 && focusThumbOnChange) {
+      var _rootRef$current2;
+
+      var id = ids.getThumb(idx);
+      var thumb = (_rootRef$current2 = rootRef.current) == null ? void 0 : _rootRef$current2.ownerDocument.getElementById(id);
+
+      if (thumb) {
+        setTimeout(function () {
+          return focus(thumb);
+        });
+      }
+    }
+  }, [focusThumbOnChange, activeIndex, ids]);
+  useUpdateEffect(function () {
+    if (eventSourceRef.current === "keyboard") {
+      onChangeEnd == null ? void 0 : onChangeEnd(valueRef.current);
+    }
+  }, [value, onChangeEnd]);
+
+  var _onPanSessionStart = function onPanSessionStart(event) {
+    var pointValue = getValueFromPointer(event) || 0;
+    var distances = value.map(function (val) {
+      return Math.abs(val - pointValue);
+    });
+    var closest = Math.min.apply(Math, distances);
+    var index = distances.indexOf(closest); // check if the clicked thumb is stacked by checking if there are multiple
+    // thumbs at the same distance
+
+    var thumbsAtPosition = distances.filter(function (distance) {
+      return distance === closest;
+    });
+    var isThumbStacked = thumbsAtPosition.length > 1; // when two thumbs are stacked and the user clicks at a point larger than
+    // their values, pick the last thumb with the greatest index
+
+    if (isThumbStacked && pointValue > value[index]) {
+      index = thumbsAtPosition.length - 1;
+    }
+
+    setActiveIndex(index);
+    actions.setValueAtIndex(index, pointValue);
+    focusThumb(index);
+  };
+
+  var _onPan = function onPan(event) {
+    if (activeIndex == -1) return;
+    var pointValue = getValueFromPointer(event) || 0;
+    setActiveIndex(activeIndex);
+    actions.setValueAtIndex(activeIndex, pointValue);
+    focusThumb(activeIndex);
+  };
+
+  usePanGesture(rootRef, {
+    onPanSessionStart: function onPanSessionStart(event) {
+      if (!isInteractive) return;
+      setDragging.on();
+
+      _onPanSessionStart(event);
+
+      onChangeStart == null ? void 0 : onChangeStart(valueRef.current);
+    },
+    onPanSessionEnd: function onPanSessionEnd() {
+      if (!isInteractive) return;
+      setDragging.off();
+      onChangeEnd == null ? void 0 : onChangeEnd(valueRef.current);
+    },
+    onPan: function onPan(event) {
+      if (!isInteractive) return;
+
+      _onPan(event);
+    }
+  });
+  var getRootProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, htmlProps, {
+      id: ids.root,
+      ref: mergeRefs(ref, rootRef),
+      tabIndex: -1,
+      "aria-disabled": ariaAttr(isDisabled),
+      "data-focused": dataAttr(isFocused),
+      style: _extends$c({}, props.style, rootStyle)
+    });
+  }, [htmlProps, isDisabled, isFocused, rootStyle, ids]);
+  var getTrackProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, {
+      ref: mergeRefs(ref, trackRef),
+      id: ids.track,
+      "data-disabled": dataAttr(isDisabled),
+      style: _extends$c({}, props.style, trackStyle)
+    });
+  }, [isDisabled, trackStyle, ids]);
+  var getInnerTrackProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, {
+      ref: ref,
+      id: ids.innerTrack,
+      style: _extends$c({}, props.style, innerTrackStyle)
+    });
+  }, [innerTrackStyle, ids]);
+  var getThumbProps = react.useCallback(function (props, ref) {
+    var _getAriaValueText;
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    var index = props.index,
+        rest = _objectWithoutPropertiesLoose$9(props, _excluded2$5);
+
+    var _value = value[index];
+
+    if (_value == null) {
+      throw new TypeError("[range-slider > thumb] Cannot find value at index `" + index + "`. The `value` or `defaultValue` length is : " + value.length);
+    }
+
+    var bounds = valueBounds[index];
+    return _extends$c({}, rest, {
+      ref: ref,
+      role: "slider",
+      tabIndex: isInteractive ? 0 : undefined,
+      id: ids.getThumb(index),
+      "data-active": dataAttr(isDragging && activeIndex === index),
+      "aria-valuetext": (_getAriaValueText = getAriaValueText == null ? void 0 : getAriaValueText(_value)) != null ? _getAriaValueText : ariaValueText == null ? void 0 : ariaValueText[index],
+      "aria-valuemin": bounds.min,
+      "aria-valuemax": bounds.max,
+      "aria-valuenow": _value,
+      "aria-orientation": orientation,
+      "aria-disabled": ariaAttr(isDisabled),
+      "aria-readonly": ariaAttr(isReadOnly),
+      "aria-label": ariaLabel == null ? void 0 : ariaLabel[index],
+      "aria-labelledby": ariaLabel != null && ariaLabel[index] ? undefined : ariaLabelledBy == null ? void 0 : ariaLabelledBy[index],
+      style: _extends$c({}, props.style, getThumbStyle(index)),
+      onKeyDown: callAllHandlers(props.onKeyDown, onKeyDown),
+      onFocus: callAllHandlers(props.onFocus, function () {
+        setFocused.on();
+        setActiveIndex(index);
+      }),
+      onBlur: callAllHandlers(props.onBlur, function () {
+        setFocused.off();
+        setActiveIndex(-1);
+      })
+    });
+  }, [ids, value, valueBounds, isInteractive, isDragging, activeIndex, getAriaValueText, ariaValueText, orientation, isDisabled, isReadOnly, ariaLabel, ariaLabelledBy, getThumbStyle, onKeyDown, setFocused]);
+  var getOutputProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, {
+      ref: ref,
+      id: ids.output,
+      htmlFor: value.map(function (v, i) {
+        return ids.getThumb(i);
+      }).join(" "),
+      "aria-live": "off"
+    });
+  }, [ids, value]);
+  var getMarkerProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    var _props = props,
+        v = _props.value,
+        rest = _objectWithoutPropertiesLoose$9(_props, _excluded3$1);
+
+    var isInRange = !(v < min || v > max);
+    var isHighlighted = v >= value[0] && v <= value[value.length - 1];
+    var percent = valueToPercent(v, min, max);
+    percent = isReversed ? 100 - percent : percent;
+
+    var markerStyle = _extends$c({
+      position: "absolute",
+      pointerEvents: "none"
+    }, orient$1({
+      orientation: orientation,
+      vertical: {
+        bottom: percent + "%"
+      },
+      horizontal: {
+        left: percent + "%"
+      }
+    }));
+
+    return _extends$c({}, rest, {
+      ref: ref,
+      id: ids.getMarker(props.value),
+      role: "presentation",
+      "aria-hidden": true,
+      "data-disabled": dataAttr(isDisabled),
+      "data-invalid": dataAttr(!isInRange),
+      "data-highlighted": dataAttr(isHighlighted),
+      style: _extends$c({}, props.style, markerStyle)
+    });
+  }, [isDisabled, isReversed, max, min, orientation, value, ids]);
+  var getInputProps = react.useCallback(function (props, ref) {
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    var index = props.index,
+        rest = _objectWithoutPropertiesLoose$9(props, _excluded4);
+
+    return _extends$c({}, rest, {
+      ref: ref,
+      id: ids.getInput(index),
+      type: "hidden",
+      value: value[index],
+      name: Array.isArray(name) ? name[index] : name + "-" + index
+    });
+  }, [name, value, ids]);
+  return {
+    state: {
+      value: value,
+      isFocused: isFocused,
+      isDragging: isDragging,
+      getThumbPercent: function getThumbPercent(i) {
+        return thumbPercents[i];
+      },
+      getThumbMinValue: function getThumbMinValue(i) {
+        return valueBounds[i].min;
+      },
+      getThumbMaxValue: function getThumbMaxValue(i) {
+        return valueBounds[i].max;
+      }
+    },
+    actions: actions,
+    getRootProps: getRootProps,
+    getTrackProps: getTrackProps,
+    getInnerTrackProps: getInnerTrackProps,
+    getThumbProps: getThumbProps,
+    getMarkerProps: getMarkerProps,
+    getInputProps: getInputProps,
+    getOutputProps: getOutputProps
+  };
+}
+
+var getValueBounds = function getValueBounds(arr, min, max, spacing) {
+  return arr.map(function (v, i) {
+    var _min = i === 0 ? min : arr[i - 1] + spacing;
+
+    var _max = i === arr.length - 1 ? max : arr[i + 1] - spacing;
+
+    return {
+      min: _min,
+      max: _max
+    };
+  });
+};
+
+var _excluded$2$4 = ["getRootProps"];
+
+var _createContext$1$1 = createContext({
+  name: "SliderContext",
+  errorMessage: "useSliderContext: `context` is undefined. Seems you forgot to wrap all slider components within <RangeSlider />"
+}),
+    RangeSliderProvider = _createContext$1$1[0];
+
+/**
+ * The Slider is used to allow users to make selections from a range of values.
+ * It provides context and functionality for all slider components
+ *
+ * @see Docs     https://chakra-ui.com/docs/form/slider
+ * @see WAI-ARIA https://www.w3.org/TR/wai-aria-practices/#slider
+ */
+var RangeSlider = /*#__PURE__*/forwardRef(function (props, ref) {
+  var styles = useMultiStyleConfig("Slider", props);
+  var ownProps = omitThemingProps(props);
+
+  var _useTheme = useTheme(),
+      direction = _useTheme.direction;
+
+  ownProps.direction = direction;
+
+  var _useRangeSlider = useRangeSlider(ownProps),
+      getRootProps = _useRangeSlider.getRootProps,
+      context = _objectWithoutPropertiesLoose$9(_useRangeSlider, _excluded$2$4);
+
+  var ctx = react.useMemo(function () {
+    return _extends$c({}, context, {
+      name: props.name
+    });
+  }, [context, props.name]);
+  return /*#__PURE__*/react.createElement(RangeSliderProvider, {
+    value: ctx
+  }, /*#__PURE__*/react.createElement(StylesProvider, {
+    value: styles
+  }, /*#__PURE__*/react.createElement(chakra.div, _extends$c({}, getRootProps({}, ref), {
+    className: "chakra-slider",
+    __css: styles.container
+  }), props.children)));
+});
+RangeSlider.defaultProps = {
+  orientation: "horizontal"
+};
+
+var _excluded$1$4 = ["min", "max", "onChange", "value", "defaultValue", "isReversed", "direction", "orientation", "id", "isDisabled", "isReadOnly", "onChangeStart", "onChangeEnd", "step", "getAriaValueText", "aria-valuetext", "aria-label", "aria-labelledby", "name", "focusThumbOnChange"];
+
+/**
+ * React hook that implements an accessible range slider.
+ *
+ * It is an alternative to `<input type="range" />`, and returns
+ * prop getters for the component parts
+ *
+ * @see Docs     https://chakra-ui.com/docs/form/slider
+ * @see WAI-ARIA https://www.w3.org/TR/wai-aria-practices-1.1/#slider
+ */
+function useSlider(props) {
+  var _getAriaValueText;
+
+  var _props$min = props.min,
+      min = _props$min === void 0 ? 0 : _props$min,
+      _props$max = props.max,
+      max = _props$max === void 0 ? 100 : _props$max,
+      onChange = props.onChange,
+      valueProp = props.value,
+      defaultValue = props.defaultValue,
+      isReversedProp = props.isReversed,
+      _props$direction = props.direction,
+      direction = _props$direction === void 0 ? "ltr" : _props$direction,
+      _props$orientation = props.orientation,
+      orientation = _props$orientation === void 0 ? "horizontal" : _props$orientation,
+      idProp = props.id,
+      isDisabled = props.isDisabled,
+      isReadOnly = props.isReadOnly,
+      onChangeStartProp = props.onChangeStart,
+      onChangeEndProp = props.onChangeEnd,
+      _props$step = props.step,
+      step = _props$step === void 0 ? 1 : _props$step,
+      getAriaValueTextProp = props.getAriaValueText,
+      ariaValueText = props["aria-valuetext"],
+      ariaLabel = props["aria-label"],
+      ariaLabelledBy = props["aria-labelledby"],
+      name = props.name,
+      _props$focusThumbOnCh = props.focusThumbOnChange,
+      focusThumbOnChange = _props$focusThumbOnCh === void 0 ? true : _props$focusThumbOnCh,
+      htmlProps = _objectWithoutPropertiesLoose$9(props, _excluded$1$4);
+
+  var onChangeStart = useCallbackRef(onChangeStartProp);
+  var onChangeEnd = useCallbackRef(onChangeEndProp);
+  var getAriaValueText = useCallbackRef(getAriaValueTextProp);
+  var isReversed = getIsReversed({
+    isReversed: isReversedProp,
+    direction: direction,
+    orientation: orientation
+  });
+  /**
+   * Enable the slider handle controlled and uncontrolled scenarios
+   */
+
+  var _useControllableState = useControllableState({
+    value: valueProp,
+    defaultValue: defaultValue != null ? defaultValue : getDefaultValue(min, max),
+    onChange: onChange
+  }),
+      computedValue = _useControllableState[0],
+      setValue = _useControllableState[1];
+
+  var _useBoolean = useBoolean(),
+      isDragging = _useBoolean[0],
+      setDragging = _useBoolean[1];
+
+  var _useBoolean2 = useBoolean(),
+      isFocused = _useBoolean2[0],
+      setFocused = _useBoolean2[1];
+
+  var eventSourceRef = react.useRef(null);
+  var isInteractive = !(isDisabled || isReadOnly);
+  /**
+   * Constrain the value because it can't be less than min
+   * or greater than max
+   */
+
+  var value = clampValue(computedValue, min, max);
+  var valueRef = useLatestRef(value);
+  var prevRef = react.useRef(valueRef.current);
+  var reversedValue = max - value + min;
+  var trackValue = isReversed ? reversedValue : value;
+  var thumbPercent = valueToPercent(trackValue, min, max);
+  var isVertical = orientation === "vertical";
+  /**
+   * Let's keep a reference to the slider track and thumb
+   */
+
+  var trackRef = react.useRef(null);
+  var thumbRef = react.useRef(null);
+  var rootRef = react.useRef(null);
+  /**
+   * Generate unique ids for component parts
+   */
+
+  var _useIds = useIds(idProp, "slider-thumb", "slider-track"),
+      thumbId = _useIds[0],
+      trackId = _useIds[1];
+  /**
+   * Get relative value of slider from the event by tracking
+   * how far you clicked within the track to determine the value
+   *
+   * @todo - Refactor this later on to use info from pan session
+   */
+
+
+  var getValueFromPointer = react.useCallback(function (event) {
+    var _event$touches$, _event$touches;
+
+    if (!trackRef.current) return;
+    eventSourceRef.current = "pointer";
+    var trackRect = getBox(trackRef.current).borderBox;
+
+    var _ref = (_event$touches$ = (_event$touches = event.touches) == null ? void 0 : _event$touches[0]) != null ? _event$touches$ : event,
+        clientX = _ref.clientX,
+        clientY = _ref.clientY;
+
+    var diff = isVertical ? trackRect.bottom - clientY : clientX - trackRect.left;
+    var length = isVertical ? trackRect.height : trackRect.width;
+    var percent = diff / length;
+
+    if (isReversed) {
+      percent = 1 - percent;
+    }
+
+    var nextValue = percentToValue(percent, min, max);
+
+    if (step) {
+      nextValue = parseFloat(roundValueToStep(nextValue, min, step));
+    }
+
+    nextValue = clampValue(nextValue, min, max);
+    return nextValue;
+  }, [isVertical, isReversed, max, min, step]);
+  var tenSteps = (max - min) / 10;
+  var oneStep = step || (max - min) / 100;
+  var constrain = react.useCallback(function (value) {
+    if (!isInteractive) return;
+    value = parseFloat(roundValueToStep(value, min, oneStep));
+    value = clampValue(value, min, max);
+    setValue(value);
+  }, [oneStep, max, min, setValue, isInteractive]);
+  var actions = react.useMemo(function () {
+    return {
+      stepUp: function stepUp(step) {
+        if (step === void 0) {
+          step = oneStep;
+        }
+
+        var next = isReversed ? value - step : value + step;
+        constrain(next);
+      },
+      stepDown: function stepDown(step) {
+        if (step === void 0) {
+          step = oneStep;
+        }
+
+        var next = isReversed ? value + step : value - step;
+        constrain(next);
+      },
+      reset: function reset() {
+        return constrain(defaultValue || 0);
+      },
+      stepTo: function stepTo(value) {
+        return constrain(value);
+      }
+    };
+  }, [constrain, isReversed, value, oneStep, defaultValue]);
+  /**
+   * Keyboard interaction to ensure users can operate
+   * the slider using only their keyboard.
+   */
+
+  var onKeyDown = react.useCallback(function (event) {
+    var eventKey = normalizeEventKey(event);
+    var keyMap = {
+      ArrowRight: function ArrowRight() {
+        return actions.stepUp();
+      },
+      ArrowUp: function ArrowUp() {
+        return actions.stepUp();
+      },
+      ArrowLeft: function ArrowLeft() {
+        return actions.stepDown();
+      },
+      ArrowDown: function ArrowDown() {
+        return actions.stepDown();
+      },
+      PageUp: function PageUp() {
+        return actions.stepUp(tenSteps);
+      },
+      PageDown: function PageDown() {
+        return actions.stepDown(tenSteps);
+      },
+      Home: function Home() {
+        return constrain(min);
+      },
+      End: function End() {
+        return constrain(max);
+      }
+    };
+    var action = keyMap[eventKey];
+
+    if (action) {
+      event.preventDefault();
+      event.stopPropagation();
+      action(event);
+      eventSourceRef.current = "keyboard";
+    }
+  }, [actions, constrain, max, min, tenSteps]);
+  /**
+   * ARIA (Optional): To define a human readable representation of the value,
+   * we allow users pass aria-valuetext.
+   */
+
+  var valueText = (_getAriaValueText = getAriaValueText == null ? void 0 : getAriaValueText(value)) != null ? _getAriaValueText : ariaValueText;
+  /**
+   * Measure the dimensions of the thumb so
+   * we can center it within the track properly
+   */
+
+  var thumbBoxModel = useDimensions(thumbRef);
+  /**
+   * Compute styles for all component parts.
+   */
+
+  var _useMemo = react.useMemo(function () {
+    var _thumbBoxModel$border;
+
+    var thumbRect = (_thumbBoxModel$border = thumbBoxModel == null ? void 0 : thumbBoxModel.borderBox) != null ? _thumbBoxModel$border : {
+      width: 0,
+      height: 0
+    };
+    return getStyles({
+      isReversed: isReversed,
+      orientation: orientation,
+      thumbRects: [thumbRect],
+      thumbPercents: [thumbPercent]
+    });
+  }, [isReversed, orientation, thumbBoxModel == null ? void 0 : thumbBoxModel.borderBox, thumbPercent]),
+      getThumbStyle = _useMemo.getThumbStyle,
+      rootStyle = _useMemo.rootStyle,
+      trackStyle = _useMemo.trackStyle,
+      innerTrackStyle = _useMemo.innerTrackStyle;
+
+  var focusThumb = react.useCallback(function () {
+    if (thumbRef.current && focusThumbOnChange) {
+      setTimeout(function () {
+        return focus(thumbRef.current);
+      });
+    }
+  }, [focusThumbOnChange]);
+  useUpdateEffect(function () {
+    focusThumb();
+
+    if (eventSourceRef.current === "keyboard") {
+      onChangeEnd == null ? void 0 : onChangeEnd(valueRef.current);
+    }
+  }, [value, onChangeEnd]);
+
+  var setValueFromPointer = function setValueFromPointer(event) {
+    var nextValue = getValueFromPointer(event);
+
+    if (nextValue != null && nextValue !== valueRef.current) {
+      setValue(nextValue);
+    }
+  };
+
+  usePanGesture(rootRef, {
+    onPanSessionStart: function onPanSessionStart(event) {
+      if (!isInteractive) return;
+      setDragging.on();
+      focusThumb();
+      setValueFromPointer(event);
+      onChangeStart == null ? void 0 : onChangeStart(valueRef.current);
+    },
+    onPanSessionEnd: function onPanSessionEnd() {
+      if (!isInteractive) return;
+      setDragging.off();
+      onChangeEnd == null ? void 0 : onChangeEnd(valueRef.current);
+      prevRef.current = valueRef.current;
+    },
+    onPan: function onPan(event) {
+      if (!isInteractive) return;
+      setValueFromPointer(event);
+    }
+  });
+  var getRootProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, htmlProps, {
+      ref: mergeRefs(ref, rootRef),
+      tabIndex: -1,
+      "aria-disabled": ariaAttr(isDisabled),
+      "data-focused": dataAttr(isFocused),
+      style: _extends$c({}, props.style, rootStyle)
+    });
+  }, [htmlProps, isDisabled, isFocused, rootStyle]);
+  var getTrackProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, {
+      ref: mergeRefs(ref, trackRef),
+      id: trackId,
+      "data-disabled": dataAttr(isDisabled),
+      style: _extends$c({}, props.style, trackStyle)
+    });
+  }, [isDisabled, trackId, trackStyle]);
+  var getInnerTrackProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, {
+      ref: ref,
+      style: _extends$c({}, props.style, innerTrackStyle)
+    });
+  }, [innerTrackStyle]);
+  var getThumbProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, {
+      ref: mergeRefs(ref, thumbRef),
+      role: "slider",
+      tabIndex: isInteractive ? 0 : undefined,
+      id: thumbId,
+      "data-active": dataAttr(isDragging),
+      "aria-valuetext": valueText,
+      "aria-valuemin": min,
+      "aria-valuemax": max,
+      "aria-valuenow": value,
+      "aria-orientation": orientation,
+      "aria-disabled": ariaAttr(isDisabled),
+      "aria-readonly": ariaAttr(isReadOnly),
+      "aria-label": ariaLabel,
+      "aria-labelledby": ariaLabel ? undefined : ariaLabelledBy,
+      style: _extends$c({}, props.style, getThumbStyle(0)),
+      onKeyDown: callAllHandlers(props.onKeyDown, onKeyDown),
+      onFocus: callAllHandlers(props.onFocus, setFocused.on),
+      onBlur: callAllHandlers(props.onBlur, setFocused.off)
+    });
+  }, [isInteractive, thumbId, isDragging, valueText, min, max, value, orientation, isDisabled, isReadOnly, ariaLabel, ariaLabelledBy, getThumbStyle, onKeyDown, setFocused.on, setFocused.off]);
+  var getMarkerProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    var isInRange = !(props.value < min || props.value > max);
+    var isHighlighted = value >= props.value;
+    var markerPercent = valueToPercent(props.value, min, max);
+
+    var markerStyle = _extends$c({
+      position: "absolute",
+      pointerEvents: "none"
+    }, orient$2({
+      orientation: orientation,
+      vertical: {
+        bottom: isReversed ? 100 - markerPercent + "%" : markerPercent + "%"
+      },
+      horizontal: {
+        left: isReversed ? 100 - markerPercent + "%" : markerPercent + "%"
+      }
+    }));
+
+    return _extends$c({}, props, {
+      ref: ref,
+      role: "presentation",
+      "aria-hidden": true,
+      "data-disabled": dataAttr(isDisabled),
+      "data-invalid": dataAttr(!isInRange),
+      "data-highlighted": dataAttr(isHighlighted),
+      style: _extends$c({}, props.style, markerStyle)
+    });
+  }, [isDisabled, isReversed, max, min, orientation, value]);
+  var getInputProps = react.useCallback(function (props, ref) {
+    if (props === void 0) {
+      props = {};
+    }
+
+    if (ref === void 0) {
+      ref = null;
+    }
+
+    return _extends$c({}, props, {
+      ref: ref,
+      type: "hidden",
+      value: value,
+      name: name
+    });
+  }, [name, value]);
+  return {
+    state: {
+      value: value,
+      isFocused: isFocused,
+      isDragging: isDragging
+    },
+    actions: actions,
+    getRootProps: getRootProps,
+    getTrackProps: getTrackProps,
+    getInnerTrackProps: getInnerTrackProps,
+    getThumbProps: getThumbProps,
+    getMarkerProps: getMarkerProps,
+    getInputProps: getInputProps
+  };
+}
+
+function orient$2(options) {
+  var orientation = options.orientation,
+      vertical = options.vertical,
+      horizontal = options.horizontal;
+  return orientation === "vertical" ? vertical : horizontal;
+}
+/**
+ * The browser <input type="range" /> calculates
+ * the default value of a slider by using mid-point
+ * between the min and the max.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range
+ */
+
+
+function getDefaultValue(min, max) {
+  return max < min ? min : min + (max - min) / 2;
+}
+
+var _excluded$8 = ["getInputProps", "getRootProps"];
+
+var _createContext$5 = createContext({
+  name: "SliderContext",
+  errorMessage: "useSliderContext: `context` is undefined. Seems you forgot to wrap all slider components within <Slider />"
+}),
+    SliderProvider = _createContext$5[0],
+    useSliderContext = _createContext$5[1];
+
+/**
+ * The Slider is used to allow users to make selections from a range of values.
+ * It provides context and functionality for all slider components
+ *
+ * @see Docs     https://chakra-ui.com/docs/form/slider
+ * @see WAI-ARIA https://www.w3.org/TR/wai-aria-practices/#slider
+ */
+var Slider$1 = /*#__PURE__*/forwardRef(function (props, ref) {
+  var styles = useMultiStyleConfig("Slider", props);
+  var ownProps = omitThemingProps(props);
+
+  var _useTheme = useTheme(),
+      direction = _useTheme.direction;
+
+  ownProps.direction = direction;
+
+  var _useSlider = useSlider(ownProps),
+      getInputProps = _useSlider.getInputProps,
+      getRootProps = _useSlider.getRootProps,
+      context = _objectWithoutPropertiesLoose$9(_useSlider, _excluded$8);
+
+  var rootProps = getRootProps();
+  var inputProps = getInputProps({}, ref);
+  return /*#__PURE__*/react.createElement(SliderProvider, {
+    value: context
+  }, /*#__PURE__*/react.createElement(StylesProvider, {
+    value: styles
+  }, /*#__PURE__*/react.createElement(chakra.div, _extends$c({}, rootProps, {
+    className: "chakra-slider",
+    __css: styles.container
+  }), props.children, /*#__PURE__*/react.createElement("input", inputProps))));
+});
+Slider$1.defaultProps = {
+  orientation: "horizontal"
+};
+
+/**
+ * Slider component that acts as the handle used to select predefined
+ * values by dragging its handle along the track
+ */
+var SliderThumb = /*#__PURE__*/forwardRef(function (props, ref) {
+  var _useSliderContext = useSliderContext(),
+      getThumbProps = _useSliderContext.getThumbProps;
+
+  var styles = useStyles();
+  var thumbProps = getThumbProps(props, ref);
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$c({}, thumbProps, {
+    className: cx("chakra-slider__thumb", props.className),
+    __css: styles.thumb
+  }));
+});
+
+var SliderTrack = /*#__PURE__*/forwardRef(function (props, ref) {
+  var _useSliderContext2 = useSliderContext(),
+      getTrackProps = _useSliderContext2.getTrackProps;
+
+  var styles = useStyles();
+  var trackProps = getTrackProps(props, ref);
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$c({}, trackProps, {
+    className: cx("chakra-slider__track", props.className),
+    __css: styles.track
+  }));
+});
+
+var SliderFilledTrack = /*#__PURE__*/forwardRef(function (props, ref) {
+  var _useSliderContext3 = useSliderContext(),
+      getInnerTrackProps = _useSliderContext3.getInnerTrackProps;
+
+  var styles = useStyles();
+  var trackProps = getInnerTrackProps(props, ref);
+  return /*#__PURE__*/react.createElement(chakra.div, _extends$c({}, trackProps, {
+    className: "chakra-slider__filled-track",
+    __css: styles.filledTrack
   }));
 });
 
@@ -13712,4 +16275,4 @@ function mergeThemeCustomizer(source, override, key, object) {
   return undefined;
 }
 
-export { Box, Button$1 as Button, ChakraProvider$1 as ChakraProvider, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };
+export { Box, Button$1 as Button, ChakraProvider$1 as ChakraProvider, ColorModeScript, Divider$1 as Divider, Flex, Grid, GridItem, HStack, Icon, IconButton, Image$1 as Image, Input$1 as Input, InputGroup, InputLeftElement, InputRightElement, List$1 as List, ListIcon, Slider$1 as Slider, SliderFilledTrack, SliderThumb, SliderTrack, Spinner$1 as Spinner, Text, VStack, color, extendTheme, useStyleConfig };
