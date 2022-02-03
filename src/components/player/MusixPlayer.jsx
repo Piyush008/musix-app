@@ -27,6 +27,7 @@ export default function MusixPlayer() {
       zIndex={"1"}
       boxShadow={`0 -5px 25px rgba(0,0,0,0.2)`}
     >
+      <audio display="none" />
       <Slider aria-label="slider-ex-2" colorScheme="pink" defaultValue={50}>
         <SliderTrack>
           <SliderFilledTrack />
@@ -40,7 +41,6 @@ export default function MusixPlayer() {
         paddingRight={"4"}
         paddingBottom={"2"}
       >
-        <GoogleLogout />
         <Box
           borderRadius={"1rem"}
           borderWidth={"thin"}
