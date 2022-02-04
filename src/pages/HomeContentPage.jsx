@@ -33,7 +33,11 @@ export default function HomeContentPage() {
       }
       state={showContentsLoadable.state}
     >
-      <Flex direction={"column"} pl={pxToAll(20)}>
+      <Flex
+        direction={"column"}
+        pl={pxToAll(20)}
+        pr={!isMobile ? pxToAll(15) : 0}
+      >
         {showContents.map(({ ...rest }, idx) => (
           <ContentWrapper key={idx} {...rest} seeAll={!isMobile} />
         ))}

@@ -136,7 +136,7 @@ export default function ContentWrapper(props) {
     <Flex direction={"column"} py={pxToAll(20)}>
       <HStack justifyContent={"space-between"}>
         <Box>
-          <Text textStyle={"h4"} color={"text.secondary"}>
+          <Text textStyle={"h5"} color={"text.secondary"}>
             {title}
           </Text>
         </Box>

@@ -12,8 +12,6 @@ import {
 import { useLocation, useParams } from "react-router-dom";
 import {
   atom,
-  selector,
-  selectorFamily,
   useRecoilState,
   useRecoilValueLoadable,
   useResetRecoilState,
@@ -21,7 +19,6 @@ import {
 } from "recoil";
 import { albumPlayListDetailsSate } from "../components/ContentWrapper/ContentWrapper";
 import CustomSuspense from "../components/util/CustomSuspense";
-import { youtubeSearch } from "../utils/auth.utils.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
 export const albumPlaylistParamState = atom({
@@ -65,6 +62,7 @@ function PlayListPage() {
   );
   const contents = albumPlayListLoadable?.contents;
   const tracks = contents?.tracks?.items ?? [];
+  const filteredTracks = tracks.filter((content) => !!content.track);
   return (
     <CustomSuspense
       state={albumPlayListLoadable.state}
@@ -119,7 +117,7 @@ function PlayListPage() {
             </GridItem>
           </Grid>
           <Divider orientation="horizontal" colorScheme={"teal"} />
-          {tracks.map(({ track: { id, ...rest } }, idx) => (
+          {filteredTracks.map(({ track: { id, ...rest } }, idx) => (
             <Track {...rest} key={id} id={id} seq={idx + 1} />
           ))}
         </Flex>
@@ -225,7 +223,7 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
         >
           {name}
         </Text>
-        <Text textStyle={"h6"} isTruncated>
+        <Text textStyle={"label"} isTruncated>
           {desc}
         </Text>
       </Flex>
@@ -295,14 +293,14 @@ function Track(props) {
             ]}
           >
             <Text
-              textStyle={"h5"}
+              textStyle={"h6"}
               color={"text.secondary"}
               isTruncated
               fontWeight={"normal"}
             >
               {props.name}
             </Text>
-            <Text textStyle={"h6"} isTruncated>
+            <Text textStyle={"label"} isTruncated>
               {artistName.join(", ")}
             </Text>
           </Box>
@@ -310,13 +308,13 @@ function Track(props) {
       </GridItem>
       {album && (
         <GridItem>
-          <Text textStyle={"h6"} isTruncated>
+          <Text textStyle={"label"} isTruncated>
             {album?.name}
           </Text>
         </GridItem>
       )}
       <GridItem justifySelf={"end"}>
-        <Text textStyle={"h6"}>{props?.duration_ms}</Text>
+        <Text textStyle={"label"}>{props?.duration_ms}</Text>
       </GridItem>
     </Grid>
   );

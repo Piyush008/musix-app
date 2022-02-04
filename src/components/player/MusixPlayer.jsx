@@ -12,7 +12,12 @@ import useAgent from "../../hooks/useAgent.js";
 import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 import { FaPause, FaPlay } from "react-icons/fa";
 import { searchTrackState } from "../../pages/AlbumPlayListPage.jsx";
-import { selector, useRecoilValue, useRecoilValueLoadable } from "recoil";
+import {
+  selector,
+  useRecoilRefresher_UNSTABLE,
+  useRecoilValue,
+  useRecoilValueLoadable,
+} from "recoil";
 import { youtubeSearch } from "../../utils/auth.utils.js";
 import { authState } from "../../App/App.jsx";
 
@@ -22,6 +27,8 @@ const init = {
   isLoading: false,
   totalDuration: 0,
   currentTime: 0,
+  isEnded: false,
+  isSliding: false,
 };
 
 const audioTrackState = selector({
@@ -43,10 +50,15 @@ export default function MusixPlayer() {
   const isMobile = useAgent();
   const player = React.useRef();
   const audioTrackLoadable = useRecoilValueLoadable(audioTrackState);
+  const audioTrackRefresh = useRecoilRefresher_UNSTABLE(audioTrackState);
   const searchTrack = useRecoilValue(searchTrackState);
   const loadingState = audioTrackLoadable.state;
   const audioContent = audioTrackLoadable.contents;
   const [PlayerState, setPlayerState] = React.useState(init);
+
+  React.useEffect(() => {
+    audioTrackRefresh();
+  }, [searchTrack]);
 
   React.useEffect(() => {
     if (loadingState === "loading")
@@ -59,19 +71,23 @@ export default function MusixPlayer() {
           isPlaying: true,
           track: `http://localhost:3000/youtube.com/watch?v=${audioContent.videoId}`,
           totalDuration: audioContent.totalDuration,
+          isEnded: false,
         });
       else setPlayerState(init);
   }, [loadingState]);
+
   // Adding onTimeUpdate Event listener to player
   React.useEffect(() => {
     if (player.current) {
       player.current.ontimeupdate = (event) =>
         setPlayerState((previousState) => ({
           ...previousState,
-          currentTime: event.srcElement.currentTime,
+          currentTime: previousState.isSliding
+            ? previousState.currentTime
+            : parseInt(event.srcElement.currentTime),
         }));
       player.current.onended = (event) => {
-        setPlayerState(init);
+        setPlayerState({ ...init, isEnded: true });
       };
     }
   }, [player]);
@@ -80,16 +96,16 @@ export default function MusixPlayer() {
     if (player.current) {
       player.current.src = PlayerState.track;
       player.current.onstalled = () => console.log("stalled");
-      player.current.onseeked = () =>
-        setPlayerState((previousState) => ({
-          ...previousState,
-          isLoading: false,
-        }));
-      player.current.onseeking = () =>
-        setPlayerState((previousState) => ({
-          ...previousState,
-          isLoading: true,
-        }));
+      // player.current.onseeked = () =>
+      //   setPlayerState((previousState) => ({
+      //     ...previousState,
+      //     isLoading: false,
+      //   }));
+      // player.current.onseeking = () =>
+      //   setPlayerState((previousState) => ({
+      //     ...previousState,
+      //     isLoading: true,
+      //   }));
     }
   }, [PlayerState.track]);
 
@@ -106,18 +122,17 @@ export default function MusixPlayer() {
   const secondsToMins = (sec) =>
     `${Math.floor(sec / 60)}:${("0" + (Math.floor(sec) % 60)).slice(-2)}`;
 
-  const getSliderValue = () =>
-    (PlayerState.currentTime / PlayerState.totalDuration) * 100;
-
   const handlePlayerChange = (value) => {
-    let currentTime = (value * PlayerState.totalDuration) / 100;
     setPlayerState((previousState) => ({
       ...previousState,
-      currentTime: currentTime,
+      currentTime: parseInt(value),
+      isSliding: true,
     }));
-    if (player.current) {
-      player.current.currentTime = currentTime;
-    }
+  };
+
+  const handlePlayerChangeEnd = (value) => {
+    setPlayerState((prevState) => ({ ...prevState, isSliding: false }));
+    player.current.currentTime = parseInt(value);
   };
 
   const handlePlayPauseClick = () => {
@@ -134,6 +149,7 @@ export default function MusixPlayer() {
         }));
       }
     }
+    if (PlayerState.isEnded && !PlayerState.isPlaying) audioTrackRefresh();
   };
 
   return (
@@ -153,9 +169,11 @@ export default function MusixPlayer() {
         aria-label="slider-ex-2"
         colorScheme="pink"
         defaultValue={0}
-        value={getSliderValue()}
+        value={PlayerState.currentTime}
         onChange={handlePlayerChange}
+        max={PlayerState.totalDuration}
         isDisabled={PlayerState.isLoading}
+        onChangeEnd={handlePlayerChangeEnd}
       >
         <SliderTrack>
           <SliderFilledTrack />

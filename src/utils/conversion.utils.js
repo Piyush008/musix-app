@@ -20,7 +20,9 @@ export const showContentConversionUtil = () => {
 };
 
 export function parseDurationIntoSec(duration) {
-  const min = parseInt(duration.match(/[0-9]+M/)[0]);
-  const sec = parseInt(duration.match(/[0-9]+S/)[0]);
+  const minMatch = duration.match(/[0-9]+M/);
+  const secMatch = duration.match(/[0-9]+S/);
+  const min = minMatch ? parseInt(minMatch[0]) : 0;
+  const sec = secMatch ? parseInt(secMatch[0]) : 0;
   return min * 60 + sec;
 }
