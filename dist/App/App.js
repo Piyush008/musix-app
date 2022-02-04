@@ -11,74 +11,37 @@ import SearchContentPage from "../pages/SearchContentPage.js";
 import SearchTextContentPage from "../pages/SearchTextContentPage.js";
 import GenrePage from "../pages/GenrePage.js";
 import AlbumPlayListPage from "../pages/AlbumPlayListPage.js";
-import useGoogleLogin from "../../_snowpack/pkg/react-google-login/src/use-google-login.js";
-import {atom, useRecoilState, useSetRecoilState} from "../../_snowpack/pkg/recoil.js";
-import {authConfig, handleAfterAuth} from "../utils/auth.utils.js";
-import {useEffect} from "../../_snowpack/pkg/react.js";
-export const authState = atom({
-  key: "authState",
-  default: {
-    isAuth: false,
-    signIn: void 0
-  }
-});
 export default function App() {
   console.log(__SNOWPACK_ENV__);
   const basename = __SNOWPACK_ENV__.MODE === "development" ? "/" : "/musix-app";
-  const setAuth = useSetRecoilState(authState);
-  const handleSuccess = (resp) => {
-    if (resp) {
-      setAuth((prevState) => ({...prevState, isAuth: true}));
-      handleAfterAuth(resp);
-    }
-  };
-  const handleFailure = (resp) => {
-    console.log(resp);
-  };
-  const {signIn, loaded} = useGoogleLogin({
-    ...authConfig,
-    uxMode: "redirect",
-    autoLoad: false,
-    onSuccess: handleSuccess,
-    onFailure: handleFailure,
-    onScriptLoadFailure: handleFailure,
-    isSignedIn: true,
-    redirectUri: "http://localhost:8080"
-  });
-  useEffect(() => {
-    if (loaded)
-      setAuth((prevState) => ({...prevState, signIn}));
-  }, [loaded]);
-  if (loaded)
-    return /* @__PURE__ */ React.createElement(Router, {
-      basename
-    }, /* @__PURE__ */ React.createElement(Routes, null, /* @__PURE__ */ React.createElement(Route, {
-      path: `${ROUTER.HOME}*`,
-      element: /* @__PURE__ */ React.createElement(HomePage, null)
-    }, /* @__PURE__ */ React.createElement(Route, {
-      index: true,
-      element: /* @__PURE__ */ React.createElement(HomeContentPage, null)
-    }), /* @__PURE__ */ React.createElement(Route, {
-      path: ROUTER.SEARCH,
-      element: /* @__PURE__ */ React.createElement(SearchPage, null)
-    }, /* @__PURE__ */ React.createElement(Route, {
-      index: true,
-      element: /* @__PURE__ */ React.createElement(SearchContentPage, null)
-    }), /* @__PURE__ */ React.createElement(Route, {
-      path: ":searchText",
-      element: /* @__PURE__ */ React.createElement(SearchTextContentPage, null)
-    })), /* @__PURE__ */ React.createElement(Route, {
-      path: `${ROUTER.GENRE}/:property`,
-      element: /* @__PURE__ */ React.createElement(GenrePage, null)
-    }), /* @__PURE__ */ React.createElement(Route, {
-      path: `${ROUTER.ALBUM}/:albumId`,
-      element: /* @__PURE__ */ React.createElement(AlbumPlayListPage, null)
-    }), /* @__PURE__ */ React.createElement(Route, {
-      path: `${ROUTER.PLAYLIST}/:playlistId`,
-      element: /* @__PURE__ */ React.createElement(AlbumPlayListPage, null)
-    }), /* @__PURE__ */ React.createElement(Route, {
-      path: "*",
-      element: /* @__PURE__ */ React.createElement(NoMatchPage, null)
-    }))));
-  return null;
+  return /* @__PURE__ */ React.createElement(Router, {
+    basename
+  }, /* @__PURE__ */ React.createElement(Routes, null, /* @__PURE__ */ React.createElement(Route, {
+    path: `${ROUTER.HOME}*`,
+    element: /* @__PURE__ */ React.createElement(HomePage, null)
+  }, /* @__PURE__ */ React.createElement(Route, {
+    index: true,
+    element: /* @__PURE__ */ React.createElement(HomeContentPage, null)
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: ROUTER.SEARCH,
+    element: /* @__PURE__ */ React.createElement(SearchPage, null)
+  }, /* @__PURE__ */ React.createElement(Route, {
+    index: true,
+    element: /* @__PURE__ */ React.createElement(SearchContentPage, null)
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: ":searchText",
+    element: /* @__PURE__ */ React.createElement(SearchTextContentPage, null)
+  })), /* @__PURE__ */ React.createElement(Route, {
+    path: `${ROUTER.GENRE}/:property`,
+    element: /* @__PURE__ */ React.createElement(GenrePage, null)
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: `${ROUTER.ALBUM}/:albumId`,
+    element: /* @__PURE__ */ React.createElement(AlbumPlayListPage, null)
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: `${ROUTER.PLAYLIST}/:playlistId`,
+    element: /* @__PURE__ */ React.createElement(AlbumPlayListPage, null)
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: "*",
+    element: /* @__PURE__ */ React.createElement(NoMatchPage, null)
+  }))));
 }
