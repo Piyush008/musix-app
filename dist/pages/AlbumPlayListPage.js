@@ -13,12 +13,16 @@ import {
 import {useLocation, useParams} from "../../_snowpack/pkg/react-router-dom.js";
 import {
   atom,
+  selector,
+  selectorFamily,
   useRecoilState,
   useRecoilValueLoadable,
-  useResetRecoilState
+  useResetRecoilState,
+  useSetRecoilState
 } from "../../_snowpack/pkg/recoil.js";
 import {albumPlayListDetailsSate} from "../components/ContentWrapper/ContentWrapper.js";
 import CustomSuspense from "../components/util/CustomSuspense.js";
+import {youtubeSearch} from "../utils/auth.utils.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import {pxToAll, pxToRem, pxToRemSm} from "../utils/theme.utils.js";
 export const albumPlaylistParamState = atom({
@@ -199,11 +203,19 @@ function AlbumPlaylistHeaderContent({url, type, name, desc}) {
     isTruncated: true
   }, desc)));
 }
+export const searchTrackState = atom({
+  key: "searchTrackState",
+  default: ""
+});
 function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
   const imageUrl = album?.images[0]?.url;
   const artistName = artists.map((artist) => artist.name);
+  const setSearchTrack = useSetRecoilState(searchTrackState);
+  const handleClick = () => {
+    setSearchTrack(`song ${props.name} ${artistName[0]} lyrics`);
+  };
   return /* @__PURE__ */ React.createElement(Grid, {
     templateColumns: album ? [
       `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(375 / 1.5)}, 2fr) minmax(${pxToRemSm(100 / 1.5)}, 1fr) ${pxToRemSm(80 / 1.5)}`,
@@ -220,7 +232,8 @@ function Track(props) {
       bg: "brand.primary",
       borderRadius: "10px",
       transition: "all 0.25s"
-    }
+    },
+    onClick: handleClick
   }, /* @__PURE__ */ React.createElement(GridItem, {
     justifySelf: "end"
   }, /* @__PURE__ */ React.createElement(Text, {

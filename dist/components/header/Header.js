@@ -6,7 +6,24 @@ import {Route, Routes} from "../../../_snowpack/pkg/react-router-dom.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import AgentDetect from "../util/AgentDetect.js";
 import SearchInput from "../Input/SearchInput.js";
+import useGoogleLogout from "../../../_snowpack/pkg/react-google-login/src/use-google-logout.js";
+import {useRecoilState} from "../../../_snowpack/pkg/recoil.js";
+import {authConfig} from "../../utils/auth.utils.js";
+import {authState} from "../../App/App.js";
 export default function Header({headerOpacity}) {
+  const [auth, setAuth] = useRecoilState(authState);
+  const handleLogoutSuccess = () => {
+    setAuth((prevState) => ({...prevState, isAuth: false}));
+  };
+  const handleFailure = (resp) => {
+    console.log(resp);
+  };
+  const {signOut} = useGoogleLogout({
+    ...authConfig,
+    onLogoutSuccess: handleLogoutSuccess,
+    onFailure: handleFailure,
+    onScriptLoadFailure: handleFailure
+  });
   return /* @__PURE__ */ React.createElement(Box, {
     h: pxToAll(80),
     pos: "sticky",
@@ -37,5 +54,7 @@ export default function Header({headerOpacity}) {
         width: "100%"
       })
     })))
-  }), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Button, null, "Enter Musix")))));
+  }), /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Button, {
+    onClick: auth.isAuth ? signOut : auth.signIn
+  }, auth.isAuth ? "Exit Musix" : "Enter Musix")))));
 }
