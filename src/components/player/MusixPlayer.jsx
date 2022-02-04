@@ -11,57 +11,19 @@ import {
 import useAgent from "../../hooks/useAgent.js";
 import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 import { FaPause, FaPlay } from "react-icons/fa";
-import { searchTrackState } from "../../pages/AlbumPlayListPage.jsx";
-import { selector, useRecoilValue, useRecoilValueLoadable } from "recoil";
-import { youtubeSearch } from "../../utils/auth.utils.js";
-import { authState } from "../../App/App.jsx";
-
-const init = {
-  track: null,
-  isPlaying: false,
-  isLoading: false,
-  totalDuration: 0,
-  currentTime: 0,
-};
-
-const audioTrackState = selector({
-  key: "audioTrackState",
-  get: async ({ get }) => {
-    const auth = get(authState);
-    const search = get(searchTrackState);
-    if (auth.isAuth && search) {
-      const [data, error] = await youtubeSearch(search);
-      if (error) throw error;
-      return data;
-    } else {
-      return init;
-    }
-  },
-});
 
 export default function MusixPlayer() {
   const isMobile = useAgent();
   const player = React.useRef();
-  const audioTrackLoadable = useRecoilValueLoadable(audioTrackState);
-  const searchTrack = useRecoilValue(searchTrackState);
-  const loadingState = audioTrackLoadable.state;
-  const audioContent = audioTrackLoadable.contents;
-  const [PlayerState, setPlayerState] = React.useState(init);
 
-  React.useEffect(() => {
-    if (loadingState === "loading")
-      setPlayerState({ ...PlayerState, isLoading: true, isPlaying: false });
-    else if (loadingState === "hasValue")
-      if (searchTrack)
-        setPlayerState({
-          ...PlayerState,
-          isLoading: false,
-          isPlaying: true,
-          track: `http://localhost:3000/youtube.com/watch?v=${audioContent.videoId}`,
-          totalDuration: audioContent.totalDuration,
-        });
-      else setPlayerState(init);
-  }, [loadingState]);
+  const [PlayerState, setPlayerState] = React.useState({
+    track: "http://localhost:3000/youtube.com/watch?v=9iIX4PBplAY",
+    isPlaying: false,
+    isLoading: false,
+    totalDuration: 211.281,
+    currentTime: 0,
+  });
+
   // Adding onTimeUpdate Event listener to player
   React.useEffect(() => {
     if (player.current) {
@@ -70,9 +32,6 @@ export default function MusixPlayer() {
           ...previousState,
           currentTime: event.srcElement.currentTime,
         }));
-      player.current.onended = (event) => {
-        setPlayerState(init);
-      };
     }
   }, [player]);
 

@@ -12,16 +12,12 @@ import {
 import { useLocation, useParams } from "react-router-dom";
 import {
   atom,
-  selector,
-  selectorFamily,
   useRecoilState,
   useRecoilValueLoadable,
   useResetRecoilState,
-  useSetRecoilState,
 } from "recoil";
 import { albumPlayListDetailsSate } from "../components/ContentWrapper/ContentWrapper";
 import CustomSuspense from "../components/util/CustomSuspense";
-import { youtubeSearch } from "../utils/auth.utils.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
 export const albumPlaylistParamState = atom({
@@ -233,20 +229,11 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
   );
 }
 
-export const searchTrackState = atom({
-  key: "searchTrackState",
-  default: "",
-});
-
 function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
   const imageUrl = album?.images[0]?.url;
   const artistName = artists.map((artist) => artist.name);
-  const setSearchTrack = useSetRecoilState(searchTrackState);
-  const handleClick = () => {
-    setSearchTrack(`song ${props.name} ${artistName[0]} lyrics`);
-  };
   return (
     <Grid
       templateColumns={
@@ -275,7 +262,6 @@ function Track(props) {
         borderRadius: "10px",
         transition: "all 0.25s",
       }}
-      onClick={handleClick}
     >
       <GridItem justifySelf={"end"}>
         <Text textStyle={"h6"}>{props.seq}</Text>
