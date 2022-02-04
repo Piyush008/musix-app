@@ -5,8 +5,28 @@ import { Route, Routes } from "react-router-dom";
 import ROUTER from "../../utils/constants/router.constants.js";
 import AgentDetect from "../util/AgentDetect.jsx";
 import SearchInput from "../Input/SearchInput.jsx";
+import useGoogleLogout from "react-google-login/src/use-google-logout";
+import { useRecoilState } from "recoil";
+import { authConfig } from "../../utils/auth.utils.js";
+import { authState } from "../../App/App.jsx";
 
 export default function Header({ headerOpacity }) {
+  const [auth, setAuth] = useRecoilState(authState);
+
+  const handleLogoutSuccess = () => {
+    setAuth((prevState) => ({ ...prevState, isAuth: false }));
+  };
+
+  const handleFailure = (resp) => {
+    console.log(resp);
+  };
+
+  const { signOut } = useGoogleLogout({
+    ...authConfig,
+    onLogoutSuccess: handleLogoutSuccess,
+    onFailure: handleFailure,
+    onScriptLoadFailure: handleFailure,
+  });
   return (
     <Box h={pxToAll(80)} pos={"sticky"} top={"0"} zIndex={"1"} right={"0"}>
       <Box position="relative">
@@ -17,7 +37,7 @@ export default function Header({ headerOpacity }) {
           bg={"brand.primary"}
           opacity={headerOpacity}
           zIndex="-1"
-        ></Box>
+        />
         <HStack
           justifyContent={"space-between"}
           alignItems={"center"}
@@ -44,7 +64,9 @@ export default function Header({ headerOpacity }) {
             }
           />
           <Box>
-            <Button>Enter Musix</Button>
+            <Button onClick={auth.isAuth ? signOut : auth.signIn}>
+              {auth.isAuth ? "Exit Musix" : "Enter Musix"}
+            </Button>
           </Box>
         </HStack>
       </Box>
