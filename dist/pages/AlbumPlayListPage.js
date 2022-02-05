@@ -224,7 +224,7 @@ function Track(props) {
   }, /* @__PURE__ */ React.createElement(GridItem, {
     justifySelf: "end"
   }, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h6"
+    textStyle: "label"
   }, props.seq)), /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(HStack, null, imageUrl && /* @__PURE__ */ React.createElement(Box, {
     width: pxToAll(60)
   }, /* @__PURE__ */ React.createElement(Image, {
@@ -236,19 +236,18 @@ function Track(props) {
       `calc(100% - ${pxToRem(60)} - 0.5rem)`
     ]
   }, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h5",
-    color: "text.secondary",
-    isTruncated: true,
-    fontWeight: "normal"
-  }, props.name), /* @__PURE__ */ React.createElement(Text, {
     textStyle: "h6",
+    color: "text.secondary",
+    isTruncated: true
+  }, props.name), /* @__PURE__ */ React.createElement(Text, {
+    textStyle: "label",
     isTruncated: true
   }, artistName.join(", "))))), album && /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h6",
+    textStyle: "label",
     isTruncated: true
   }, album?.name)), /* @__PURE__ */ React.createElement(GridItem, {
     justifySelf: "end"
   }, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h6"
+    textStyle: "label"
   }, props?.duration_ms)));
 }

@@ -58,11 +58,12 @@ function BigCard({
     paddingTop: pxToAll(15)
   }, /* @__PURE__ */ React.createElement(Text, {
     isTruncated: true,
-    textStyle: "h5",
-    color: "text.secondary"
+    textStyle: "h6",
+    color: "text.secondary",
+    fontWeight: "bold"
   }, title), /* @__PURE__ */ React.createElement(Text, {
     noOfLines: 2,
-    textStyle: "h6"
+    textStyle: "label"
   }, subtitle)));
 }
 BigCard.defaultProps = {

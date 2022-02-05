@@ -128,7 +128,7 @@ export default function ContentWrapper(props) {
   }, /* @__PURE__ */ React.createElement(HStack, {
     justifyContent: "space-between"
   }, /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h4",
+    textStyle: "h5",
     color: "text.secondary"
   }, title)), seeAll && /* @__PURE__ */ React.createElement(CustomItem, {
     variant: "card",
