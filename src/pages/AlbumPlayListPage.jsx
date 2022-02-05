@@ -264,7 +264,7 @@ function Track(props) {
       }}
     >
       <GridItem justifySelf={"end"}>
-        <Text textStyle={"h6"}>{props.seq}</Text>
+        <Text textStyle={"label"}>{props.seq}</Text>
       </GridItem>
       <GridItem>
         <HStack>
@@ -280,15 +280,10 @@ function Track(props) {
               `calc(100% - ${pxToRem(60)} - 0.5rem)`,
             ]}
           >
-            <Text
-              textStyle={"h5"}
-              color={"text.secondary"}
-              isTruncated
-              fontWeight={"normal"}
-            >
+            <Text textStyle={"h6"} color={"text.secondary"} isTruncated>
               {props.name}
             </Text>
-            <Text textStyle={"h6"} isTruncated>
+            <Text textStyle={"label"} isTruncated>
               {artistName.join(", ")}
             </Text>
           </Box>
@@ -296,13 +291,13 @@ function Track(props) {
       </GridItem>
       {album && (
         <GridItem>
-          <Text textStyle={"h6"} isTruncated>
+          <Text textStyle={"label"} isTruncated>
             {album?.name}
           </Text>
         </GridItem>
       )}
       <GridItem justifySelf={"end"}>
-        <Text textStyle={"h6"}>{props?.duration_ms}</Text>
+        <Text textStyle={"label"}>{props?.duration_ms}</Text>
       </GridItem>
     </Grid>
   );
