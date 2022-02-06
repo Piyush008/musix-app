@@ -11,7 +11,7 @@ export default function Header({headerOpacity}) {
     h: pxToAll(80),
     pos: "sticky",
     top: "0",
-    zIndex: "1",
+    zIndex: "2",
     right: "0"
   }, /* @__PURE__ */ React.createElement(Box, {
     position: "relative"
@@ -20,8 +20,7 @@ export default function Header({headerOpacity}) {
     width: "100%",
     height: pxToAll(80),
     bg: "brand.primary",
-    opacity: headerOpacity,
-    zIndex: "-1"
+    opacity: headerOpacity
   }), /* @__PURE__ */ React.createElement(HStack, {
     justifyContent: "space-between",
     alignItems: "center",
