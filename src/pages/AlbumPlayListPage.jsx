@@ -190,7 +190,18 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
         bgPos={["center"]}
         height={[pxToRemSm(170), null, pxToRem(380)]}
         width={"100%"}
-        opacity={"0.5"}
+      />
+      <Box
+        bgGradient={
+          "linear(to-r, blackAlpha.600 25%,blackAlpha.500 50%, blackAlpha.400 75%, blackAlpha.300 100%)"
+        }
+        bgSize={"cover"}
+        bgPos={["center"]}
+        height={[pxToRemSm(170), null, pxToRem(380)]}
+        width={"100%"}
+        zIndex={1}
+        pos={"absolute"}
+        top={"0"}
       />
       <Flex
         p={pxToAll(20)}
@@ -204,6 +215,7 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
           null,
           `calc(${pxToRem(380)} - ${pxToRem(80)})`,
         ]}
+        zIndex={2}
       >
         <Text
           textTransform={"uppercase"}
