@@ -9,6 +9,7 @@ import {
 import {MdClose, MdSearch} from "../../../_snowpack/pkg/react-icons/md.js";
 import {useNavigate, useParams} from "../../../_snowpack/pkg/react-router-dom.js";
 import {atom, selectorFamily, useRecoilState} from "../../../_snowpack/pkg/recoil.js";
+import useAgent from "../../hooks/useAgent.js";
 import {searchItems} from "../../utils/spotify.utils.js";
 export const searchTextState = atom({
   key: "searchTextState",
@@ -24,7 +25,7 @@ export const searchDetailsState = selectorFamily({
       country: "IN"
     });
     if (error)
-      throw "Failure";
+      throw error;
     return data;
   }
 });
@@ -33,8 +34,10 @@ export default function SearchInput({...rest}) {
   const navigate = useNavigate();
   const searchText = useParams()?.searchText ?? "";
   const inputRef = React.useRef(null);
+  const isMobile = useAgent();
   React.useEffect(() => {
-    inputRef.current.focus();
+    if (!isMobile)
+      inputRef.current.focus();
     setSearchText(searchText);
   }, []);
   const handleChange = (value) => {

@@ -11,6 +11,7 @@ import {
 } from "../../_snowpack/pkg/@chakra-ui/react.js";
 import {MdSearch} from "../../_snowpack/pkg/react-icons/md.js";
 import {Outlet} from "../../_snowpack/pkg/react-router-dom.js";
+import SearchInput from "../components/Input/SearchInput.js";
 import AgentDetect from "../components/util/AgentDetect.js";
 import {pxToAll} from "../utils/theme.utils.js";
 export default function SearchPage() {
@@ -20,17 +21,12 @@ export default function SearchPage() {
     height: "100%"
   }, /* @__PURE__ */ React.createElement(AgentDetect, {
     mobileComponent: /* @__PURE__ */ React.createElement(VStack, {
-      mb: pxToAll(10)
+      mb: pxToAll(20)
     }, /* @__PURE__ */ React.createElement(Box, null, /* @__PURE__ */ React.createElement(Text, {
       textStyle: "h4",
       color: "text.secondary"
-    }, "Search")), /* @__PURE__ */ React.createElement(InputGroup, null, /* @__PURE__ */ React.createElement(InputLeftElement, {
-      children: /* @__PURE__ */ React.createElement(Icon, {
-        as: MdSearch,
-        textStyle: "icon.md"
-      })
-    }), /* @__PURE__ */ React.createElement(Input, {
-      "aria-label": "search"
-    })))
+    }, "Search")), /* @__PURE__ */ React.createElement(SearchInput, {
+      width: ["100%", "75%"]
+    }))
   }), /* @__PURE__ */ React.createElement(Outlet, null));
 }

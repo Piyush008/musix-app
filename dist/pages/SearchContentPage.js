@@ -33,7 +33,9 @@ export default function SearchContentPage() {
     color: "text.secondary"
   }, "Browse all"), /* @__PURE__ */ React.createElement(CardRenderer, {
     autoRows: "auto",
-    noOfChildren: "auto-fill"
+    noOfChildren: "auto-fill",
+    minCardWidth: 175,
+    mt: pxToAll(15)
   }, items.map(({id, ...rest}) => /* @__PURE__ */ React.createElement(CategoryCard, {
     key: id,
     ...rest,

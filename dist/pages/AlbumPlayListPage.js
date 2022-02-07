@@ -15,7 +15,8 @@ import {
   atom,
   useRecoilState,
   useRecoilValueLoadable,
-  useResetRecoilState
+  useResetRecoilState,
+  useSetRecoilState
 } from "../../_snowpack/pkg/recoil.js";
 import {albumPlayListDetailsSate} from "../components/ContentWrapper/ContentWrapper.js";
 import CustomSuspense from "../components/util/CustomSuspense.js";
@@ -56,6 +57,7 @@ function PlayListPage() {
   const albumPlayListLoadable = useRecoilValueLoadable(albumPlayListDetailsSate(albumPlaylistParam));
   const contents = albumPlayListLoadable?.contents;
   const tracks = contents?.tracks?.items ?? [];
+  const filteredTracks = tracks.filter((content) => !!content.track);
   return /* @__PURE__ */ React.createElement(CustomSuspense, {
     state: albumPlayListLoadable.state,
     fallback: /* @__PURE__ */ React.createElement(Box, {
@@ -104,7 +106,7 @@ function PlayListPage() {
   }, "DURATION"))), /* @__PURE__ */ React.createElement(Divider, {
     orientation: "horizontal",
     colorScheme: "teal"
-  }), tracks.map(({track: {id, ...rest}}, idx) => /* @__PURE__ */ React.createElement(Track, {
+  }), filteredTracks.map(({track: {id, ...rest}}, idx) => /* @__PURE__ */ React.createElement(Track, {
     ...rest,
     key: id,
     id,
@@ -172,7 +174,7 @@ function AlbumPlaylistHeaderContent({url, type, name, desc}) {
     height: [pxToRemSm(170), null, pxToRem(380)],
     width: "100%"
   }), /* @__PURE__ */ React.createElement(Box, {
-    bgGradient: "linear(to-r, blackAlpha.600 25%,blackAlpha.500 50%, blackAlpha.400 75%, blackAlpha.300 100%)",
+    bgGradient: "linear(to-t, blackAlpha.700 25%,blackAlpha.600 50%, blackAlpha.300 75%, blackAlpha.200 100%)",
     bgSize: "cover",
     bgPos: ["center"],
     height: [pxToRemSm(170), null, pxToRem(380)],
@@ -204,15 +206,23 @@ function AlbumPlaylistHeaderContent({url, type, name, desc}) {
     lineHeight: "1.25",
     isTruncated: true
   }, name), /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "h6",
+    textStyle: "label",
     isTruncated: true
   }, desc)));
 }
-function Track(props) {
+export const searchTrackState = atom({
+  key: "searchTrackState",
+  default: ""
+});
+export function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
   const imageUrl = album?.images[0]?.url;
   const artistName = artists.map((artist) => artist.name);
+  const setSearchTrack = useSetRecoilState(searchTrackState);
+  const handleClick = () => {
+    setSearchTrack(`song ${props.name} ${artistName[0]} audio`);
+  };
   return /* @__PURE__ */ React.createElement(Grid, {
     templateColumns: album ? [
       `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(375 / 1.5)}, 2fr) minmax(${pxToRemSm(100 / 1.5)}, 1fr) ${pxToRemSm(80 / 1.5)}`,
@@ -229,11 +239,12 @@ function Track(props) {
       bg: "brand.primary",
       borderRadius: "10px",
       transition: "all 0.25s"
-    }
+    },
+    onClick: handleClick
   }, /* @__PURE__ */ React.createElement(GridItem, {
     justifySelf: "end"
   }, /* @__PURE__ */ React.createElement(Text, {
-    textStyle: "label"
+    textStyle: "h6"
   }, props.seq)), /* @__PURE__ */ React.createElement(GridItem, null, /* @__PURE__ */ React.createElement(HStack, null, imageUrl && /* @__PURE__ */ React.createElement(Box, {
     width: pxToAll(60)
   }, /* @__PURE__ */ React.createElement(Image, {
@@ -247,7 +258,8 @@ function Track(props) {
   }, /* @__PURE__ */ React.createElement(Text, {
     textStyle: "h6",
     color: "text.secondary",
-    isTruncated: true
+    isTruncated: true,
+    fontWeight: "normal"
   }, props.name), /* @__PURE__ */ React.createElement(Text, {
     textStyle: "label",
     isTruncated: true

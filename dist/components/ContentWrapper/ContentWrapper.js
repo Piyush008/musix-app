@@ -143,25 +143,27 @@ export default function ContentWrapper(props) {
   }, items.map(({id, ...rest}) => /* @__PURE__ */ React.createElement(BigCardWrapper, {
     ...rest,
     key: id,
-    id
+    id,
+    width: "100%"
   }))));
 }
-function BigCardWrapper(props) {
+export function BigCardWrapper(props) {
   const navigate = useNavigate();
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
-  const imageSource = props?.images?.[0]?.url;
+  const imageSource = props?.images?.[0]?.url || props?.album?.images?.[0]?.url;
   const type = props?.type;
   const id = props?.id;
   const handleClick = () => {
     navigate(`/${type}/${id}`);
   };
   return /* @__PURE__ */ React.createElement(BigCard, {
-    imageBorderRadius: "10px",
+    imageBorderRadius: type === "artist" ? "50%" : "10px",
     imageSource,
     title,
     subtitle,
-    onClick: handleClick
+    onClick: handleClick,
+    imageWidth: props.width
   });
 }
 ContentWrapper.defaultProps = {

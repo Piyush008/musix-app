@@ -12,7 +12,7 @@ function CardRenderer({
 }) {
   return /* @__PURE__ */ React.createElement(AgentDetect, {
     desktopComponent: /* @__PURE__ */ React.createElement(Grid, {
-      templateColumns: `repeat(auto-fill,minmax(${pxToRem(minCardWidth)},1fr))`,
+      templateColumns: `repeat(auto-fit,minmax(${pxToRem(minCardWidth)},1fr))`,
       templateRows: `repeat(${noOfRows},1fr)`,
       autoRows: otherProps.overflowY != "hidden" ? void 0 : autoRows,
       rowGap: "0.7rem",
