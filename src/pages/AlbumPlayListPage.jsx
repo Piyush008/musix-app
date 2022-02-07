@@ -15,6 +15,7 @@ import {
   useRecoilState,
   useRecoilValueLoadable,
   useResetRecoilState,
+  useSetRecoilState,
 } from "recoil";
 import { albumPlayListDetailsSate } from "../components/ContentWrapper/ContentWrapper";
 import CustomSuspense from "../components/util/CustomSuspense";
@@ -61,6 +62,7 @@ function PlayListPage() {
   );
   const contents = albumPlayListLoadable?.contents;
   const tracks = contents?.tracks?.items ?? [];
+  const filteredTracks = tracks.filter((content) => !!content.track);
   return (
     <CustomSuspense
       state={albumPlayListLoadable.state}
@@ -115,7 +117,7 @@ function PlayListPage() {
             </GridItem>
           </Grid>
           <Divider orientation="horizontal" colorScheme={"teal"} />
-          {tracks.map(({ track: { id, ...rest } }, idx) => (
+          {filteredTracks.map(({ track: { id, ...rest } }, idx) => (
             <Track {...rest} key={id} id={id} seq={idx + 1} />
           ))}
         </Flex>
@@ -193,7 +195,7 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
       />
       <Box
         bgGradient={
-          "linear(to-r, blackAlpha.600 25%,blackAlpha.500 50%, blackAlpha.400 75%, blackAlpha.300 100%)"
+          "linear(to-t, blackAlpha.700 25%,blackAlpha.600 50%, blackAlpha.300 75%, blackAlpha.200 100%)"
         }
         bgSize={"cover"}
         bgPos={["center"]}
@@ -233,7 +235,7 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
         >
           {name}
         </Text>
-        <Text textStyle={"h6"} isTruncated>
+        <Text textStyle={"label"} isTruncated>
           {desc}
         </Text>
       </Flex>
@@ -241,11 +243,20 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
   );
 }
 
-function Track(props) {
+export const searchTrackState = atom({
+  key: "searchTrackState",
+  default: "",
+});
+
+export function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
   const imageUrl = album?.images[0]?.url;
   const artistName = artists.map((artist) => artist.name);
+  const setSearchTrack = useSetRecoilState(searchTrackState);
+  const handleClick = () => {
+    setSearchTrack(`song ${props.name} ${artistName[0]} audio`);
+  };
   return (
     <Grid
       templateColumns={
@@ -274,9 +285,10 @@ function Track(props) {
         borderRadius: "10px",
         transition: "all 0.25s",
       }}
+      onClick={handleClick}
     >
       <GridItem justifySelf={"end"}>
-        <Text textStyle={"label"}>{props.seq}</Text>
+        <Text textStyle={"h6"}>{props.seq}</Text>
       </GridItem>
       <GridItem>
         <HStack>
@@ -292,7 +304,12 @@ function Track(props) {
               `calc(100% - ${pxToRem(60)} - 0.5rem)`,
             ]}
           >
-            <Text textStyle={"h6"} color={"text.secondary"} isTruncated>
+            <Text
+              textStyle={"h6"}
+              color={"text.secondary"}
+              isTruncated
+              fontWeight={"normal"}
+            >
               {props.name}
             </Text>
             <Text textStyle={"label"} isTruncated>

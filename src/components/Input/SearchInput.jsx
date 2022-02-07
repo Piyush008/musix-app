@@ -8,6 +8,7 @@ import {
 import { MdClose, MdSearch } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import { atom, selectorFamily, useRecoilState } from "recoil";
+import useAgent from "../../hooks/useAgent.js";
 import { searchItems } from "../../utils/spotify.utils.js";
 
 export const searchTextState = atom({
@@ -23,7 +24,7 @@ export const searchDetailsState = selectorFamily({
       limit: 5,
       country: "IN",
     });
-    if (error) throw "Failure";
+    if (error) throw error;
     return data;
   },
 });
@@ -33,9 +34,10 @@ export default function SearchInput({ ...rest }) {
   const navigate = useNavigate();
   const searchText = useParams()?.searchText ?? "";
   const inputRef = React.useRef(null);
+  const isMobile = useAgent();
 
   React.useEffect(() => {
-    inputRef.current.focus();
+    if (!isMobile) inputRef.current.focus();
     setSearchText(searchText);
   }, []);
 
