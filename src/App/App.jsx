@@ -9,7 +9,7 @@ import SearchTextContentPage from "../pages/SearchTextContentPage";
 import GenrePage from "../pages/GenrePage";
 import AlbumPlayListPage from "../pages/AlbumPlayListPage";
 import useGoogleLogin from "react-google-login/src/use-google-login";
-import { atom, useRecoilState, useSetRecoilState } from "recoil";
+import { atom, useRecoilCallback, useSetRecoilState } from "recoil";
 import { authConfig, handleAfterAuth } from "../utils/auth.utils.js";
 import { useEffect } from "react";
 
@@ -44,8 +44,18 @@ export default function App() {
     redirectUri: "http://localhost:8080",
   });
 
+  // const googleOauthCallback = useRecoilCallback(({ snapshot }) => () => {
+  //   const auth = snapshot.getLoadable(authState).contents;
+  //   if (auth.isAuth) signIn();
+  // });
   useEffect(() => {
-    if (loaded) setAuth((prevState) => ({ ...prevState, signIn }));
+    if (loaded) {
+      setAuth((prevState) => ({ ...prevState, signIn }));
+      // const intervalId = setInterval(googleOauthCallback, 3599 * 1000);
+      // return () => {
+      //   clearInterval(intervalId);
+      // };
+    }
   }, [loaded]);
   if (loaded)
     return (

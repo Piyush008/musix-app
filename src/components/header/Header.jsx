@@ -28,7 +28,7 @@ export default function Header({ headerOpacity }) {
     onScriptLoadFailure: handleFailure,
   });
   return (
-    <Box h={pxToAll(80)} pos={"sticky"} top={"0"} zIndex={"1"} right={"0"}>
+    <Box h={pxToAll(80)} pos={"sticky"} top={"0"} zIndex={"2"} right={"0"}>
       <Box position="relative">
         <Box
           position="absolute"
@@ -36,7 +36,6 @@ export default function Header({ headerOpacity }) {
           height={pxToAll(80)}
           bg={"brand.primary"}
           opacity={headerOpacity}
-          zIndex="-1"
         />
         <HStack
           justifyContent={"space-between"}

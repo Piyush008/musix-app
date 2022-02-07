@@ -192,7 +192,18 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
         bgPos={["center"]}
         height={[pxToRemSm(170), null, pxToRem(380)]}
         width={"100%"}
-        opacity={"0.5"}
+      />
+      <Box
+        bgGradient={
+          "linear(to-t, blackAlpha.700 25%,blackAlpha.600 50%, blackAlpha.300 75%, blackAlpha.200 100%)"
+        }
+        bgSize={"cover"}
+        bgPos={["center"]}
+        height={[pxToRemSm(170), null, pxToRem(380)]}
+        width={"100%"}
+        zIndex={1}
+        pos={"absolute"}
+        top={"0"}
       />
       <Flex
         p={pxToAll(20)}
@@ -206,6 +217,7 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
           null,
           `calc(${pxToRem(380)} - ${pxToRem(80)})`,
         ]}
+        zIndex={2}
       >
         <Text
           textTransform={"uppercase"}
@@ -236,14 +248,14 @@ export const searchTrackState = atom({
   default: "",
 });
 
-function Track(props) {
+export function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
   const imageUrl = album?.images[0]?.url;
   const artistName = artists.map((artist) => artist.name);
   const setSearchTrack = useSetRecoilState(searchTrackState);
   const handleClick = () => {
-    setSearchTrack(`song ${props.name} ${artistName[0]} lyrics`);
+    setSearchTrack(`song ${props.name} ${artistName[0]} audio`);
   };
   return (
     <Grid

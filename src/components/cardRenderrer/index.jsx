@@ -14,7 +14,7 @@ function CardRenderer({
     <AgentDetect
       desktopComponent={
         <Grid
-          templateColumns={`repeat(auto-fill,minmax(${pxToRem(
+          templateColumns={`repeat(auto-fit,minmax(${pxToRem(
             minCardWidth
           )},1fr))`}
           templateRows={`repeat(${noOfRows},1fr)`}

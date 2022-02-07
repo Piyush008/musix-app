@@ -9,6 +9,7 @@ function BigCard({
   title,
   subtitle,
   onClick,
+  imageWidth,
   onPlayClick,
   isPlaying,
   ...otherProps
@@ -21,47 +22,48 @@ function BigCard({
       borderRadius="4"
       padding="2.5"
       cursor="pointer"
+      height={"max-content"}
       _hover={{ bgColor: "whiteAlpha.100" }}
       onMouseEnter={() => setPlayButtonVisble(true)}
       onMouseLeave={() => setPlayButtonVisble(false)}
       onClick={onClick}
+      pos={"relative"}
       {...otherProps}
     >
-      <Box>
+      <Box width={imageWidth}>
         <Image
           borderRadius={imageBorderRadius}
           boxShadow="0 8px 24px rgb(0 0 0 / 50%)"
           src={imageSource}
         />
-        <Box height="0" position="relative" textAlign="right">
-          <IconButton
-            visibility={PlayButtonVisble ? "visible" : "hidden"}
-            fontSize="0.75rem !important"
-            paddingInlineStart="0px !important"
-            paddingInlineEnd="0px !important"
-            borderRadius="100%"
-            bgColor="green.300"
-            padding="8px !important"
-            top={"0rem"}
-            right="0.17rem"
-            color="white"
-            _hover={{
-              bgColor: "blackAlpha.700",
-              transform: "scale(1.2,1.2)",
-              cursor: "pointer",
-            }}
-            _groupHover={{
-              top: "-1.75rem",
-              transition: "top 1s visibility 1s",
-            }}
-            icon={isPlaying ? <FaPause /> : <FaPlay />}
-          />
-        </Box>
+      </Box>
+      <Box height="0" pos="absolute" textAlign="right" right={pxToAll(15)}>
+        <IconButton
+          visibility={PlayButtonVisble ? "visible" : "hidden"}
+          fontSize="0.75rem !important"
+          paddingInlineStart="0px !important"
+          paddingInlineEnd="0px !important"
+          borderRadius="100%"
+          bgColor="green.300"
+          padding="8px !important"
+          top={"0"}
+          color="white"
+          _hover={{
+            bgColor: "blackAlpha.700",
+            transform: "scale(1.2,1.2)",
+            cursor: "pointer",
+          }}
+          _groupHover={{
+            top: `${imageWidth === "100%" ? "-1.75rem" : "0"}`,
+            transition: "top 1s visibility 1s",
+          }}
+          icon={isPlaying ? <FaPause /> : <FaPlay />}
+        />
       </Box>
       <Box paddingTop={pxToAll(15)}>
         <Text
           isTruncated
-          textStyle={"h6"}
+          textStyle={imageWidth !== "100%" ? "h4" : "h6"}
           color={"text.secondary"}
           fontWeight="bold"
         >
@@ -77,8 +79,6 @@ function BigCard({
 
 BigCard.defaultProps = {
   imageBorderRadius: "4",
-  height: "100%",
-  width: "100%",
   marginTop: "0.7rem",
 };
 

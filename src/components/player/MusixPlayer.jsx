@@ -174,6 +174,7 @@ export default function MusixPlayer() {
         max={PlayerState.totalDuration}
         isDisabled={PlayerState.isLoading}
         onChangeEnd={handlePlayerChangeEnd}
+        focusThumbOnChange={false}
       >
         <SliderTrack>
           <SliderFilledTrack />

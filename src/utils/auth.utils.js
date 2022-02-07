@@ -5,6 +5,7 @@ export const authConfig = {
   clientId: CLIENT_ID,
   cookiePolicy: "single_host_origin",
   scope: "email profile https://www.googleapis.com/auth/youtube.force-ssl",
+  prompt: "select_account",
 };
 let token = undefined;
 export const handleAfterAuth = (resp) => {

@@ -154,18 +154,19 @@ export default function ContentWrapper(props) {
       </HStack>
       <CardRenderer autoRows={autoRows} noOfChildren={noOfChildren}>
         {items.map(({ id, ...rest }) => (
-          <BigCardWrapper {...rest} key={id} id={id} />
+          <BigCardWrapper {...rest} key={id} id={id} width={"100%"} />
         ))}
       </CardRenderer>
     </Flex>
   );
 }
 
-function BigCardWrapper(props) {
+export function BigCardWrapper(props) {
   const navigate = useNavigate();
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
-  const imageSource = props?.images?.[0]?.url;
+  const imageSource =
+    props?.images?.[0]?.url || props?.albums?.images?.[0]?.url;
   const type = props?.type;
   const id = props?.id;
   const handleClick = () => {
@@ -173,15 +174,15 @@ function BigCardWrapper(props) {
   };
   return (
     <BigCard
-      imageBorderRadius={"10px"}
+      imageBorderRadius={type === "artist" ? "50%" : "10px"}
       imageSource={imageSource}
       title={title}
       subtitle={subtitle}
       onClick={handleClick}
+      imageWidth={props.width}
     />
   );
 }
-
 ContentWrapper.defaultProps = {
   autoRows: 0,
   seeAll: true,
