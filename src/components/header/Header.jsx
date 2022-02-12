@@ -8,7 +8,7 @@ import SearchInput from "../Input/SearchInput.jsx";
 import useGoogleLogout from "react-google-login/src/use-google-logout";
 import { useRecoilState } from "recoil";
 import { authConfig } from "../../utils/auth.utils.js";
-import { authState } from "../../App/App.jsx";
+import { authState } from "../../atoms/auth.atoms.js";
 
 export default function Header({ headerOpacity }) {
   const [auth, setAuth] = useRecoilState(authState);
@@ -28,7 +28,7 @@ export default function Header({ headerOpacity }) {
     onScriptLoadFailure: handleFailure,
   });
   return (
-    <Box h={pxToAll(80)} pos={"sticky"} top={"0"} zIndex={"2"} right={"0"}>
+    <Box h={pxToAll(80)} pos={"sticky"} top={"0"} zIndex={"3"} right={"0"}>
       <Box position="relative">
         <Box
           position="absolute"

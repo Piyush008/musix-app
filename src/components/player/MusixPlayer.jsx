@@ -11,15 +11,24 @@ import {
 import useAgent from "../../hooks/useAgent.js";
 import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 import { FaPause, FaPlay } from "react-icons/fa";
-import { searchTrackState } from "../../pages/AlbumPlayListPage.jsx";
+import {
+  albumPlayListSelectorTrackState,
+  albumPlayListTrackState,
+  searchTrackState,
+} from "../../pages/AlbumPlayListPage.jsx";
 import {
   selector,
   useRecoilRefresher_UNSTABLE,
+  useRecoilState,
   useRecoilValue,
   useRecoilValueLoadable,
+  useSetRecoilState,
 } from "recoil";
-import { youtubeSearch } from "../../utils/auth.utils.js";
-import { authState } from "../../App/App.jsx";
+import { musixToken, youtubeSearch } from "../../utils/auth.utils.js";
+import { musixAxios } from "../../utils/axios.utils.js";
+import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
+import { authState } from "../../atoms/auth.atoms.js";
+import { secondsToMins } from "../../utils/conversion.utils.js";
 
 const init = {
   track: null,
@@ -37,9 +46,24 @@ const audioTrackState = selector({
     const auth = get(authState);
     const search = get(searchTrackState);
     if (auth.isAuth && search) {
-      const [data, error] = await youtubeSearch(search);
-      if (error) throw error;
-      return data;
+      try {
+        const resp = await musixAxios(musixToken()).get(
+          `/youtubeSearch/${search}`
+        );
+        if (resp.status === 200) {
+          return resp.data?.value;
+        }
+      } catch (e) {
+        const [data, error] = await youtubeSearch(search);
+        if (error) throw error;
+        try {
+          await musixAxios(musixToken()).post("/youtubeSearch/", {
+            searchName: search,
+            ...data,
+          });
+        } catch (e2) {}
+        return data;
+      }
     } else {
       return init;
     }
@@ -51,7 +75,11 @@ export default function MusixPlayer() {
   const player = React.useRef();
   const audioTrackLoadable = useRecoilValueLoadable(audioTrackState);
   const audioTrackRefresh = useRecoilRefresher_UNSTABLE(audioTrackState);
-  const searchTrack = useRecoilValue(searchTrackState);
+  const [searchTrack, setSearchTrack] = useRecoilState(searchTrackState);
+  const albumPlayListSelectorTrack = useRecoilValue(
+    albumPlayListSelectorTrackState
+  );
+  const setAlbumPlayListTrack = useSetRecoilState(albumPlayListTrackState);
   const loadingState = audioTrackLoadable.state;
   const audioContent = audioTrackLoadable.contents;
   const [PlayerState, setPlayerState] = React.useState(init);
@@ -88,9 +116,27 @@ export default function MusixPlayer() {
         }));
       player.current.onended = (event) => {
         setPlayerState({ ...init, isEnded: true });
+        const { idx, nextSearchTrack } = albumPlayListSelectorTrack;
+        if (idx >= 0) {
+          setSearchTrack(nextSearchTrack);
+          setAlbumPlayListTrack((prevState) => {
+            return [
+              ...prevState.slice(0, idx - 1),
+              {
+                ...prevState[idx - 1],
+                isPlaying: PLAYMODE.INQUEUE,
+              },
+              {
+                ...prevState[idx],
+                isPlaying: PLAYMODE.PLAYING,
+              },
+              ...prevState.slice(idx + 1),
+            ];
+          });
+        }
       };
     }
-  }, [player]);
+  }, [player, albumPlayListSelectorTrack]);
 
   React.useEffect(() => {
     if (player.current) {
@@ -118,9 +164,6 @@ export default function MusixPlayer() {
       }
     }
   }, [PlayerState.isPlaying]);
-
-  const secondsToMins = (sec) =>
-    `${Math.floor(sec / 60)}:${("0" + (Math.floor(sec) % 60)).slice(-2)}`;
 
   const handlePlayerChange = (value) => {
     setPlayerState((previousState) => ({

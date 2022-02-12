@@ -35,9 +35,8 @@ export default function SearchTextContentPage() {
       );
       if (!matchedItem) {
         const popularityArr = artistTrackItems.map((item) => item.popularity);
-        const idx = popularityArr.findIndex(
-          (item) => item.popularity === Math.max(popularityArr)
-        );
+        const maxPop = Math.max(...popularityArr);
+        const idx = popularityArr.findIndex((item) => item === maxPop);
         matchedItem = artistTrackItems[idx];
       }
       setTopResult(matchedItem);

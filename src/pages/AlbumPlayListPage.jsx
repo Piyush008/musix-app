@@ -12,6 +12,7 @@ import {
 import { useLocation, useParams } from "react-router-dom";
 import {
   atom,
+  selector,
   useRecoilState,
   useRecoilValueLoadable,
   useResetRecoilState,
@@ -20,6 +21,11 @@ import {
 import { albumPlayListDetailsSate } from "../components/ContentWrapper/ContentWrapper";
 import CustomSuspense from "../components/util/CustomSuspense";
 import ROUTER from "../utils/constants/router.constants.js";
+import { PLAYMODE } from "../utils/constants/trackState.constants.js";
+import {
+  searchTrackTemplate,
+  secondsToMins,
+} from "../utils/conversion.utils.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
 export const albumPlaylistParamState = atom({
   key: "albumPlaylistParamState",
@@ -195,15 +201,17 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
       />
       <Box
         bgGradient={
-          "linear(to-t, blackAlpha.700 25%,blackAlpha.600 50%, blackAlpha.300 75%, blackAlpha.200 100%)"
+          "linear(to-t, blackAlpha.700 10%,blackAlpha.600 30%, transparent 100%)"
         }
-        bgSize={"cover"}
-        bgPos={["center"]}
-        height={[pxToRemSm(170), null, pxToRem(380)]}
+        height={[
+          `calc(${pxToRemSm(170)} - ${pxToRemSm(53.3)})`,
+          null,
+          `calc(${pxToRem(380)} - ${pxToRem(80)})`,
+        ]}
         width={"100%"}
         zIndex={1}
         pos={"absolute"}
-        top={"0"}
+        top={pxToAll(80)}
       />
       <Flex
         p={pxToAll(20)}
@@ -248,14 +256,61 @@ export const searchTrackState = atom({
   default: "",
 });
 
+export const albumPlayListTrackState = atom({
+  key: "albumPlayListTrackState",
+  default: [],
+});
+export const albumPlayListSelectorTrackState = selector({
+  key: "albumPlayListSelectorTrackState",
+  get: ({ get }) => {
+    const albumPlayListTrack = get(albumPlayListTrackState);
+    let idx = albumPlayListTrack.findIndex(
+      (track) => track.isPlaying === PLAYMODE.PLAYING
+    );
+    if (idx >= 0) {
+      idx = idx + 1 === albumPlayListTrack.length ? 0 : idx + 1;
+      const nextTrack = albumPlayListTrack[idx];
+      return {
+        idx,
+        nextSearchTrack: searchTrackTemplate(nextTrack.song, nextTrack.artist),
+      };
+    }
+    return { idx, nextSearchTrack: get(searchTrackState) };
+  },
+  set: ({ set, get }, { id, searchTrack }) => {
+    const albumPlayListParam = get(albumPlaylistParamState);
+    const albumPlayListDetails = get(
+      albumPlayListDetailsSate(albumPlayListParam)
+    );
+    const items = albumPlayListDetails?.tracks?.items ?? [];
+    const modItems = items.map((item) => {
+      const name = item?.track?.name || item?.name;
+      const artists = item?.track?.artists || item?.artists;
+      const itemId = item?.track?.id || item?.id;
+      return {
+        song: name,
+        artist: artists[0].name,
+        isPlaying: id === itemId ? PLAYMODE.PLAYING : PLAYMODE.INQUEUE,
+      };
+    });
+    set(albumPlayListTrackState, modItems);
+    set(searchTrackState, searchTrack);
+  },
+});
 export function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
   const imageUrl = album?.images[0]?.url;
   const artistName = artists.map((artist) => artist.name);
-  const setSearchTrack = useSetRecoilState(searchTrackState);
+  // const setSearchTrack = useSetRecoilState(searchTrackState);
+  const setAlbumPlayListSelectorTrack = useSetRecoilState(
+    albumPlayListSelectorTrackState
+  );
   const handleClick = () => {
-    setSearchTrack(`song ${props.name} ${artistName[0]} audio`);
+    setAlbumPlayListSelectorTrack({
+      id: props.id,
+      searchTrack: searchTrackTemplate(props.name, artistName[0]),
+    });
   };
   return (
     <Grid
@@ -326,7 +381,9 @@ export function Track(props) {
         </GridItem>
       )}
       <GridItem justifySelf={"end"}>
-        <Text textStyle={"label"}>{props?.duration_ms}</Text>
+        <Text textStyle={"label"}>
+          {secondsToMins(props?.duration_ms / 1000)}
+        </Text>
       </GridItem>
     </Grid>
   );

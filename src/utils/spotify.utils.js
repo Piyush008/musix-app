@@ -7,7 +7,12 @@ export async function spotifyAuth() {
     const resp = await spotifyAxios(SPOTIFY_AUTH).post(
       "https://accounts.spotify.com/api/token?grant_type=client_credentials",
       null,
-      { baseURL: "" }
+      {
+        baseURL: "",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
     );
     spotifyToken = "Bearer " + resp.data.access_token;
   } catch (e) {

@@ -1,3 +1,4 @@
+import { KJUR as kjur } from "jsrsasign";
 import axios from "axios";
 import { API_KEY, CLIENT_ID } from "./constants/privateKey.constants.js";
 import { parseDurationIntoSec } from "./conversion.utils.js";
@@ -7,10 +8,11 @@ export const authConfig = {
   scope: "email profile https://www.googleapis.com/auth/youtube.force-ssl",
   prompt: "select_account",
 };
-let token = undefined;
-export const handleAfterAuth = (resp) => {
-  const { accessToken } = resp;
-  token = accessToken;
+
+let token = undefined,
+  sub = undefined;
+export const handleAfterAuth = (accessToken, email) => {
+  (token = accessToken), (sub = email);
 };
 
 export async function youtubeSearch(search) {
@@ -43,3 +45,12 @@ export async function youtubeSearch(search) {
   }
   return [data, error];
 }
+
+export const musixToken = () => {
+  const iat = kjur.jws.IntDate.getNow();
+  const exp = iat + 30;
+  const sPayload = !sub ? { iat, exp } : { iat, exp, sub };
+  return kjur.jws.JWS.sign(null, { alg: "HS256" }, sPayload, {
+    b64: "VkxHW8cnwZSnNkq7utZNg8mE2SPgzTtzxfGi1U27ujI=",
+  });
+};

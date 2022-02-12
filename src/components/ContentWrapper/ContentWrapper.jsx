@@ -16,81 +16,6 @@ import CardRenderer from "../cardRenderrer/index.jsx";
 import BigCard from "../cards/bigCard/index.jsx";
 import CustomItem from "../util/CustomItem.jsx";
 
-const categoryState = selectorFamily({
-  key: "categoryState",
-  get:
-    ({ property }) =>
-    async () => {
-      const [data, error] = await getCategoryDetails(property, {
-        country: "IN",
-        locale: "en_IN",
-      });
-      if (error) throw error;
-      return data;
-    },
-});
-const categoryPlayListState = selectorFamily({
-  key: "categoryPlayListState",
-  get:
-    ({ property, limit }) =>
-    async () => {
-      const [data, error] = await getCategoryPlayList(property, {
-        country: "IN",
-        limit,
-      });
-      if (error) throw error;
-      return data;
-    },
-});
-
-const featuredPlayListState = selectorFamily({
-  key: "featuredPlayListState",
-  get:
-    ({ limit }) =>
-    async () => {
-      const [data, error] = await getFeaturedPlayList({
-        country: "IN",
-        locale: "en_IN",
-        limit,
-        timestamp: new Date().toISOString(),
-      });
-      if (error) throw error;
-      return data;
-    },
-});
-
-const newReleasesState = selectorFamily({
-  key: "newReleasesState",
-  get:
-    ({ limit }) =>
-    async () => {
-      const [data, error] = await getNewReleases({
-        country: "IN",
-        limit,
-      });
-      if (error) throw error;
-      return { message: "Popular new releases", ...data };
-    },
-});
-
-export const contentWrapperState = selectorFamily({
-  key: "contentWrapperState",
-  get:
-    (params) =>
-    ({ get }) => {
-      const { as, ...rest } = params;
-      if (as == "category") {
-        const catPlayListDetails = get(categoryPlayListState(rest));
-        const catDetails = get(categoryState(rest));
-        return { ...catPlayListDetails, message: catDetails };
-      } else if (as == "release") {
-        return get(newReleasesState(rest));
-      } else if (as == "featured") {
-        return get(featuredPlayListState(rest));
-      }
-    },
-});
-
 const albumState = selectorFamily({
   key: "albumState",
   get: (id) => async () => {
@@ -165,8 +90,7 @@ export function BigCardWrapper(props) {
   const navigate = useNavigate();
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
-  const imageSource =
-    props?.images?.[0]?.url || props?.albums?.images?.[0]?.url;
+  const imageSource = props?.images?.[0]?.url || props?.album?.images?.[0]?.url;
   const type = props?.type;
   const id = props?.id;
   const handleClick = () => {

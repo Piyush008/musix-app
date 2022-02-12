@@ -1,24 +1,10 @@
 import { Box, Flex, Spinner } from "@chakra-ui/react";
-import { selector, useRecoilValueLoadable } from "recoil";
-import ContentWrapper, {
-  contentWrapperState,
-} from "../components/ContentWrapper/ContentWrapper";
+import { useRecoilValueLoadable } from "recoil";
+import ContentWrapper from "../components/ContentWrapper/ContentWrapper";
 import CustomSuspense from "../components/util/CustomSuspense";
 import useAgent from "../hooks/useAgent";
-import { showContentConversionUtil } from "../utils/conversion.utils.js";
+import { showContentState } from "../selector/content.selector.js";
 import { pxToAll } from "../utils/theme.utils.js";
-
-const showContentState = selector({
-  key: "showContentState",
-  get: ({ get }) => {
-    const metaData = showContentConversionUtil();
-    const data = metaData.map((content) => ({
-      ...content,
-      ...get(contentWrapperState({ ...content, limit: 6 })),
-    }));
-    return { data };
-  },
-});
 
 export default function HomeContentPage() {
   const showContentsLoadable = useRecoilValueLoadable(showContentState);

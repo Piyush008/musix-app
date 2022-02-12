@@ -26,3 +26,9 @@ export function parseDurationIntoSec(duration) {
   const sec = secMatch ? parseInt(secMatch[0]) : 0;
   return min * 60 + sec;
 }
+
+export const searchTrackTemplate = (song, artist) =>
+  `song ${song} ${artist} audio`;
+
+export const secondsToMins = (sec) =>
+  `${Math.floor(sec / 60)}:${("0" + (Math.floor(sec) % 60)).slice(-2)}`;

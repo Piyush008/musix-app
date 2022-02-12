@@ -1,7 +1,7 @@
 import { Image, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
-import { genreParamState } from "../../pages/GenrePage.jsx";
+import { genreParamState } from "../../atoms/genre.atoms.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import { pxToAll } from "../../utils/theme.utils.js";
 import CustomItem from "../util/CustomItem";

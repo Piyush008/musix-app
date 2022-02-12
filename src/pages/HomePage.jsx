@@ -1,24 +1,16 @@
 import { Box, Flex, Spinner } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { selector, useRecoilCallback, useRecoilValueLoadable } from "recoil";
+import { useRecoilCallback, useRecoilValueLoadable } from "recoil";
 import Header from "../components/header/Header";
 import MusixPlayer from "../components/player/MusixPlayer";
 import DesktopSideBar from "../components/sidebar/DesktopSideBar";
 import MobileSideBar from "../components/sidebar/MobileSideBar";
 import AgentDetect from "../components/util/AgentDetect";
 import CustomSuspense from "../components/util/CustomSuspense";
+import { spotifyAuthState } from "../selector/auth.selector.js";
 import { spotifyAuth } from "../utils/spotify.utils.js";
 import { pxToRem } from "../utils/theme.utils.js";
-
-export const spotifyAuthState = selector({
-  key: "spotifyAuthState",
-  get: async () => {
-    const [token, error] = await spotifyAuth();
-    if (error) throw error;
-    return token;
-  },
-});
 
 export default function HomePage() {
   const ref = useRef();

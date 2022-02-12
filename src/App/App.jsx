@@ -9,30 +9,48 @@ import SearchTextContentPage from "../pages/SearchTextContentPage";
 import GenrePage from "../pages/GenrePage";
 import AlbumPlayListPage from "../pages/AlbumPlayListPage";
 import useGoogleLogin from "react-google-login/src/use-google-login";
-import { atom, useRecoilCallback, useSetRecoilState } from "recoil";
-import { authConfig, handleAfterAuth } from "../utils/auth.utils.js";
+import { useSetRecoilState } from "recoil";
+import {
+  authConfig,
+  handleAfterAuth,
+  musixToken,
+} from "../utils/auth.utils.js";
 import { useEffect } from "react";
+import { musixAxios } from "../utils/axios.utils.js";
+import { authState } from "../atoms/auth.atoms.js";
 
-export const authState = atom({
-  key: "authState",
-  default: {
-    isAuth: false,
-    signIn: undefined,
-  },
-});
 export default function App() {
   console.log(import.meta.env);
   const basename = import.meta.env.MODE === "development" ? "/" : "/musix-app";
   const setAuth = useSetRecoilState(authState);
-  const handleSuccess = (resp) => {
+
+  const handleSuccess = async (resp) => {
     if (resp) {
-      setAuth((prevState) => ({ ...prevState, isAuth: true }));
-      handleAfterAuth(resp);
+      const {
+        accessToken,
+        profileObj: { email, googleId, imageUrl, name },
+      } = resp;
+      try {
+        const resp2 = await musixAxios(musixToken()).post("/users/", {
+          email,
+          imageUrl,
+          providerId: googleId,
+          userName: name,
+        });
+        if (resp2.data.success) {
+          setAuth((prevState) => ({ ...prevState, isAuth: true }));
+          handleAfterAuth(accessToken, email);
+        }
+      } catch (e) {
+        setAuth((prevState) => ({ ...prevState, isAuth: false }));
+      }
     }
   };
+
   const handleFailure = (resp) => {
     console.log(resp);
   };
+
   const { signIn, loaded } = useGoogleLogin({
     ...authConfig,
     uxMode: "redirect",
@@ -42,19 +60,12 @@ export default function App() {
     onScriptLoadFailure: handleFailure,
     isSignedIn: true,
     redirectUri: "http://localhost:8080",
+    accessType: "offline",
   });
 
-  // const googleOauthCallback = useRecoilCallback(({ snapshot }) => () => {
-  //   const auth = snapshot.getLoadable(authState).contents;
-  //   if (auth.isAuth) signIn();
-  // });
   useEffect(() => {
     if (loaded) {
       setAuth((prevState) => ({ ...prevState, signIn }));
-      // const intervalId = setInterval(googleOauthCallback, 3599 * 1000);
-      // return () => {
-      //   clearInterval(intervalId);
-      // };
     }
   }, [loaded]);
   if (loaded)

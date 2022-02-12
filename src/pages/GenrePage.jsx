@@ -1,30 +1,16 @@
 import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import {
-  atom,
-  selector,
   useRecoilState,
   useRecoilValueLoadable,
   useResetRecoilState,
 } from "recoil";
-import ContentWrapper, {
-  contentWrapperState,
-} from "../components/ContentWrapper/ContentWrapper";
+import { genreParamState } from "../atoms/genre.atoms.js";
+import { genreContentState } from "../selector/genre.selector.js";
 import CustomSuspense from "../components/util/CustomSuspense";
+import ContentWrapper from "../components/ContentWrapper/ContentWrapper";
 import useAgent from "../hooks/useAgent";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
-
-export const genreParamState = atom({
-  key: "genreParamState",
-  default: null,
-});
-const genreContentState = selector({
-  key: "genreContentState",
-  get: ({ get }) => {
-    const params = get(genreParamState);
-    return get(contentWrapperState(params));
-  },
-});
 
 export default function GenrePage() {
   const property = useParams().property;
