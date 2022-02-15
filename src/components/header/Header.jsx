@@ -9,10 +9,11 @@ import useGoogleLogout from "react-google-login/src/use-google-logout";
 import { useRecoilState } from "recoil";
 import { authConfig } from "../../utils/auth.utils.js";
 import { authState } from "../../atoms/auth.atoms.js";
+import { useEffect, useState } from "react";
 
-export default function Header({ headerOpacity }) {
+export default function Header({ cb }) {
   const [auth, setAuth] = useRecoilState(authState);
-
+  const [headerOpacity, setHeaderOpacity] = useState(0);
   const handleLogoutSuccess = () => {
     setAuth((prevState) => ({ ...prevState, isAuth: false }));
   };
@@ -27,6 +28,21 @@ export default function Header({ headerOpacity }) {
     onFailure: handleFailure,
     onScriptLoadFailure: handleFailure,
   });
+
+  const handleScroll = (scrollTop, scrollHeight) => {
+    let opacity = scrollTop / scrollHeight / 0.15;
+    if (opacity <= 1) {
+      setHeaderOpacity(opacity);
+    } else {
+      setHeaderOpacity(1);
+    }
+  };
+
+  useEffect(() => {
+    console.log(handleScroll);
+    cb(handleScroll);
+  }, []);
+
   return (
     <Box h={pxToAll(80)} pos={"sticky"} top={"0"} zIndex={"3"} right={"0"}>
       <Box position="relative">

@@ -11,10 +11,16 @@ function BigCard({
   onClick,
   imageWidth,
   onPlayClick,
+  onPauseClick,
   isPlaying,
   ...otherProps
 }) {
   const [PlayButtonVisble, setPlayButtonVisble] = useState(false);
+  const handlePlayClick = (e) => {
+    e.stopPropagation();
+    if (!isPlaying) onPlayClick();
+    else onPauseClick();
+  };
   return (
     <Box
       role="group"
@@ -58,6 +64,7 @@ function BigCard({
             transition: "top 1s visibility 1s",
           }}
           icon={isPlaying ? <FaPause /> : <FaPlay />}
+          onClick={handlePlayClick}
         />
       </Box>
       <Box paddingTop={pxToAll(15)}>

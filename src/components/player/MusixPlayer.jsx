@@ -12,27 +12,25 @@ import useAgent from "../../hooks/useAgent.js";
 import { pxToAll, pxToRem } from "../../utils/theme.utils.js";
 import { FaPause, FaPlay } from "react-icons/fa";
 import {
-  albumPlayListSelectorTrackState,
-  albumPlayListTrackState,
-  searchTrackState,
-} from "../../pages/AlbumPlayListPage.jsx";
-import {
   selector,
   useRecoilRefresher_UNSTABLE,
   useRecoilState,
   useRecoilValue,
   useRecoilValueLoadable,
-  useSetRecoilState,
 } from "recoil";
 import { musixToken, youtubeSearch } from "../../utils/auth.utils.js";
 import { musixAxios } from "../../utils/axios.utils.js";
 import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
 import { authState } from "../../atoms/auth.atoms.js";
 import { secondsToMins } from "../../utils/conversion.utils.js";
+import { albumPlayListSelectorTrackState } from "../../selector/albumPlayList.selector.js";
+import {
+  albumPlayListTrackState,
+  searchTrackState,
+} from "../../atoms/albumPlayList.atom.js";
 
 const init = {
   track: null,
-  isPlaying: false,
   isLoading: false,
   totalDuration: 0,
   currentTime: 0,
@@ -44,8 +42,9 @@ const audioTrackState = selector({
   key: "audioTrackState",
   get: async ({ get }) => {
     const auth = get(authState);
-    const search = get(searchTrackState);
+    let search = get(searchTrackState);
     if (auth.isAuth && search) {
+      search = encodeURIComponent(search);
       try {
         const resp = await musixAxios(musixToken()).get(
           `/youtubeSearch/${search}`
@@ -58,7 +57,7 @@ const audioTrackState = selector({
         if (error) throw error;
         try {
           await musixAxios(musixToken()).post("/youtubeSearch/", {
-            searchName: search,
+            searchName: decodeURIComponent(search),
             ...data,
           });
         } catch (e2) {}
@@ -79,34 +78,40 @@ export default function MusixPlayer() {
   const albumPlayListSelectorTrack = useRecoilValue(
     albumPlayListSelectorTrackState
   );
-  const setAlbumPlayListTrack = useSetRecoilState(albumPlayListTrackState);
+  const [albumPlayListTrack, setAlbumPlayListTrack] = useRecoilState(
+    albumPlayListTrackState
+  );
+  const isPlaying = albumPlayListTrack?.isPlaying ?? false;
   const loadingState = audioTrackLoadable.state;
   const audioContent = audioTrackLoadable.contents;
   const [PlayerState, setPlayerState] = React.useState(init);
 
+  console.log("Hi");
   React.useEffect(() => {
-    audioTrackRefresh();
-  }, [searchTrack]);
-
-  React.useEffect(() => {
-    if (loadingState === "loading")
-      setPlayerState({ ...PlayerState, isLoading: true, isPlaying: false });
-    else if (loadingState === "hasValue")
-      if (searchTrack)
-        setPlayerState({
-          ...PlayerState,
-          isLoading: false,
-          isPlaying: true,
-          track: `http://localhost:3000/youtube.com/watch?v=${audioContent.videoId}`,
-          totalDuration: audioContent.totalDuration,
-          isEnded: false,
-        });
-      else setPlayerState(init);
-  }, [loadingState]);
+    if (!!searchTrack) {
+      if (loadingState === "loading")
+        setPlayerState({ ...PlayerState, isLoading: true });
+      else if (loadingState === "hasValue")
+        if (searchTrack)
+          setPlayerState({
+            ...PlayerState,
+            track: `http://localhost:3000/youtube.com/watch?v=${audioContent.videoId}`,
+            totalDuration: audioContent.totalDuration,
+            isEnded: false,
+          });
+        else setPlayerState(init);
+    }
+  }, [loadingState, searchTrack]);
 
   // Adding onTimeUpdate Event listener to player
   React.useEffect(() => {
     if (player.current) {
+      player.current.src = PlayerState.track;
+      player.current.onstalled = () => console.log("stalled");
+      player.current.onloadeddata = () => {
+        setPlayerState((prevState) => ({ ...prevState, isLoading: false }));
+        player.current.play();
+      };
       player.current.ontimeupdate = (event) =>
         setPlayerState((previousState) => ({
           ...previousState,
@@ -114,56 +119,52 @@ export default function MusixPlayer() {
             ? previousState.currentTime
             : parseInt(event.srcElement.currentTime),
         }));
-      player.current.onended = (event) => {
-        setPlayerState({ ...init, isEnded: true });
-        const { idx, nextSearchTrack } = albumPlayListSelectorTrack;
-        if (idx >= 0) {
-          setSearchTrack(nextSearchTrack);
-          setAlbumPlayListTrack((prevState) => {
-            return [
-              ...prevState.slice(0, idx - 1),
-              {
-                ...prevState[idx - 1],
-                isPlaying: PLAYMODE.INQUEUE,
-              },
-              {
-                ...prevState[idx],
-                isPlaying: PLAYMODE.PLAYING,
-              },
-              ...prevState.slice(idx + 1),
-            ];
-          });
-        }
-      };
-    }
-  }, [player, albumPlayListSelectorTrack]);
-
-  React.useEffect(() => {
-    if (player.current) {
-      player.current.src = PlayerState.track;
-      player.current.onstalled = () => console.log("stalled");
-      // player.current.onseeked = () =>
-      //   setPlayerState((previousState) => ({
-      //     ...previousState,
-      //     isLoading: false,
-      //   }));
-      // player.current.onseeking = () =>
-      //   setPlayerState((previousState) => ({
-      //     ...previousState,
-      //     isLoading: true,
-      //   }));
     }
   }, [PlayerState.track]);
 
   React.useEffect(() => {
-    if (player.current) {
-      if (!PlayerState.isPlaying) {
-        player.current.pause();
-      } else {
-        player.current.play();
-      }
-    }
-  }, [PlayerState.isPlaying]);
+    if (player.current)
+      player.current.onended = (event) => {
+        setPlayerState({ ...init, isEnded: true });
+        const { idx, totalLength, nextSearchTrack } =
+          albumPlayListSelectorTrack;
+        if (idx >= 0) {
+          setSearchTrack(nextSearchTrack);
+          setAlbumPlayListTrack((prevState) => {
+            if (totalLength - 1 === idx)
+              return {
+                ...prevState,
+                items: [
+                  {
+                    ...prevState.items[0],
+                    isPlaying: PLAYMODE.PLAYING,
+                  },
+                  ...prevState.items.slice(1, idx),
+                  {
+                    ...prevState.items[idx],
+                    isPlaying: PLAYMODE.INQUEUE,
+                  },
+                ],
+              };
+            return {
+              ...prevState,
+              items: [
+                ...prevState.items.slice(0, idx),
+                {
+                  ...prevState.items[idx],
+                  isPlaying: PLAYMODE.INQUEUE,
+                },
+                {
+                  ...prevState.items[idx + 1],
+                  isPlaying: PLAYMODE.PLAYING,
+                },
+                ...prevState.items.slice(idx + 2),
+              ],
+            };
+          });
+        }
+      };
+  }, [albumPlayListSelectorTrack]);
 
   const handlePlayerChange = (value) => {
     setPlayerState((previousState) => ({
@@ -179,20 +180,40 @@ export default function MusixPlayer() {
   };
 
   const handlePlayPauseClick = () => {
+    const { idx } = albumPlayListSelectorTrack;
     if (player.current && PlayerState.track) {
-      if (PlayerState.isPlaying) {
-        setPlayerState((previousState) => ({
-          ...previousState,
+      if (isPlaying) {
+        console.log(idx);
+        setAlbumPlayListTrack((prevState) => ({
+          ...prevState,
           isPlaying: false,
+          items: [
+            ...prevState.items.slice(0, idx),
+            {
+              ...prevState.items[idx],
+              isPlaying: PLAYMODE.PAUSE,
+            },
+            ...prevState.items.slice(idx + 1),
+          ],
         }));
+        player.current.pause();
       } else {
-        setPlayerState((previousState) => ({
-          ...previousState,
+        setAlbumPlayListTrack((prevState) => ({
+          ...prevState,
           isPlaying: true,
+          items: [
+            ...prevState.items.slice(0, idx),
+            {
+              ...prevState.items[idx],
+              isPlaying: PLAYMODE.PLAYING,
+            },
+            ...prevState.items.slice(idx + 1),
+          ],
         }));
+        player.current.play();
       }
     }
-    if (PlayerState.isEnded && !PlayerState.isPlaying) audioTrackRefresh();
+    if (PlayerState.isEnded && !isPlaying) audioTrackRefresh();
   };
 
   return (
@@ -246,7 +267,7 @@ export default function MusixPlayer() {
             onClick={handlePlayPauseClick}
             isLoading={PlayerState.isLoading}
             isRound={true}
-            icon={PlayerState.isPlaying ? <FaPause /> : <FaPlay />}
+            icon={isPlaying ? <FaPause /> : <FaPlay />}
           />
         </Box>
         <Box

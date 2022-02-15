@@ -8,6 +8,7 @@ import ContentWrapper, {
 } from "../components/ContentWrapper/ContentWrapper";
 import { searchDetailsState } from "../components/Input/SearchInput";
 import CustomSuspense from "../components/util/CustomSuspense";
+import ROUTER from "../utils/constants/router.constants.js";
 import { pxToAll } from "../utils/theme.utils.js";
 import { Track } from "./AlbumPlayListPage";
 
@@ -62,7 +63,13 @@ export default function SearchTextContentPage() {
               Songs
             </Text>
             {tracks.map(({ id, ...rest }, idx) => (
-              <Track {...rest} key={id} id={id} seq={idx + 1} />
+              <Track
+                {...rest}
+                key={id}
+                id={id}
+                seq={idx + 1}
+                view={ROUTER.SEARCH}
+              />
             ))}
           </GridItem>
         </CardRenderer>

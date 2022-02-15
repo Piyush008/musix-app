@@ -11,20 +11,11 @@ import CustomSuspense from "../components/util/CustomSuspense";
 import { spotifyAuthState } from "../selector/auth.selector.js";
 import { spotifyAuth } from "../utils/spotify.utils.js";
 import { pxToRem } from "../utils/theme.utils.js";
-
+let setHeader = (...params) => console.log(params);
 export default function HomePage() {
   const ref = useRef();
   const spotifyAuthLodableState =
     useRecoilValueLoadable(spotifyAuthState).state;
-  const [headerOpacity, setHeaderOpacity] = useState(0);
-  const handleScroll = (scrollTop, scrollHeight) => {
-    let opacity = scrollTop / scrollHeight / 0.15;
-    if (opacity <= 1) {
-      setHeaderOpacity(opacity);
-    } else {
-      setHeaderOpacity(1);
-    }
-  };
 
   const spotifyAuthCallback = useRecoilCallback(
     () => async () => {
@@ -39,6 +30,8 @@ export default function HomePage() {
       clearInterval(intervalId);
     };
   }, []);
+
+  const headerCallBack = (func) => (setHeader = func);
   return (
     <Flex direction={"column"} wrap={"nowrap"}>
       <Flex direction={"row"} wrap={"nowrap"}>
@@ -51,7 +44,7 @@ export default function HomePage() {
           minHeight={"unset"}
           overflow={"auto"}
           onScroll={() =>
-            handleScroll(ref.current.scrollTop, ref.current.scrollHeight)
+            setHeader(ref.current.scrollTop, ref.current.scrollHeight)
           }
           css={{
             "&::-webkit-scrollbar": {
@@ -66,7 +59,7 @@ export default function HomePage() {
             },
           }}
         >
-          <Header headerOpacity={headerOpacity} />
+          <Header cb={headerCallBack} />
           <CustomSuspense
             fallback={
               <Box pos={"relative"} top={"30%"} textAlign={"center"}>

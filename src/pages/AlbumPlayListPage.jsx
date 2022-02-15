@@ -11,26 +11,24 @@ import {
 } from "@chakra-ui/react";
 import { useLocation, useParams } from "react-router-dom";
 import {
-  atom,
-  selector,
+  useRecoilCallback,
   useRecoilState,
   useRecoilValueLoadable,
   useResetRecoilState,
   useSetRecoilState,
 } from "recoil";
-import { albumPlayListDetailsSate } from "../components/ContentWrapper/ContentWrapper";
+import { albumPlaylistParamState } from "../atoms/albumPlayList.atom.js";
 import CustomSuspense from "../components/util/CustomSuspense";
+import {
+  albumPlayListDetailsSate,
+  albumPlayListSelectorTrackState,
+} from "../selector/albumPlayList.selector.js";
 import ROUTER from "../utils/constants/router.constants.js";
-import { PLAYMODE } from "../utils/constants/trackState.constants.js";
 import {
   searchTrackTemplate,
   secondsToMins,
 } from "../utils/conversion.utils.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
-export const albumPlaylistParamState = atom({
-  key: "albumPlaylistParamState",
-  default: null,
-});
 
 export default function AlbumPlayListPage() {
   const location = useLocation();
@@ -251,67 +249,45 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
   );
 }
 
-export const searchTrackState = atom({
-  key: "searchTrackState",
-  default: "",
-});
-
-export const albumPlayListTrackState = atom({
-  key: "albumPlayListTrackState",
-  default: [],
-});
-export const albumPlayListSelectorTrackState = selector({
-  key: "albumPlayListSelectorTrackState",
-  get: ({ get }) => {
-    const albumPlayListTrack = get(albumPlayListTrackState);
-    let idx = albumPlayListTrack.findIndex(
-      (track) => track.isPlaying === PLAYMODE.PLAYING
-    );
-    if (idx >= 0) {
-      idx = idx + 1 === albumPlayListTrack.length ? 0 : idx + 1;
-      const nextTrack = albumPlayListTrack[idx];
-      return {
-        idx,
-        nextSearchTrack: searchTrackTemplate(nextTrack.song, nextTrack.artist),
-      };
-    }
-    return { idx, nextSearchTrack: get(searchTrackState) };
-  },
-  set: ({ set, get }, { id, searchTrack }) => {
-    const albumPlayListParam = get(albumPlaylistParamState);
-    const albumPlayListDetails = get(
-      albumPlayListDetailsSate(albumPlayListParam)
-    );
-    const items = albumPlayListDetails?.tracks?.items ?? [];
-    const modItems = items.map((item) => {
-      const name = item?.track?.name || item?.name;
-      const artists = item?.track?.artists || item?.artists;
-      const itemId = item?.track?.id || item?.id;
-      return {
-        song: name,
-        artist: artists[0].name,
-        isPlaying: id === itemId ? PLAYMODE.PLAYING : PLAYMODE.INQUEUE,
-      };
-    });
-    set(albumPlayListTrackState, modItems);
-    set(searchTrackState, searchTrack);
-  },
-});
 export function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
   const imageUrl = album?.images[0]?.url;
   const artistName = artists.map((artist) => artist.name);
-  // const setSearchTrack = useSetRecoilState(searchTrackState);
-  const setAlbumPlayListSelectorTrack = useSetRecoilState(
-    albumPlayListSelectorTrackState
+  // const setAlbumPlayListSelectorTrack = useSetRecoilState(
+  //   albumPlayListSelectorTrackState
+  // );
+  const handleClick = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async (albumId, trackName, artistName, trackId, view) => {
+        const albumPlayListParam = snapshot.getLoadable(
+          albumPlaylistParamState
+        );
+        if (
+          albumPlayListParam.contents?.id !== albumId &&
+          view === ROUTER.SEARCH
+        ) {
+          set(albumPlaylistParamState, { type: ROUTER.ALBUM, id: albumId });
+          try {
+            await snapshot.getPromise(
+              albumPlayListDetailsSate({ type: ROUTER.ALBUM, id: albumId })
+            );
+            set(albumPlayListSelectorTrackState, {
+              id: trackId,
+              searchTrack: searchTrackTemplate(trackName, artistName),
+            });
+          } catch (e) {
+            console.log(e);
+          }
+        } else
+          set(albumPlayListSelectorTrackState, {
+            id: trackId,
+            searchTrack: searchTrackTemplate(trackName, artistName),
+          });
+      },
+    []
   );
-  const handleClick = () => {
-    setAlbumPlayListSelectorTrack({
-      id: props.id,
-      searchTrack: searchTrackTemplate(props.name, artistName[0]),
-    });
-  };
+
   return (
     <Grid
       templateColumns={
@@ -340,7 +316,9 @@ export function Track(props) {
         borderRadius: "10px",
         transition: "all 0.25s",
       }}
-      onClick={handleClick}
+      onClick={() =>
+        handleClick(album.id, props.name, artistName[0], props.id, props.view)
+      }
     >
       <GridItem justifySelf={"end"}>
         <Text textStyle={"h6"}>{props.seq}</Text>
@@ -388,3 +366,7 @@ export function Track(props) {
     </Grid>
   );
 }
+
+Track.defaultProps = {
+  view: "NOT_SEARCH_VIEW",
+};

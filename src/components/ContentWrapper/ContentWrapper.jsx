@@ -1,52 +1,28 @@
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { selectorFamily } from "recoil";
-import useAgent from "../../hooks/useAgent.js";
-import ROUTER from "../../utils/constants/router.constants.js";
 import {
-  getAlbum,
-  getCategoryDetails,
-  getCategoryPlayList,
-  getFeaturedPlayList,
-  getNewReleases,
-  getPlayListDetails,
-} from "../../utils/spotify.utils.js";
+  useRecoilCallback,
+  useRecoilState,
+  useRecoilValue,
+  useSetRecoilState,
+} from "recoil";
+import {
+  albumPlaylistParamState,
+  albumPlayListTrackState,
+} from "../../atoms/albumPlayList.atom.js";
+import useAgent from "../../hooks/useAgent.js";
+import {
+  albumPlayListDetailsSate,
+  albumPlayListSelectorTrackState,
+} from "../../selector/albumPlayList.selector.js";
+import ROUTER from "../../utils/constants/router.constants.js";
+import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
+import { searchTrackTemplate } from "../../utils/conversion.utils.js";
 import { pxToAll } from "../../utils/theme.utils.js";
 import CardRenderer from "../cardRenderrer/index.jsx";
 import BigCard from "../cards/bigCard/index.jsx";
 import CustomItem from "../util/CustomItem.jsx";
 
-const albumState = selectorFamily({
-  key: "albumState",
-  get: (id) => async () => {
-    const [data, error] = await getAlbum(id, { market: "IN" });
-    if (error) throw error;
-    return data;
-  },
-});
-
-const playlistState = selectorFamily({
-  key: "playlistState",
-  get: (id) => async () => {
-    const [data, error] = await getPlayListDetails(id, {
-      id,
-      market: "IN",
-      limit: 20,
-    });
-    if (error) throw error;
-    return data;
-  },
-});
-export const albumPlayListDetailsSate = selectorFamily({
-  key: "albumPlayListDetailsState",
-  get:
-    (params) =>
-    async ({ get }) => {
-      const { type, id } = params;
-      if (type === "album") return get(albumState(id));
-      else if (type === "playlist") return get(playlistState(id));
-    },
-});
 export default function ContentWrapper(props) {
   const { property, autoRows, seeAll, noOfChildren } = props;
   const items = props?.playlists?.items || props?.albums?.items || [];
@@ -88,14 +64,65 @@ export default function ContentWrapper(props) {
 
 export function BigCardWrapper(props) {
   const navigate = useNavigate();
+  const [albumPlayListTrack, setAlbumPlayListTrack] = useRecoilState(
+    albumPlayListTrackState
+  );
+  const albumPlayListSelectorTrack = useRecoilValue(
+    albumPlayListSelectorTrackState
+  );
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
   const imageSource = props?.images?.[0]?.url || props?.album?.images?.[0]?.url;
   const type = props?.type;
   const id = props?.id;
+  const isPlaying =
+    albumPlayListTrack?.id === id &&
+    albumPlayListTrack?.isPlaying === PLAYMODE.PLAYING;
   const handleClick = () => {
     navigate(`/${type}/${id}`);
   };
+
+  const handlePlayClick = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async (type, id) => {
+        set(albumPlaylistParamState, { type, id });
+        try {
+          const albumPlayListDetails = await snapshot.getPromise(
+            albumPlayListDetailsSate({
+              type,
+              id,
+            })
+          );
+          const items = albumPlayListDetails?.tracks?.items ?? [];
+          const searchTrack = searchTrackTemplate(
+            items[0]?.track?.name || items[0].name,
+            items[0]?.track?.artists[0].name || items[0]?.artists[0].name
+          );
+          const itemId = items[0]?.track?.id || items[0]?.id;
+          set(albumPlayListSelectorTrackState, { id: itemId, searchTrack });
+        } catch (e) {
+          console.log(e);
+        }
+      },
+    []
+  );
+
+  const handlePauseClick = () => {
+    const { idx } = albumPlayListSelectorTrack;
+    setAlbumPlayListTrack((prevState) => ({
+      ...prevState,
+      isPlaying: PLAYMODE.PAUSE,
+      items: [
+        ...prevState.items.slice(0, idx - 1),
+        {
+          ...prevState.items[idx - 1],
+          isPlaying: PLAYMODE.PAUSE,
+        },
+        ...prevState.items.slice(idx),
+      ],
+    }));
+  };
+
   return (
     <BigCard
       imageBorderRadius={type === "artist" ? "50%" : "10px"}
@@ -104,6 +131,9 @@ export function BigCardWrapper(props) {
       subtitle={subtitle}
       onClick={handleClick}
       imageWidth={props.width}
+      onPlayClick={() => handlePlayClick(type, id)}
+      onPauseClick={handlePauseClick}
+      isPlaying={isPlaying}
     />
   );
 }
