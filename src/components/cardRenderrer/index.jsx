@@ -8,13 +8,14 @@ function CardRenderer({
   noOfRows,
   autoRows,
   noOfChildren,
+  fills,
   ...otherProps
 }) {
   return (
     <AgentDetect
       desktopComponent={
         <Grid
-          templateColumns={`repeat(auto-fit,minmax(${pxToRem(
+          templateColumns={`repeat(${fills},minmax(${pxToRem(
             minCardWidth
           )},1fr))`}
           templateRows={`repeat(${noOfRows},1fr)`}
@@ -57,6 +58,7 @@ CardRenderer.defaultProps = {
   overflowY: "hidden",
   autoRows: 0,
   noOfChildren: 6,
+  fills: "auto-fill",
 };
 
 export default CardRenderer;

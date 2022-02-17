@@ -51,6 +51,7 @@ export default function SearchTextContentPage() {
           minCardWidth={"380"}
           noOfChildren={"auto-fit"}
           overflowX="hidden"
+          fills={"auto-fit"}
         >
           <GridItem>
             <Text textStyle={"h5"} color="text.secondary">

@@ -4,6 +4,7 @@ const ROUTER = {
   GENRE: "genre",
   PLAYLIST: "playlist",
   ALBUM: "album",
+  ARTIST: "artist",
 };
 
 export default ROUTER;

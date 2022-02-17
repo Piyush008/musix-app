@@ -18,6 +18,7 @@ import {
 import { useEffect } from "react";
 import { musixAxios } from "../utils/axios.utils.js";
 import { authState } from "../atoms/auth.atoms.js";
+import ArtistPage from "../pages/ArtistPage";
 
 export default function App() {
   console.log(import.meta.env);
@@ -86,6 +87,10 @@ export default function App() {
             <Route
               path={`${ROUTER.PLAYLIST}/:playlistId`}
               element={<AlbumPlayListPage />}
+            />
+            <Route
+              path={`${ROUTER.ARTIST}/:artistId`}
+              element={<ArtistPage />}
             />
             <Route path="*" element={<NoMatchPage />} />
           </Route>

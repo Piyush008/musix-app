@@ -22,7 +22,7 @@ export const albumPlayListSelectorTrackState = selector({
       idx = idx + 1 === items.length ? 0 : idx + 1;
       const nextTrack = items[idx];
       return {
-        idx: items.length - idx - 1,
+        idx,
         totalLength: items.length,
         nextSearchTrack: searchTrackTemplate(nextTrack.song, nextTrack.artist),
       };

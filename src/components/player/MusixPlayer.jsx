@@ -131,34 +131,43 @@ export default function MusixPlayer() {
         if (idx >= 0) {
           setSearchTrack(nextSearchTrack);
           setAlbumPlayListTrack((prevState) => {
-            if (totalLength - 1 === idx)
+            if (idx == 0) {
+              if (totalLength == 1)
+                return {
+                  ...prevState,
+                  isPlaying: PLAYMODE.PAUSE,
+                  items: [
+                    { ...prevState.items[idx], isPlaying: PLAYMODE.PAUSE },
+                  ],
+                };
               return {
                 ...prevState,
                 items: [
                   {
-                    ...prevState.items[0],
+                    ...prevState.items[idx],
                     isPlaying: PLAYMODE.PLAYING,
                   },
-                  ...prevState.items.slice(1, idx),
+                  ...prevState.items.slice(1, totalLength - 1),
                   {
-                    ...prevState.items[idx],
+                    ...prevState.items[totalLength - 1],
                     isPlaying: PLAYMODE.INQUEUE,
                   },
                 ],
               };
+            }
             return {
               ...prevState,
               items: [
-                ...prevState.items.slice(0, idx),
+                ...prevState.items.slice(0, idx - 1),
                 {
-                  ...prevState.items[idx],
+                  ...prevState.items[idx - 1],
                   isPlaying: PLAYMODE.INQUEUE,
                 },
                 {
-                  ...prevState.items[idx + 1],
+                  ...prevState.items[idx],
                   isPlaying: PLAYMODE.PLAYING,
                 },
-                ...prevState.items.slice(idx + 2),
+                ...prevState.items.slice(idx + 1),
               ],
             };
           });
@@ -179,41 +188,61 @@ export default function MusixPlayer() {
     player.current.currentTime = parseInt(value);
   };
 
+  React.useEffect(() => {
+    if (player.current.src === PlayerState.track) {
+      if (isPlaying === PLAYMODE.PLAYING) player.current.play();
+      else if (isPlaying === PLAYMODE.PAUSE) player.current.pause();
+    }
+  }, [player, isPlaying]);
+
   const handlePlayPauseClick = () => {
-    const { idx } = albumPlayListSelectorTrack;
-    if (player.current && PlayerState.track) {
+    const { idx, totalLength } = albumPlayListSelectorTrack;
+    let currentIdx = idx - 1;
+    if (idx == 0) currentIdx = totalLength - 1;
+    if (PlayerState.track) {
       if (isPlaying) {
-        console.log(idx);
         setAlbumPlayListTrack((prevState) => ({
           ...prevState,
-          isPlaying: false,
+          isPlaying: PLAYMODE.PAUSE,
           items: [
-            ...prevState.items.slice(0, idx),
+            ...prevState.items.slice(0, currentIdx),
             {
-              ...prevState.items[idx],
+              ...prevState.items[currentIdx],
               isPlaying: PLAYMODE.PAUSE,
             },
-            ...prevState.items.slice(idx + 1),
+            ...prevState.items.slice(currentIdx + 1),
           ],
         }));
-        player.current.pause();
       } else {
         setAlbumPlayListTrack((prevState) => ({
           ...prevState,
-          isPlaying: true,
+          isPlaying: PLAYMODE.PLAYING,
           items: [
-            ...prevState.items.slice(0, idx),
+            ...prevState.items.slice(0, currentIdx),
             {
-              ...prevState.items[idx],
+              ...prevState.items[currentIdx],
               isPlaying: PLAYMODE.PLAYING,
             },
-            ...prevState.items.slice(idx + 1),
+            ...prevState.items.slice(currentIdx + 1),
           ],
         }));
-        player.current.play();
       }
     }
-    if (PlayerState.isEnded && !isPlaying) audioTrackRefresh();
+    if (PlayerState.isEnded && !isPlaying) {
+      setAlbumPlayListTrack((prevState) => ({
+        ...prevState,
+        isPlaying: PLAYMODE.PLAYING,
+        items: [
+          ...prevState.items.slice(0, currentIdx),
+          {
+            ...prevState.items[currentIdx],
+            isPlaying: PLAYMODE.PLAYING,
+          },
+          ...prevState.items.slice(currentIdx + 1),
+        ],
+      }));
+      audioTrackRefresh();
+    }
   };
 
   return (

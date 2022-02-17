@@ -179,7 +179,13 @@ function AlbumPage() {
           </Grid>
           <Divider orientation="horizontal" colorScheme={"teal"} />
           {tracks.map(({ id, ...rest }, idx) => (
-            <Track {...rest} key={id} id={id} seq={idx + 1} />
+            <Track
+              {...rest}
+              key={id}
+              id={id}
+              seq={idx + 1}
+              album={{ id: contents?.id }}
+            />
           ))}
         </Flex>
       </Flex>
@@ -252,7 +258,7 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
 export function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
-  const imageUrl = album?.images[0]?.url;
+  const imageUrl = album?.images?.[0]?.url;
   const artistName = artists.map((artist) => artist.name);
   // const setAlbumPlayListSelectorTrack = useSetRecoilState(
   //   albumPlayListSelectorTrackState
@@ -312,7 +318,7 @@ export function Track(props) {
       px={pxToAll(20)}
       transition="all 0.25s"
       _hover={{
-        bg: "brand.primary",
+        bg: "shade.primary",
         borderRadius: "10px",
         transition: "all 0.25s",
       }}
@@ -351,7 +357,7 @@ export function Track(props) {
           </Box>
         </HStack>
       </GridItem>
-      {album && (
+      {album?.name && (
         <GridItem>
           <Text textStyle={"label"} isTruncated>
             {album?.name}

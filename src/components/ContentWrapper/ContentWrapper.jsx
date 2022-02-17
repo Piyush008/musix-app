@@ -73,8 +73,8 @@ export function BigCardWrapper(props) {
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
   const imageSource = props?.images?.[0]?.url || props?.album?.images?.[0]?.url;
-  const type = props?.type;
-  const id = props?.id;
+  const type = props?.album?.type || props?.type;
+  const id = props?.album?.id || props?.id;
   const isPlaying =
     albumPlayListTrack?.id === id &&
     albumPlayListTrack?.isPlaying === PLAYMODE.PLAYING;
@@ -82,7 +82,7 @@ export function BigCardWrapper(props) {
     navigate(`/${type}/${id}`);
   };
 
-  const handlePlayClick = useRecoilCallback(
+  const handlePlayCallback = useRecoilCallback(
     ({ snapshot, set }) =>
       async (type, id) => {
         set(albumPlaylistParamState, { type, id });
@@ -107,18 +107,42 @@ export function BigCardWrapper(props) {
     []
   );
 
+  const handlePlayClick = () => {
+    if (albumPlayListTrack?.id === id) {
+      const { idx, totalLength } = albumPlayListSelectorTrack;
+      let currentIdx = idx - 1;
+      if (idx == 0) currentIdx = totalLength - 1;
+      setAlbumPlayListTrack((prevState) => ({
+        ...prevState,
+        isPlaying: PLAYMODE.PLAYING,
+        items: [
+          ...prevState.items.slice(0, currentIdx),
+          {
+            ...prevState.items[currentIdx],
+            isPlaying: PLAYMODE.PLAYING,
+          },
+          ...prevState.items.slice(currentIdx + 1),
+        ],
+      }));
+    } else {
+      handlePlayCallback(type, id);
+    }
+  };
+
   const handlePauseClick = () => {
-    const { idx } = albumPlayListSelectorTrack;
+    const { idx, totalLength } = albumPlayListSelectorTrack;
+    let currentIdx = idx - 1;
+    if (idx == 0) currentIdx = totalLength - 1;
     setAlbumPlayListTrack((prevState) => ({
       ...prevState,
       isPlaying: PLAYMODE.PAUSE,
       items: [
-        ...prevState.items.slice(0, idx - 1),
+        ...prevState.items.slice(0, currentIdx),
         {
-          ...prevState.items[idx - 1],
+          ...prevState.items[currentIdx],
           isPlaying: PLAYMODE.PAUSE,
         },
-        ...prevState.items.slice(idx),
+        ...prevState.items.slice(currentIdx + 1),
       ],
     }));
   };
@@ -131,7 +155,7 @@ export function BigCardWrapper(props) {
       subtitle={subtitle}
       onClick={handleClick}
       imageWidth={props.width}
-      onPlayClick={() => handlePlayClick(type, id)}
+      onPlayClick={handlePlayClick}
       onPauseClick={handlePauseClick}
       isPlaying={isPlaying}
     />
