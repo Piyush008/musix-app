@@ -89,6 +89,10 @@ export default function App() {
               element={<AlbumPlayListPage />}
             />
             <Route
+              path={`uPlaylist/:playlistId`}
+              element={<AlbumPlayListPage />}
+            />
+            <Route
               path={`${ROUTER.ARTIST}/:artistId`}
               element={<ArtistPage />}
             />

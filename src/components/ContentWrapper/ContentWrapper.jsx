@@ -1,20 +1,14 @@
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import {
-  useRecoilCallback,
-  useRecoilState,
-  useRecoilValue,
-  useSetRecoilState,
-} from "recoil";
-import {
-  albumPlaylistParamState,
-  albumPlayListTrackState,
-} from "../../atoms/albumPlayList.atom.js";
+import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
+import { albumPlayListTrackState } from "../../atoms/albumPlayList.atom.js";
 import useAgent from "../../hooks/useAgent.js";
 import {
   albumPlayListDetailsSate,
   albumPlayListSelectorTrackState,
 } from "../../selector/albumPlayList.selector.js";
+import { musixToken } from "../../utils/auth.utils.js";
+import { musixAxios } from "../../utils/axios.utils.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
 import { searchTrackTemplate } from "../../utils/conversion.utils.js";
@@ -24,8 +18,8 @@ import BigCard from "../cards/bigCard/index.jsx";
 import CustomItem from "../util/CustomItem.jsx";
 
 export default function ContentWrapper(props) {
-  const { property, autoRows, seeAll, noOfChildren } = props;
-  const items = props?.playlists?.items || props?.albums?.items || [];
+  const { as, property, autoRows, seeAll, noOfChildren } = props;
+  const items = props?.playlists?.items || props?.albums?.items || props?.rows;
   const title = props?.message?.name || props?.message || "";
   const navigate = useNavigate();
   const isMobile = useAgent();
@@ -34,7 +28,7 @@ export default function ContentWrapper(props) {
   };
 
   return (
-    <Flex direction={"column"} py={pxToAll(20)}>
+    <Flex direction={"column"} py={pxToAll(10)}>
       <HStack justifyContent={"space-between"}>
         <Box>
           <Text textStyle={"h5"} color={"text.secondary"}>
@@ -54,9 +48,12 @@ export default function ContentWrapper(props) {
         )}
       </HStack>
       <CardRenderer autoRows={autoRows} noOfChildren={noOfChildren}>
-        {items.map(({ id, ...rest }) => (
-          <BigCardWrapper {...rest} key={id} id={id} width={"100%"} />
-        ))}
+        {items.map(({ ...rest }) => {
+          const modId = rest?.id || rest?.spotifyId;
+          return (
+            <BigCardWrapper {...rest} key={modId} id={modId} width={"100%"} />
+          );
+        })}
       </CardRenderer>
     </Flex>
   );
@@ -72,9 +69,10 @@ export function BigCardWrapper(props) {
   );
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
-  const imageSource = props?.images?.[0]?.url || props?.album?.images?.[0]?.url;
+  const imageSource =
+    props?.imgUrl || props?.images?.[0]?.url || props?.album?.images?.[0]?.url;
   const type = props?.album?.type || props?.type;
-  const id = props?.album?.id || props?.id;
+  const id = props?.spotifyId || props?.album?.id || props?.id;
   const isPlaying =
     albumPlayListTrack?.id === id &&
     albumPlayListTrack?.isPlaying === PLAYMODE.PLAYING;
@@ -85,7 +83,6 @@ export function BigCardWrapper(props) {
   const handlePlayCallback = useRecoilCallback(
     ({ snapshot, set }) =>
       async (type, id) => {
-        set(albumPlaylistParamState, { type, id });
         try {
           const albumPlayListDetails = await snapshot.getPromise(
             albumPlayListDetailsSate({
@@ -93,13 +90,21 @@ export function BigCardWrapper(props) {
               id,
             })
           );
-          const items = albumPlayListDetails?.tracks?.items ?? [];
+          const items =
+            albumPlayListDetails?.tracks?.items ||
+            albumPlayListDetails?.tracks ||
+            [];
           const searchTrack = searchTrackTemplate(
             items[0]?.track?.name || items[0].name,
             items[0]?.track?.artists[0].name || items[0]?.artists[0].name
           );
           const itemId = items[0]?.track?.id || items[0]?.id;
-          set(albumPlayListSelectorTrackState, { id: itemId, searchTrack });
+          set(albumPlayListSelectorTrackState, {
+            id: itemId,
+            searchTrack,
+            type,
+            albumPlayListId: id,
+          });
         } catch (e) {
           console.log(e);
         }
@@ -107,7 +112,7 @@ export function BigCardWrapper(props) {
     []
   );
 
-  const handlePlayClick = () => {
+  const handlePlayClick = async () => {
     if (albumPlayListTrack?.id === id) {
       const { idx, totalLength } = albumPlayListSelectorTrack;
       let currentIdx = idx - 1;
@@ -125,7 +130,15 @@ export function BigCardWrapper(props) {
         ],
       }));
     } else {
-      handlePlayCallback(type, id);
+      const resp = await musixAxios(musixToken()).put("/playItems/", {
+        type,
+        spotifyId: id,
+        name: title,
+        description: props.description,
+        imgUrl: imageSource,
+        artists: props.artists,
+      });
+      if (!(resp.status >= 400)) await handlePlayCallback(type, id);
     }
   };
 

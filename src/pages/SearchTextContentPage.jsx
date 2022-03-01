@@ -63,15 +63,24 @@ export default function SearchTextContentPage() {
             <Text textStyle={"h5"} color="text.secondary">
               Songs
             </Text>
-            {tracks.map(({ id, ...rest }, idx) => (
-              <Track
-                {...rest}
-                key={id}
-                id={id}
-                seq={idx + 1}
-                view={ROUTER.SEARCH}
-              />
-            ))}
+            {tracks.map(({ id, ...rest }, idx) => {
+              const { album } = rest;
+              return (
+                <Track
+                  {...rest}
+                  key={id}
+                  id={id}
+                  seq={idx + 1}
+                  header={{
+                    id: album.id,
+                    name: album.name,
+                    desc: "",
+                    type: ROUTER.ALBUM,
+                    imgUrl: album.images[0].url,
+                  }}
+                />
+              );
+            })}
           </GridItem>
         </CardRenderer>
         <ContentWrapper albums={albums} message={"Albums"} seeAll={false} />

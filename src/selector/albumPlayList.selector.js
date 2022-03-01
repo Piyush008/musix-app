@@ -4,9 +4,11 @@ import {
   searchTrackState,
   albumPlaylistParamState,
 } from "../atoms/albumPlayList.atom.js";
+import ROUTER from "../utils/constants/router.constants.js";
 import { PLAYMODE } from "../utils/constants/trackState.constants.js";
 import { searchTrackTemplate } from "../utils/conversion.utils.js";
 import { getAlbum, getPlayListDetails } from "../utils/spotify.utils.js";
+import { getRecommendState, uPlaylistState } from "./content.selector.js";
 
 export const albumPlayListSelectorTrackState = selector({
   key: "albumPlayListSelectorTrackState",
@@ -19,29 +21,39 @@ export const albumPlayListSelectorTrackState = selector({
         track.isPlaying === PLAYMODE.PAUSE
     );
     if (idx >= 0) {
-      idx = idx + 1 === items.length ? 0 : idx + 1;
-      const nextTrack = items[idx];
+      const nextIdx = idx + 1 === items.length ? 0 : idx + 1;
+      const nextTrack = items[nextIdx];
       return {
-        idx,
+        currentItem: items[idx],
+        idx: nextIdx,
         totalLength: items.length,
-        nextSearchTrack: searchTrackTemplate(nextTrack.song, nextTrack.artist),
+        nextSearchTrack: searchTrackTemplate(
+          nextTrack.song,
+          nextTrack.artists[0].name
+        ),
       };
     }
     return { idx, nextSearchTrack: get(searchTrackState) };
   },
-  set: ({ set, get }, { id, searchTrack }) => {
-    const albumPlayListParam = get(albumPlaylistParamState);
+  set: ({ set, get }, { id, searchTrack, type, albumPlayListId }) => {
     const albumPlayListDetails = get(
-      albumPlayListDetailsSate(albumPlayListParam)
+      albumPlayListDetailsSate({ type, id: albumPlayListId })
     );
-    const items = albumPlayListDetails?.tracks?.items ?? [];
+    const items =
+      albumPlayListDetails?.tracks?.items || albumPlayListDetails?.tracks || [];
     const modItems = items.map((item) => {
       const name = item?.track?.name || item?.name;
       const artists = item?.track?.artists || item?.artists;
       const itemId = item?.track?.id || item?.id;
+      const imageSource =
+        item?.track?.album?.images?.[0]?.url ||
+        item?.album?.images?.[0]?.url ||
+        albumPlayListDetails?.images?.[0]?.url;
       return {
+        itemId,
+        imageSource,
         song: name,
-        artist: artists[0].name,
+        artists,
         isPlaying: id === itemId ? PLAYMODE.PLAYING : PLAYMODE.INQUEUE,
       };
     });
@@ -81,7 +93,28 @@ export const albumPlayListDetailsSate = selectorFamily({
     (params) =>
     async ({ get }) => {
       const { type, id } = params;
-      if (type === "album") return get(albumState(id));
-      else if (type === "playlist") return get(playlistState(id));
+      if (type === ROUTER.ALBUM) return get(albumState(id));
+      else if (type === ROUTER.PLAYLIST) return get(playlistState(id));
+      else if (type === "uPlaylist") {
+        const data = get(uPlaylistState);
+        const foundIdx = data?.rows.findIndex((ele) => ele.id === id);
+        if (foundIdx > -1) {
+          const dailyMix = data.rows[foundIdx];
+          const { artistIds, genres, trackIds } = dailyMix;
+          const items =
+            get(
+              getRecommendState({
+                artistIds,
+                genres,
+                trackIds: trackIds.split(",").slice(0, 2).join(),
+                limit: 20,
+              })
+            )?.tracks ?? [];
+          return {
+            ...dailyMix,
+            tracks: items,
+          };
+        }
+      }
     },
 });

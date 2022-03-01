@@ -76,3 +76,6 @@ export const getTracks = async (query) =>
 
 export const searchItems = async (query) =>
   await createSpotifyAxiosInstance("/search", query);
+
+export const recommend = async (query) =>
+  await createSpotifyAxiosInstance("/recommendations", query);

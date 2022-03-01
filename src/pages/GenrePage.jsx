@@ -4,6 +4,7 @@ import {
   useRecoilState,
   useRecoilValueLoadable,
   useResetRecoilState,
+  useSetRecoilState,
 } from "recoil";
 import { genreParamState } from "../atoms/genre.atoms.js";
 import { genreContentState } from "../selector/genre.selector.js";
@@ -11,22 +12,37 @@ import CustomSuspense from "../components/util/CustomSuspense";
 import ContentWrapper from "../components/ContentWrapper/ContentWrapper";
 import useAgent from "../hooks/useAgent";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
+import { useEffect } from "react";
 
 export default function GenrePage() {
-  const property = useParams().property;
+  const { property } = useParams();
   const [genreParam, setGenreParam] = useRecoilState(genreParamState);
   const resetGenreParam = useResetRecoilState(genreParamState);
-  const isMobile = useAgent();
-  React.useEffect(() => {
-    if (property === "featured" || property === "release")
-      setGenreParam({ as: property, property, limit: 20 });
-    else setGenreParam({ as: "category", property, limit: 20 });
+  useEffect(() => {
+    if (property) {
+      if (
+        property === "recently" ||
+        property === "mixes" ||
+        property === "topPlayItems"
+      )
+        setGenreParam({ as: "user", property, limit: 20 });
+      else if (property === "featured" || property === "release")
+        setGenreParam({ as: property, property, limit: 20 });
+      else setGenreParam({ as: "category", property, limit: 20 });
+    }
     return () => {
       resetGenreParam();
     };
   }, []);
+
+  if (genreParam != null) return <GenreContentPage />;
+  return null;
+}
+
+function GenreContentPage() {
+  const isMobile = useAgent();
   const showAllContentLoadable = useRecoilValueLoadable(genreContentState);
-  const contents = showAllContentLoadable.contents;
+  const contents = showAllContentLoadable?.contents ?? {};
   return (
     <CustomSuspense
       fallback={

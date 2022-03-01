@@ -17,12 +17,17 @@ import {
   useResetRecoilState,
   useSetRecoilState,
 } from "recoil";
-import { albumPlaylistParamState } from "../atoms/albumPlayList.atom.js";
+import {
+  albumPlaylistParamState,
+  albumPlayListTrackState,
+} from "../atoms/albumPlayList.atom.js";
 import CustomSuspense from "../components/util/CustomSuspense";
 import {
   albumPlayListDetailsSate,
   albumPlayListSelectorTrackState,
 } from "../selector/albumPlayList.selector.js";
+import { musixToken } from "../utils/auth.utils.js";
+import { musixAxios } from "../utils/axios.utils.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import {
   searchTrackTemplate,
@@ -48,12 +53,18 @@ export default function AlbumPlayListPage() {
         type: ROUTER.ALBUM,
         id: params["albumId"],
       });
+    else if (location.pathname.includes("uPlaylist"))
+      setAlbumPlaylistParam({
+        type: "uPlaylist",
+        id: params["playlistId"],
+      });
     return () => {
       resetParam();
     };
   }, []);
-  if (albumPlaylistParam?.type === "playlist") return <PlayListPage />;
-  else if (albumPlaylistParam?.type === "album") return <AlbumPage />;
+  if (albumPlaylistParam?.type === ROUTER.PLAYLIST) return <PlayListPage />;
+  else if (albumPlaylistParam?.type === ROUTER.ALBUM) return <AlbumPage />;
+  else if (albumPlaylistParam?.type === "uPlaylist") return <PlayListPage />;
   return null;
 }
 
@@ -65,8 +76,13 @@ function PlayListPage() {
     albumPlayListDetailsSate(albumPlaylistParam)
   );
   const contents = albumPlayListLoadable?.contents;
-  const tracks = contents?.tracks?.items ?? [];
-  const filteredTracks = tracks.filter((content) => !!content.track);
+  const imgUrl = contents?.images?.[0]?.url || contents?.imgUrl;
+  const type = contents?.type;
+  const name = contents?.name;
+  const desc = contents?.description;
+  let filteredTracks = contents?.tracks?.items || contents?.tracks || [];
+  if (type === ROUTER.PLAYLIST)
+    filteredTracks = filteredTracks.filter((content) => !!content.track);
   return (
     <CustomSuspense
       state={albumPlayListLoadable.state}
@@ -82,10 +98,10 @@ function PlayListPage() {
     >
       <Flex direction={"column"} pos={"relative"} top={pxToAll(-80)}>
         <AlbumPlaylistHeaderContent
-          url={contents?.images?.[0]?.url}
-          type={contents?.type}
-          name={contents?.name}
-          desc={contents?.description}
+          url={imgUrl}
+          type={type}
+          name={name}
+          desc={desc}
         />
         <Flex direction={"column"} px={pxToAll(20)} overflow={"hidden"}>
           <Grid
@@ -121,9 +137,19 @@ function PlayListPage() {
             </GridItem>
           </Grid>
           <Divider orientation="horizontal" colorScheme={"teal"} />
-          {filteredTracks.map(({ track: { id, ...rest } }, idx) => (
-            <Track {...rest} key={id} id={id} seq={idx + 1} />
-          ))}
+          {filteredTracks.map((props, idx) => {
+            const track = props?.track || props;
+            const { id, ...rest } = track;
+            return (
+              <Track
+                {...rest}
+                key={id}
+                id={id}
+                seq={idx + 1}
+                header={{ id: contents?.id, name, desc, type, imgUrl }}
+              />
+            );
+          })}
         </Flex>
       </Flex>
     </CustomSuspense>
@@ -138,6 +164,10 @@ function AlbumPage() {
     albumPlayListDetailsSate(albumPlaylistParam)
   );
   const contents = albumPlayListLoadable.contents;
+  const imgUrl = contents?.images?.[0]?.url;
+  const type = contents?.type;
+  const name = contents?.name;
+  const desc = "";
   const tracks = contents?.tracks?.items ?? [];
   return (
     <CustomSuspense
@@ -154,10 +184,10 @@ function AlbumPage() {
     >
       <Flex direction={"column"} pos={"relative"} top={pxToAll(-80)}>
         <AlbumPlaylistHeaderContent
-          url={contents?.images?.[0]?.url}
-          type={contents?.type}
-          name={contents?.name}
-          desc={""}
+          url={imgUrl}
+          type={type}
+          name={name}
+          desc={desc}
         />
         <Flex direction={"column"} px={pxToAll(20)} overflow={"hidden"}>
           <Grid
@@ -184,7 +214,7 @@ function AlbumPage() {
               key={id}
               id={id}
               seq={idx + 1}
-              album={{ id: contents?.id }}
+              header={{ id: contents?.id, name, desc, type, imgUrl }}
             />
           ))}
         </Flex>
@@ -258,38 +288,48 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
 export function Track(props) {
   const artists = props?.artists ?? [];
   const album = props?.album;
-  const imageUrl = album?.images?.[0]?.url;
+  const imageUrl = props?.imgUrl || album?.images?.[0]?.url;
   const artistName = artists.map((artist) => artist.name);
-  // const setAlbumPlayListSelectorTrack = useSetRecoilState(
-  //   albumPlayListSelectorTrackState
-  // );
+
   const handleClick = useRecoilCallback(
     ({ snapshot, set }) =>
-      async (albumId, trackName, artistName, trackId, view) => {
-        const albumPlayListParam = snapshot.getLoadable(
-          albumPlaylistParamState
+      async (header, artists, trackName, artistName, trackId) => {
+        const albumPlayListTrack = snapshot.getLoadable(
+          albumPlayListTrackState
         );
-        if (
-          albumPlayListParam.contents?.id !== albumId &&
-          view === ROUTER.SEARCH
-        ) {
-          set(albumPlaylistParamState, { type: ROUTER.ALBUM, id: albumId });
-          try {
-            await snapshot.getPromise(
-              albumPlayListDetailsSate({ type: ROUTER.ALBUM, id: albumId })
-            );
+        const release = snapshot.retain();
+        try {
+          const { type, id, name, desc, imgUrl } = header;
+          if (albumPlayListTrack.contents?.id !== id) {
+            const resp = await musixAxios(musixToken()).put("/playItems/", {
+              type,
+              spotifyId: id,
+              name,
+              description: desc,
+              imgUrl,
+              artists,
+            });
+            if (!(resp.status >= 400)) {
+              await snapshot.getPromise(albumPlayListDetailsSate({ type, id }));
+              set(albumPlayListSelectorTrackState, {
+                id: trackId,
+                searchTrack: searchTrackTemplate(trackName, artistName),
+                type,
+                albumPlayListId: id,
+              });
+            }
+          } else
             set(albumPlayListSelectorTrackState, {
               id: trackId,
               searchTrack: searchTrackTemplate(trackName, artistName),
+              type,
+              albumPlayListId: id,
             });
-          } catch (e) {
-            console.log(e);
-          }
-        } else
-          set(albumPlayListSelectorTrackState, {
-            id: trackId,
-            searchTrack: searchTrackTemplate(trackName, artistName),
-          });
+        } catch (e) {
+          console.log(e);
+        } finally {
+          release();
+        }
       },
     []
   );
@@ -297,7 +337,7 @@ export function Track(props) {
   return (
     <Grid
       templateColumns={
-        album
+        imageUrl
           ? [
               `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(
                 375 / 1.5
@@ -323,7 +363,7 @@ export function Track(props) {
         transition: "all 0.25s",
       }}
       onClick={() =>
-        handleClick(album.id, props.name, artistName[0], props.id, props.view)
+        handleClick(props.header, artists, props.name, artistName[0], props.id)
       }
     >
       <GridItem justifySelf={"end"}>
@@ -357,7 +397,7 @@ export function Track(props) {
           </Box>
         </HStack>
       </GridItem>
-      {album?.name && (
+      {album && (
         <GridItem>
           <Text textStyle={"label"} isTruncated>
             {album?.name}
@@ -372,7 +412,3 @@ export function Track(props) {
     </Grid>
   );
 }
-
-Track.defaultProps = {
-  view: "NOT_SEARCH_VIEW",
-};

@@ -111,6 +111,7 @@ export default function MusixPlayer() {
       player.current.onloadeddata = () => {
         setPlayerState((prevState) => ({ ...prevState, isLoading: false }));
         player.current.play();
+        playItemsTrack();
       };
       player.current.ontimeupdate = (event) =>
         setPlayerState((previousState) => ({
@@ -119,6 +120,18 @@ export default function MusixPlayer() {
             ? previousState.currentTime
             : parseInt(event.srcElement.currentTime),
         }));
+      async function playItemsTrack() {
+        const { itemId, song, artists, imageSource } =
+          albumPlayListSelectorTrack.currentItem;
+        await musixAxios(musixToken()).put("/playItems/", {
+          type: "track",
+          spotifyId: itemId,
+          name: song,
+          description: "",
+          imgUrl: imageSource,
+          artists,
+        });
+      }
     }
   }, [PlayerState.track]);
 
