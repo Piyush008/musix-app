@@ -7,10 +7,10 @@ import ContentWrapper, {
   BigCardWrapper,
 } from "../components/ContentWrapper/ContentWrapper";
 import { searchDetailsState } from "../components/Input/SearchInput";
+import Track from "../components/track/Track";
 import CustomSuspense from "../components/util/CustomSuspense";
 import ROUTER from "../utils/constants/router.constants.js";
 import { pxToAll } from "../utils/theme.utils.js";
-import { Track } from "./AlbumPlayListPage";
 
 export default function SearchTextContentPage() {
   const searchText = useParams()?.searchText.trim() ?? "";

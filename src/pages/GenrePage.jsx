@@ -1,5 +1,5 @@
 import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import {
   useRecoilState,
   useRecoilValueLoadable,
@@ -16,11 +16,14 @@ import { useEffect } from "react";
 
 export default function GenrePage() {
   const { property } = useParams();
+  const location = useLocation();
   const [genreParam, setGenreParam] = useRecoilState(genreParamState);
   const resetGenreParam = useResetRecoilState(genreParamState);
   useEffect(() => {
     if (property) {
-      if (
+      if (location.pathname.includes("recommend"))
+        setGenreParam({ as: "recommend", property, limit: 20 });
+      else if (
         property === "recently" ||
         property === "mixes" ||
         property === "topPlayItems"

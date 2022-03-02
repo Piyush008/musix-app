@@ -73,6 +73,9 @@ const theme = extendTheme({
       lineHeight: 1.25,
     },
     icon: {
+      lg: {
+        fontSize: pxToAll(40),
+      },
       md: {
         fontSize: pxToAll(24),
       },

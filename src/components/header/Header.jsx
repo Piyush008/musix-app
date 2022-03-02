@@ -1,4 +1,4 @@
-import { Box, HStack, Button } from "@chakra-ui/react";
+import { Box, HStack, Button, Circle, Icon } from "@chakra-ui/react";
 import { pxToAll } from "../../utils/theme.utils.js";
 import Logo from "../logo/Logo";
 import { Route, Routes } from "react-router-dom";
@@ -10,6 +10,7 @@ import { useRecoilState } from "recoil";
 import { authConfig } from "../../utils/auth.utils.js";
 import { authState } from "../../atoms/auth.atoms.js";
 import { useEffect, useState } from "react";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 export default function Header({ cb }) {
   const [auth, setAuth] = useRecoilState(authState);
@@ -63,12 +64,12 @@ export default function Header({ cb }) {
             mobileComponent={<Logo />}
             desktopComponent={
               <HStack width={["100%", null, "40%"]}>
-                {/* <Circle size={pxToAll(35)} bg="shade.secondary">
+                <Circle size={pxToAll(35)} bg="shade.secondary">
                   <Icon as={MdKeyboardArrowLeft} textStyle={"icon.md"} />
                 </Circle>
                 <Circle size={pxToAll(35)} bg="shade.secondary">
                   <Icon as={MdKeyboardArrowRight} textStyle={"icon.md"} />
-                </Circle> */}
+                </Circle>
                 <Routes>
                   <Route
                     path={`${ROUTER.SEARCH}/*`}

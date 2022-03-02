@@ -28,7 +28,25 @@ export function parseDurationIntoSec(duration) {
 }
 
 export const searchTrackTemplate = (song, artist) =>
-  `song ${song} by ${artist} audio type`;
+  `song ${song} by ${artist} audio lyrics`;
 
 export const secondsToMins = (sec) =>
   `${Math.floor(sec / 60)}:${("0" + (Math.floor(sec) % 60)).slice(-2)}`;
+
+/**
+ * @description Use Only for getting new Array value for setAlbumPlayListTrack play/pause
+ * @param prevState @param value @param index
+ * @returns newState
+ */
+export const getNewStateForPlayPause = (prevState, value, index) => ({
+  ...prevState,
+  isPlaying: value,
+  items: [
+    ...prevState.items.slice(0, index),
+    {
+      ...prevState.items[index],
+      isPlaying: value,
+    },
+    ...prevState.items.slice(index + 1),
+  ],
+});

@@ -80,6 +80,7 @@ export default function App() {
               <Route path=":searchText" element={<SearchTextContentPage />} />
             </Route>
             <Route path={`${ROUTER.GENRE}/:property`} element={<GenrePage />} />
+            <Route path={"recommend/:property"} element={<GenrePage />} />
             <Route
               path={`${ROUTER.ALBUM}/:albumId`}
               element={<AlbumPlayListPage />}

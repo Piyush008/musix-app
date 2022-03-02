@@ -16,6 +16,18 @@ const Button = {
       height: "max-content",
       minWidth: "max-content",
     },
+    xl: {
+      height: pxToAll(60),
+      fontSize: pxToAll(24),
+      minWidth: pxToAll(60),
+      borderRadius: "50%",
+    },
+    lg: {
+      height: pxToAll(50),
+      fontSize: pxToAll(24),
+      minWidth: pxToAll(50),
+      borderRadius: "50%",
+    },
   },
   variants: {
     normal: {

@@ -25,8 +25,9 @@ export const showAuthContentState = selector({
   get: async ({ get }) => {
     const data = [
       ...get(userMixesSelectorState),
-      get(topPlayItemsSelectorState(6)),
+      ...get(topPlayItemsSelectorState(6)),
       ...get(topArtistsSelectorState(6)),
+      ...get(showContentState)?.data,
     ];
     return { data };
   },
@@ -154,7 +155,10 @@ export const userMixesSelectorState = selector({
         );
       }
       if (data2) return [data1, data2];
-      else return [data1];
+      else {
+        if (!data1?.rows.length) return [];
+        return [data1];
+      }
     } catch (e) {
       throw e;
     }
@@ -171,7 +175,9 @@ export const topPlayItemsSelectorState = selectorFamily({
           params: { size },
         }
       );
-      return resp.data;
+      const data = resp.data;
+      if (!data?.rows.length) return [];
+      return [data];
     } catch (e) {
       throw e;
     }
@@ -204,6 +210,22 @@ export const getTopArtistState = selector({
   },
 });
 
+export const getRecommendSelectorState = selectorFamily({
+  key: "getRecommendSelectorState",
+  get:
+    ({ artist, size }) =>
+    async ({ get }) => {
+      return {
+        as: "recommend",
+        property: artist.id,
+        message: `More like ${artist.name}`,
+        rows:
+          get(getRecommendState({ artistIds: artist.id, limit: size }))
+            ?.tracks ?? [],
+      };
+    },
+});
+
 export const topArtistsSelectorState = selectorFamily({
   key: "topArtistsSelectorState",
   get:
@@ -211,14 +233,9 @@ export const topArtistsSelectorState = selectorFamily({
     async ({ get }) => {
       try {
         const artists = get(getTopArtistState);
-        const data = artists.map((artist) => ({
-          as: "recommend",
-          property: artist.id,
-          message: `More like ${artist.name}`,
-          rows:
-            get(getRecommendState({ artistIds: artist.id, limit: size }))
-              ?.tracks ?? [],
-        }));
+        const data = artists.map((artist) =>
+          get(getRecommendSelectorState({ artist, size }))
+        );
         return data;
       } catch (e) {
         throw e;

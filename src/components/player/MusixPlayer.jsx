@@ -1,11 +1,15 @@
 import {
   Box,
+  Flex,
+  Grid,
+  GridItem,
   HStack,
   IconButton,
   Slider,
   SliderFilledTrack,
   SliderThumb,
   SliderTrack,
+  Text,
   VStack,
 } from "@chakra-ui/react";
 import useAgent from "../../hooks/useAgent.js";
@@ -22,7 +26,10 @@ import { musixToken, youtubeSearch } from "../../utils/auth.utils.js";
 import { musixAxios } from "../../utils/axios.utils.js";
 import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
 import { authState } from "../../atoms/auth.atoms.js";
-import { secondsToMins } from "../../utils/conversion.utils.js";
+import {
+  getNewStateForPlayPause,
+  secondsToMins,
+} from "../../utils/conversion.utils.js";
 import { albumPlayListSelectorTrackState } from "../../selector/albumPlayList.selector.js";
 import {
   albumPlayListTrackState,
@@ -86,7 +93,6 @@ export default function MusixPlayer() {
   const audioContent = audioTrackLoadable.contents;
   const [PlayerState, setPlayerState] = React.useState(init);
 
-  console.log("Hi");
   React.useEffect(() => {
     if (!!searchTrack) {
       if (loadingState === "loading")
@@ -214,50 +220,47 @@ export default function MusixPlayer() {
     if (idx == 0) currentIdx = totalLength - 1;
     if (PlayerState.track) {
       if (isPlaying) {
-        setAlbumPlayListTrack((prevState) => ({
-          ...prevState,
-          isPlaying: PLAYMODE.PAUSE,
-          items: [
-            ...prevState.items.slice(0, currentIdx),
-            {
-              ...prevState.items[currentIdx],
-              isPlaying: PLAYMODE.PAUSE,
-            },
-            ...prevState.items.slice(currentIdx + 1),
-          ],
-        }));
+        setAlbumPlayListTrack((prevState) =>
+          getNewStateForPlayPause(prevState, PLAYMODE.PAUSE, currentIdx)
+        );
       } else {
-        setAlbumPlayListTrack((prevState) => ({
-          ...prevState,
-          isPlaying: PLAYMODE.PLAYING,
-          items: [
-            ...prevState.items.slice(0, currentIdx),
-            {
-              ...prevState.items[currentIdx],
-              isPlaying: PLAYMODE.PLAYING,
-            },
-            ...prevState.items.slice(currentIdx + 1),
-          ],
-        }));
+        setAlbumPlayListTrack((prevState) =>
+          getNewStateForPlayPause(prevState, PLAYMODE.PLAYING, currentIdx)
+        );
       }
     }
     if (PlayerState.isEnded && !isPlaying) {
-      setAlbumPlayListTrack((prevState) => ({
-        ...prevState,
-        isPlaying: PLAYMODE.PLAYING,
-        items: [
-          ...prevState.items.slice(0, currentIdx),
-          {
-            ...prevState.items[currentIdx],
-            isPlaying: PLAYMODE.PLAYING,
-          },
-          ...prevState.items.slice(currentIdx + 1),
-        ],
-      }));
+      setAlbumPlayListTrack((prevState) =>
+        getNewStateForPlayPause(prevState, PLAYMODE.PLAYING, currentIdx)
+      );
       audioTrackRefresh();
     }
   };
+  /**
+ *  return (
+    <Grid 
+    templateColumns={`minmax(100px,${pxToRem(260)}) minmax(200px, 1fr) ${pxToRem(230)}`}
+    gridColumnGap={pxToRem(30)}>
+      <GridItem>
+       <HStack>
+          <Box width={pxToAll(60)}>
+            <Image src={}/>
+          </Box>
+          <Box>
+            <Text textStyle={'h6'} color={'text.secondary'}></Text>
+            <Text textStyle={'label'}></Text>
+          </Box>
+        </HStack> 
+      </GridItem>
+      <GridItem>
 
+      </GridItem>
+      <GridItem>
+
+      </GridItem>
+    </Grid>
+  )
+ */
   return (
     <VStack
       justify={"space-evenly"}

@@ -46,21 +46,10 @@ function BigCard({
       <Box height="0" pos="absolute" textAlign="right" right={pxToAll(15)}>
         <IconButton
           visibility={PlayButtonVisble ? "visible" : "hidden"}
-          fontSize="0.75rem !important"
-          paddingInlineStart="0px !important"
-          paddingInlineEnd="0px !important"
-          borderRadius="100%"
-          bgColor="green.300"
-          padding="8px !important"
           top={"0"}
-          color="white"
-          _hover={{
-            bgColor: "blackAlpha.700",
-            transform: "scale(1.2,1.2)",
-            cursor: "pointer",
-          }}
+          size="lg"
           _groupHover={{
-            top: `${imageWidth === "100%" ? "-1.75rem" : "0"}`,
+            top: `${imageWidth === "100%" ? "-2rem" : "0"}`,
             transition: "top 1s visibility 1s",
           }}
           icon={isPlaying ? <FaPause /> : <FaPlay />}

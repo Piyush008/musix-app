@@ -11,7 +11,10 @@ import { musixToken } from "../../utils/auth.utils.js";
 import { musixAxios } from "../../utils/axios.utils.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
-import { searchTrackTemplate } from "../../utils/conversion.utils.js";
+import {
+  getNewStateForPlayPause,
+  searchTrackTemplate,
+} from "../../utils/conversion.utils.js";
 import { pxToAll } from "../../utils/theme.utils.js";
 import CardRenderer from "../cardRenderrer/index.jsx";
 import BigCard from "../cards/bigCard/index.jsx";
@@ -24,7 +27,8 @@ export default function ContentWrapper(props) {
   const navigate = useNavigate();
   const isMobile = useAgent();
   const showAllContent = () => {
-    navigate(`${ROUTER.GENRE}/${property}`);
+    if (as === "recommend") navigate(`${as}/${property}`);
+    else navigate(`${ROUTER.GENRE}/${property}`);
   };
 
   return (
@@ -117,18 +121,9 @@ export function BigCardWrapper(props) {
       const { idx, totalLength } = albumPlayListSelectorTrack;
       let currentIdx = idx - 1;
       if (idx == 0) currentIdx = totalLength - 1;
-      setAlbumPlayListTrack((prevState) => ({
-        ...prevState,
-        isPlaying: PLAYMODE.PLAYING,
-        items: [
-          ...prevState.items.slice(0, currentIdx),
-          {
-            ...prevState.items[currentIdx],
-            isPlaying: PLAYMODE.PLAYING,
-          },
-          ...prevState.items.slice(currentIdx + 1),
-        ],
-      }));
+      setAlbumPlayListTrack((prevState) =>
+        getNewStateForPlayPause(prevState, PLAYMODE.PLAYING, currentIdx)
+      );
     } else {
       const resp = await musixAxios(musixToken()).put("/playItems/", {
         type,
@@ -146,18 +141,9 @@ export function BigCardWrapper(props) {
     const { idx, totalLength } = albumPlayListSelectorTrack;
     let currentIdx = idx - 1;
     if (idx == 0) currentIdx = totalLength - 1;
-    setAlbumPlayListTrack((prevState) => ({
-      ...prevState,
-      isPlaying: PLAYMODE.PAUSE,
-      items: [
-        ...prevState.items.slice(0, currentIdx),
-        {
-          ...prevState.items[currentIdx],
-          isPlaying: PLAYMODE.PAUSE,
-        },
-        ...prevState.items.slice(currentIdx + 1),
-      ],
-    }));
+    setAlbumPlayListTrack((prevState) =>
+      getNewStateForPlayPause(prevState, PLAYMODE.PAUSE, currentIdx)
+    );
   };
 
   return (
