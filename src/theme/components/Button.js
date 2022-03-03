@@ -2,7 +2,7 @@ import { pxToAll } from "../../utils/theme.utils";
 
 const Button = {
   baseStyle: {
-    bg: "shade.primary",
+    bg: "brand.secondary",
     borderRadius: "25px",
     pos: "relative",
     cursor: "auto",

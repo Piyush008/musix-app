@@ -11,21 +11,18 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { FaPause, FaPlay } from "react-icons/fa";
-import { FcLike, FcLikePlaceholder } from "react-icons/fc";
+import { FcLike } from "react-icons/fc";
 import { GiSelfLove } from "react-icons/gi";
 import { useLocation, useParams } from "react-router-dom";
 import {
   useRecoilState,
-  useRecoilValue,
   useRecoilValueLoadable,
   useResetRecoilState,
 } from "recoil";
-import {
-  albumPlaylistParamState,
-  albumPlayListTrackState,
-} from "../atoms/albumPlayList.atom.js";
+import { albumPlaylistParamState } from "../atoms/albumPlayList.atom.js";
 import Track from "../components/track/Track.jsx";
 import CustomSuspense from "../components/util/CustomSuspense";
+import usePlayPauseClick from "../hooks/usePlayPauseClick.js";
 import { albumPlayListDetailsSate } from "../selector/albumPlayList.selector.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
@@ -98,20 +95,21 @@ function PlayListPage() {
           name={name}
           desc={desc}
         />
-        <Flex direction={"column"} px={pxToAll(20)} overflow={"hidden"}>
-          <AlbumPlaylistMiddleContent id={contents?.id} />
+        <Flex
+          direction={"column"}
+          pl={pxToAll(20)}
+          pr={["0", "0", pxToRem(20)]}
+          overflow={"hidden"}
+        >
+          <AlbumPlaylistMiddleContent
+            id={contents?.id}
+            type={type}
+            title={name}
+            imageSource={imgUrl}
+            details={{ description: desc }}
+          />
           <Grid
-            templateColumns={[
-              `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(
-                375 / 1.5
-              )}, 2fr) minmax(${pxToRemSm(100 / 1.5)}, 1fr) ${pxToRemSm(
-                80 / 1.5
-              )}`,
-              null,
-              `${pxToRem(25)} minmax(${pxToRem(300)}, 2fr) minmax(${pxToRem(
-                100
-              )}, 1fr) ${pxToRem(80)}`,
-            ]}
+            templateColumns={`25px minmax(170px, 2fr) minmax(85px, 1fr) 100px`}
             gridColumnGap={pxToAll(20)}
             height={pxToAll(40)}
             alignItems={"center"}
@@ -121,14 +119,16 @@ function PlayListPage() {
               <Text textStyle={"label"}>#</Text>
             </GridItem>
             <GridItem>
-              <Text textStyle={"label"}>TITLE</Text>
+              <Text textStyle={"label"} letterSpacing={"widest"}>
+                TITLE
+              </Text>
             </GridItem>
             <GridItem>
-              <Text textStyle={"label"} isTruncated>
+              <Text textStyle={"label"} isTruncated letterSpacing={"widest"}>
                 ALBUM
               </Text>
             </GridItem>
-            <GridItem justifySelf={"end"}>
+            <GridItem justifySelf={"end"} letterSpacing={"widest"}>
               <Text textStyle={"label"}>DURATION</Text>
             </GridItem>
           </Grid>
@@ -164,6 +164,7 @@ function AlbumPage() {
   const type = contents?.type;
   const name = contents?.name;
   const desc = "";
+  const artists = contents?.artists ?? [];
   const tracks = contents?.tracks?.items ?? [];
   return (
     <CustomSuspense
@@ -185,23 +186,39 @@ function AlbumPage() {
           name={name}
           desc={desc}
         />
-        <Flex direction={"column"} px={pxToAll(20)} overflow={"hidden"}>
-          <AlbumPlaylistMiddleContent id={contents?.id} />
+        <Flex
+          direction={"column"}
+          pl={pxToAll(20)}
+          pr={["0", "0", pxToRem(20)]}
+          overflow={"hidden"}
+        >
+          <AlbumPlaylistMiddleContent
+            id={contents?.id}
+            type={type}
+            title={name}
+            details={{ description: desc, artists }}
+          />
           <Grid
-            templateColumns={"25px minmax(300px, 2fr) 100px"}
+            templateColumns={"25px minmax(170px, 1fr) 100px"}
             gridColumnGap={pxToAll(20)}
             height={pxToAll(40)}
             alignItems={"center"}
             px={pxToAll(20)}
           >
             <GridItem justifySelf={"end"}>
-              <Text textStyle={"label"}>#</Text>
+              <Text textStyle={"label"} letterSpacing={"widest"}>
+                #
+              </Text>
             </GridItem>
             <GridItem>
-              <Text textStyle={"label"}>TITLE</Text>
+              <Text textStyle={"label"} letterSpacing={"widest"}>
+                TITLE
+              </Text>
             </GridItem>
             <GridItem justifySelf={"end"}>
-              <Text textStyle={"label"}>DURATION</Text>
+              <Text textStyle={"label"} letterSpacing={"widest"}>
+                DURATION
+              </Text>
             </GridItem>
           </Grid>
           <Divider orientation="horizontal" colorScheme={"teal"} />
@@ -282,14 +299,21 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
   );
 }
 
-function AlbumPlaylistMiddleContent({ id }) {
-  const albumPlayListTrack = useRecoilValue(albumPlayListTrackState);
-  const isPlaying =
-    !!albumPlayListTrack?.isPlaying && albumPlayListTrack?.id === id;
+function AlbumPlaylistMiddleContent({ id, type, title, imageSource, details }) {
+  const [isPlaying, onPlayClick, onPauseClick] = usePlayPauseClick(id);
   const isLiked = false;
+
+  const handleClick = () => {
+    if (isPlaying) onPauseClick();
+    else onPlayClick(type, title, imageSource, details);
+  };
   return (
     <HStack spacing={pxToAll(20)} my={pxToAll(20)}>
-      <IconButton size={"xl"} icon={isPlaying ? <FaPause /> : <FaPlay />} />
+      <IconButton
+        size={"xl"}
+        icon={isPlaying ? <FaPause /> : <FaPlay />}
+        onClick={handleClick}
+      />
       <Icon
         as={true ? GiSelfLove : FcLike}
         textStyle={"icon.lg"}

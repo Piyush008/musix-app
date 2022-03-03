@@ -1,12 +1,25 @@
-import { Box, Grid, GridItem, HStack, Image, Text } from "@chakra-ui/react";
-import { useRecoilCallback } from "recoil";
+import {
+  Box,
+  Grid,
+  GridItem,
+  HStack,
+  Icon,
+  Image,
+  Text,
+} from "@chakra-ui/react";
+import { FaPause, FaPlay } from "react-icons/fa";
+import { FcLike } from "react-icons/fc";
+import { GiSelfLove } from "react-icons/gi";
+import { useRecoilCallback, useRecoilValue } from "recoil";
 import { albumPlayListTrackState } from "../../atoms/albumPlayList.atom.js";
+import usePlayPauseClick from "../../hooks/usePlayPauseClick.js";
 import {
   albumPlayListDetailsSate,
   albumPlayListSelectorTrackState,
 } from "../../selector/albumPlayList.selector.js";
 import { musixToken } from "../../utils/auth.utils.js";
 import { musixAxios } from "../../utils/axios.utils.js";
+import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
 import {
   searchTrackTemplate,
   secondsToMins,
@@ -14,12 +27,23 @@ import {
 import { pxToAll, pxToRem, pxToRemSm } from "../../utils/theme.utils.js";
 
 export default function Track(props) {
+  const [isAlbumPlayListPlaying, , onPauseClick] = usePlayPauseClick(
+    props.header.id
+  );
+  const currentItem = useRecoilValue(
+    albumPlayListSelectorTrackState
+  )?.currentItem;
+
+  const [isEnter, setEnter] = React.useState(false);
+  const isCurrentItem = currentItem?.itemId === props.id;
+  const isPlaying =
+    isCurrentItem && currentItem?.isPlaying === PLAYMODE.PLAYING;
   const artists = props?.artists ?? [];
   const album = props?.album;
   const imageUrl = props?.imgUrl || album?.images?.[0]?.url;
   const artistName = artists.map((artist) => artist.name);
 
-  const handleClick = useRecoilCallback(
+  const handlePlayCallback = useRecoilCallback(
     ({ snapshot, set }) =>
       async (header, artists, trackName, artistName, trackId) => {
         const albumPlayListTrack = snapshot.getLoadable(
@@ -62,22 +86,23 @@ export default function Track(props) {
     []
   );
 
+  const handleClick = () => {
+    if (isPlaying && isAlbumPlayListPlaying) onPauseClick();
+    else
+      handlePlayCallback(
+        props.header,
+        artists,
+        props.name,
+        artistName[0],
+        props.id
+      );
+  };
   return (
     <Grid
       templateColumns={
         imageUrl
-          ? [
-              `${pxToRemSm(25 / 1.5)} minmax(${pxToRemSm(
-                375 / 1.5
-              )}, 2fr) minmax(${pxToRemSm(100 / 1.5)}, 1fr) ${pxToRemSm(
-                80 / 1.5
-              )}`,
-              null,
-              `${pxToRem(25)} minmax(${pxToRem(300)}, 2fr) minmax(${pxToRem(
-                100
-              )}, 1fr) ${pxToRem(80)}`,
-            ]
-          : "25px minmax(300px, 2fr) 100px"
+          ? `25px minmax(170px, 2fr) minmax(85px, 1fr) 100px`
+          : "25px minmax(170px, 1fr) 100px"
       }
       gridColumnGap={pxToAll(20)}
       height={pxToAll(70)}
@@ -86,21 +111,33 @@ export default function Track(props) {
       px={pxToAll(20)}
       transition="all 0.25s"
       _hover={{
-        bg: "shade.primary",
+        bg: "shade.hoverPrimary",
+        color: "text.secondary",
         borderRadius: "10px",
         transition: "all 0.25s",
       }}
-      onClick={() =>
-        handleClick(props.header, artists, props.name, artistName[0], props.id)
-      }
+      onClick={handleClick}
+      onMouseEnter={() => setEnter(true)}
+      onMouseLeave={() => setEnter(false)}
     >
       <GridItem justifySelf={"end"}>
-        <Text textStyle={"h6"}>{props.seq}</Text>
+        {isEnter ? (
+          <Icon
+            as={isPlaying ? FaPause : FaPlay}
+            textStyle={"icon.md"}
+            _hover={{
+              color: "text.play",
+              transition: "all 0.25s",
+            }}
+          />
+        ) : (
+          <Text textStyle={"h6"}>{props.seq}</Text>
+        )}
       </GridItem>
       <GridItem>
         <HStack>
           {imageUrl && (
-            <Box width={pxToAll(60)}>
+            <Box width={pxToAll(60)} zIndex="-1">
               <Image src={imageUrl} />
             </Box>
           )}
@@ -111,7 +148,11 @@ export default function Track(props) {
               `calc(100% - ${pxToRem(60)} - 0.5rem)`,
             ]}
           >
-            <Text textStyle={"h6"} color={"text.secondary"} isTruncated>
+            <Text
+              textStyle={"h6"}
+              color={!isCurrentItem ? "text.secondary" : "text.play"}
+              isTruncated
+            >
               {props.name}
             </Text>
             <Text textStyle={"label"} isTruncated>
@@ -120,14 +161,30 @@ export default function Track(props) {
           </Box>
         </HStack>
       </GridItem>
-      {album && (
+      {imageUrl && (
         <GridItem>
           <Text textStyle={"label"} isTruncated>
             {album?.name}
           </Text>
         </GridItem>
       )}
-      <GridItem justifySelf={"end"}>
+      <GridItem
+        justifySelf={"end"}
+        columnGap={pxToRem(40)}
+        height={"100%"}
+        alignItems="center"
+        d={"flex"}
+      >
+        {isEnter && (
+          <Icon
+            as={true ? GiSelfLove : FcLike}
+            textStyle={"icon.md"}
+            _hover={{
+              color: "text.play",
+              transition: "all 0.25s",
+            }}
+          />
+        )}
         <Text textStyle={"label"}>
           {secondsToMins(props?.duration_ms / 1000)}
         </Text>

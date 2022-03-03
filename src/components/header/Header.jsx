@@ -63,7 +63,7 @@ export default function Header({ cb }) {
           <AgentDetect
             mobileComponent={<Logo />}
             desktopComponent={
-              <HStack width={["100%", null, "40%"]}>
+              <HStack width={["100%", null, "40%"]} zIndex={"1"}>
                 <Circle size={pxToAll(35)} bg="shade.secondary">
                   <Icon as={MdKeyboardArrowLeft} textStyle={"icon.md"} />
                 </Circle>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
 import { albumPlayListTrackState } from "../../atoms/albumPlayList.atom.js";
 import useAgent from "../../hooks/useAgent.js";
+import usePlayPauseClick from "../../hooks/usePlayPauseClick.js";
 import {
   albumPlayListDetailsSate,
   albumPlayListSelectorTrackState,
@@ -65,85 +66,15 @@ export default function ContentWrapper(props) {
 
 export function BigCardWrapper(props) {
   const navigate = useNavigate();
-  const [albumPlayListTrack, setAlbumPlayListTrack] = useRecoilState(
-    albumPlayListTrackState
-  );
-  const albumPlayListSelectorTrack = useRecoilValue(
-    albumPlayListSelectorTrackState
-  );
   const title = props?.name ?? "";
   const subtitle = props?.description || props?.artists?.[0]?.name || "";
   const imageSource =
     props?.imgUrl || props?.images?.[0]?.url || props?.album?.images?.[0]?.url;
   const type = props?.album?.type || props?.type;
   const id = props?.spotifyId || props?.album?.id || props?.id;
-  const isPlaying =
-    albumPlayListTrack?.id === id &&
-    albumPlayListTrack?.isPlaying === PLAYMODE.PLAYING;
+  const [isPlaying, onPlayClick, onPauseClick] = usePlayPauseClick(id);
   const handleClick = () => {
     navigate(`/${type}/${id}`);
-  };
-
-  const handlePlayCallback = useRecoilCallback(
-    ({ snapshot, set }) =>
-      async (type, id) => {
-        try {
-          const albumPlayListDetails = await snapshot.getPromise(
-            albumPlayListDetailsSate({
-              type,
-              id,
-            })
-          );
-          const items =
-            albumPlayListDetails?.tracks?.items ||
-            albumPlayListDetails?.tracks ||
-            [];
-          const searchTrack = searchTrackTemplate(
-            items[0]?.track?.name || items[0].name,
-            items[0]?.track?.artists[0].name || items[0]?.artists[0].name
-          );
-          const itemId = items[0]?.track?.id || items[0]?.id;
-          set(albumPlayListSelectorTrackState, {
-            id: itemId,
-            searchTrack,
-            type,
-            albumPlayListId: id,
-          });
-        } catch (e) {
-          console.log(e);
-        }
-      },
-    []
-  );
-
-  const handlePlayClick = async () => {
-    if (albumPlayListTrack?.id === id) {
-      const { idx, totalLength } = albumPlayListSelectorTrack;
-      let currentIdx = idx - 1;
-      if (idx == 0) currentIdx = totalLength - 1;
-      setAlbumPlayListTrack((prevState) =>
-        getNewStateForPlayPause(prevState, PLAYMODE.PLAYING, currentIdx)
-      );
-    } else {
-      const resp = await musixAxios(musixToken()).put("/playItems/", {
-        type,
-        spotifyId: id,
-        name: title,
-        description: props.description,
-        imgUrl: imageSource,
-        artists: props.artists,
-      });
-      if (!(resp.status >= 400)) await handlePlayCallback(type, id);
-    }
-  };
-
-  const handlePauseClick = () => {
-    const { idx, totalLength } = albumPlayListSelectorTrack;
-    let currentIdx = idx - 1;
-    if (idx == 0) currentIdx = totalLength - 1;
-    setAlbumPlayListTrack((prevState) =>
-      getNewStateForPlayPause(prevState, PLAYMODE.PAUSE, currentIdx)
-    );
   };
 
   return (
@@ -154,8 +85,13 @@ export function BigCardWrapper(props) {
       subtitle={subtitle}
       onClick={handleClick}
       imageWidth={props.width}
-      onPlayClick={handlePlayClick}
-      onPauseClick={handlePauseClick}
+      onPlayClick={() =>
+        onPlayClick(type, title, imageSource, {
+          artists: props.artists,
+          description: props.description,
+        })
+      }
+      onPauseClick={onPauseClick}
       isPlaying={isPlaying}
     />
   );

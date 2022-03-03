@@ -19,7 +19,7 @@ const Input = {
   variants: {
     normal: {
       field: {
-        bg: "shade.hoverPrimary",
+        bg: "shade.primary",
         borderRadius: "25px",
         _focus: {
           boxShadow: `0 0 5px rgba(0,0,0,0.5)`,
