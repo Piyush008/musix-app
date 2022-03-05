@@ -63,7 +63,10 @@ export default function DesktopSideBar() {
               <ListIcon as={MdPlaylistAdd} textStyle={"icon.md"} />
               Create Playlist
             </CustomItem>
-            <CustomItem>
+            <CustomItem
+              onClick={() => handleNavigate("collection/tracks")}
+              layerStyle={pathName.includes(`/collection/tracks`) && "selected"}
+            >
               <ListIcon as={FcLike} textStyle={"icon.md"} />
               Liked Songs
             </CustomItem>

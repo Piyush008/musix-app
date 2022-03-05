@@ -9,7 +9,7 @@ import SearchTextContentPage from "../pages/SearchTextContentPage";
 import GenrePage from "../pages/GenrePage";
 import AlbumPlayListPage from "../pages/AlbumPlayListPage";
 import useGoogleLogin from "react-google-login/src/use-google-login";
-import { useSetRecoilState } from "recoil";
+import { useRecoilCallback, useSetRecoilState } from "recoil";
 import {
   authConfig,
   handleAfterAuth,
@@ -19,12 +19,26 @@ import { useEffect } from "react";
 import { musixAxios } from "../utils/axios.utils.js";
 import { authState } from "../atoms/auth.atoms.js";
 import ArtistPage from "../pages/ArtistPage";
+import { likedItemsSelectorState } from "../selector/albumPlayList.selector.js";
+import { likedItemsState } from "../atoms/albumPlayList.atom.js";
 
 export default function App() {
   console.log(import.meta.env);
   const basename = import.meta.env.MODE === "development" ? "/" : "/musix-app";
   const setAuth = useSetRecoilState(authState);
 
+  const setLikedItems = useRecoilCallback(
+    ({ set, snapshot }) =>
+      async () => {
+        try {
+          const rows = await snapshot.getPromise(likedItemsSelectorState);
+          set(likedItemsState, rows);
+        } catch (e) {
+          console.log(e);
+        }
+      },
+    []
+  );
   const handleSuccess = async (resp) => {
     if (resp) {
       const {
@@ -41,6 +55,7 @@ export default function App() {
         if (resp2.data.success) {
           setAuth((prevState) => ({ ...prevState, isAuth: true }));
           handleAfterAuth(accessToken, email);
+          setLikedItems();
         }
       } catch (e) {
         setAuth((prevState) => ({ ...prevState, isAuth: false }));
@@ -93,6 +108,7 @@ export default function App() {
               path={`uPlaylist/:playlistId`}
               element={<AlbumPlayListPage />}
             />
+            <Route path={`collection/tracks`} element={<AlbumPlayListPage />} />
             <Route
               path={`${ROUTER.ARTIST}/:artistId`}
               element={<ArtistPage />}

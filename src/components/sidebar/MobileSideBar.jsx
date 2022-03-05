@@ -36,7 +36,7 @@ export default function MobileSideBar() {
         onClick={() => handleNavigate(ROUTER.HOME)}
         layerStyle={pathName == ROUTER.HOME && "iconActive"}
       >
-        <Icon as={MdHome} textStyle={"icon.sm"} />
+        <Icon as={MdHome} textStyle={"icon.md"} />
         <Text>Home</Text>
       </CustomItem>
       <CustomItem
@@ -45,15 +45,20 @@ export default function MobileSideBar() {
         onClick={() => handleNavigate(ROUTER.SEARCH)}
         layerStyle={pathName.includes(`/${ROUTER.SEARCH}`) && "iconActive"}
       >
-        <Icon as={MdSearch} textStyle={"icon.sm"} />
+        <Icon as={MdSearch} textStyle={"icon.md"} />
         <Text textStyle={"label"}>Search</Text>
       </CustomItem>
       <CustomItem variant="tab" size="sm">
-        <Icon as={MdLibraryBooks} textStyle={"icon.sm"} />
+        <Icon as={MdLibraryBooks} textStyle={"icon.md"} />
         <Text>Playlist</Text>
       </CustomItem>
-      <CustomItem variant="tab" size="sm">
-        <Icon as={FcLike} textStyle={"icon.sm"} />
+      <CustomItem
+        variant="tab"
+        size="sm"
+        onClick={() => handleNavigate("collection/tracks")}
+        layerStyle={pathName.includes(`/collection/tracks`) && "iconActive"}
+      >
+        <Icon as={FcLike} textStyle={"icon.md"} />
         <Text>Liked Songs</Text>
       </CustomItem>
     </HStack>

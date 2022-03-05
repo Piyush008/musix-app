@@ -4,10 +4,16 @@ import {
   searchTrackState,
   albumPlaylistParamState,
 } from "../atoms/albumPlayList.atom.js";
+import { musixToken } from "../utils/auth.utils.js";
+import { musixAxios } from "../utils/axios.utils.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import { PLAYMODE } from "../utils/constants/trackState.constants.js";
 import { searchTrackTemplate } from "../utils/conversion.utils.js";
-import { getAlbum, getPlayListDetails } from "../utils/spotify.utils.js";
+import {
+  getAlbum,
+  getPlayListDetails,
+  getTracks,
+} from "../utils/spotify.utils.js";
 import { getRecommendState, uPlaylistState } from "./content.selector.js";
 
 export const albumPlayListSelectorTrackState = selector({
@@ -115,6 +121,42 @@ export const albumPlayListDetailsSate = selectorFamily({
             tracks: items,
           };
         }
+      } else if (type === "collection") {
+        const rows = get(likedItemsSelectorState);
+        const ids = Object.entries(rows)
+          .filter((row) => row[1] == "track")
+          .map((row) => row[0])
+          .join();
+        const tracks = get(trackState(ids)) ?? [];
+        return {
+          id: "tracks",
+          type,
+          name: "Liked Songs",
+          description: "",
+          imgUrl: `${tracks[0]?.album?.images[0]?.url}`,
+          tracks,
+        };
       }
     },
+});
+
+export const likedItemsSelectorState = selector({
+  key: "likedItemsSelectorState",
+  get: async () => {
+    try {
+      const resp = await musixAxios(musixToken()).get("/liked/");
+      return resp.data?.rows;
+    } catch (e) {
+      throw e;
+    }
+  },
+});
+
+export const trackState = selectorFamily({
+  key: "trackState",
+  get: (ids) => async () => {
+    const [data, error] = await getTracks({ ids });
+    if (error) throw undefined;
+    return data?.tracks;
+  },
 });

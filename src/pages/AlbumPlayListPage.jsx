@@ -15,15 +15,23 @@ import { FcLike } from "react-icons/fc";
 import { GiSelfLove } from "react-icons/gi";
 import { useLocation, useParams } from "react-router-dom";
 import {
+  useRecoilCallback,
   useRecoilState,
+  useRecoilValue,
   useRecoilValueLoadable,
   useResetRecoilState,
 } from "recoil";
-import { albumPlaylistParamState } from "../atoms/albumPlayList.atom.js";
+import {
+  albumPlaylistParamState,
+  likedItemsState,
+} from "../atoms/albumPlayList.atom.js";
 import Track from "../components/track/Track.jsx";
 import CustomSuspense from "../components/util/CustomSuspense";
+import useLiked from "../hooks/useLiked.js";
 import usePlayPauseClick from "../hooks/usePlayPauseClick.js";
 import { albumPlayListDetailsSate } from "../selector/albumPlayList.selector.js";
+import { musixToken } from "../utils/auth.utils.js";
+import { musixAxios } from "../utils/axios.utils.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
 
@@ -50,13 +58,19 @@ export default function AlbumPlayListPage() {
         type: "uPlaylist",
         id: params["playlistId"],
       });
+    else if (location.pathname.includes("collection"))
+      setAlbumPlaylistParam({
+        type: "collection",
+        id: "tracks",
+      });
     return () => {
       resetParam();
     };
-  }, []);
+  }, [location.pathname]);
   if (albumPlaylistParam?.type === ROUTER.PLAYLIST) return <PlayListPage />;
   else if (albumPlaylistParam?.type === ROUTER.ALBUM) return <AlbumPage />;
   else if (albumPlaylistParam?.type === "uPlaylist") return <PlayListPage />;
+  else if (albumPlaylistParam?.type === "collection") return <PlayListPage />;
   return null;
 }
 
@@ -301,12 +315,14 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
 
 function AlbumPlaylistMiddleContent({ id, type, title, imageSource, details }) {
   const [isPlaying, onPlayClick, onPauseClick] = usePlayPauseClick(id);
-  const isLiked = false;
-
+  const onLiked = useLiked();
+  const likedItems = useRecoilValue(likedItemsState);
+  const isLiked = !!likedItems[id] && likedItems[id] === type;
   const handleClick = () => {
     if (isPlaying) onPauseClick();
     else onPlayClick(type, title, imageSource, details);
   };
+
   return (
     <HStack spacing={pxToAll(20)} my={pxToAll(20)}>
       <IconButton
@@ -315,12 +331,13 @@ function AlbumPlaylistMiddleContent({ id, type, title, imageSource, details }) {
         onClick={handleClick}
       />
       <Icon
-        as={true ? GiSelfLove : FcLike}
+        as={isLiked ? FcLike : GiSelfLove}
         textStyle={"icon.lg"}
         _hover={{
           color: "text.secondary",
           transition: "all 0.25s",
         }}
+        onClick={() => onLiked(id, type)}
       />
     </HStack>
   );

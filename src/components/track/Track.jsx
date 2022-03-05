@@ -11,7 +11,11 @@ import { FaPause, FaPlay } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
 import { GiSelfLove } from "react-icons/gi";
 import { useRecoilCallback, useRecoilValue } from "recoil";
-import { albumPlayListTrackState } from "../../atoms/albumPlayList.atom.js";
+import {
+  albumPlayListTrackState,
+  likedItemsState,
+} from "../../atoms/albumPlayList.atom.js";
+import useLiked from "../../hooks/useLiked.js";
 import usePlayPauseClick from "../../hooks/usePlayPauseClick.js";
 import {
   albumPlayListDetailsSate,
@@ -33,7 +37,8 @@ export default function Track(props) {
   const currentItem = useRecoilValue(
     albumPlayListSelectorTrackState
   )?.currentItem;
-
+  const onLiked = useLiked();
+  const likedItems = useRecoilValue(likedItemsState);
   const [isEnter, setEnter] = React.useState(false);
   const isCurrentItem = currentItem?.itemId === props.id;
   const isPlaying =
@@ -42,7 +47,7 @@ export default function Track(props) {
   const album = props?.album;
   const imageUrl = props?.imgUrl || album?.images?.[0]?.url;
   const artistName = artists.map((artist) => artist.name);
-
+  const isLiked = !!likedItems[props.id] && likedItems[props.id] === "track";
   const handlePlayCallback = useRecoilCallback(
     ({ snapshot, set }) =>
       async (header, artists, trackName, artistName, trackId) => {
@@ -177,11 +182,15 @@ export default function Track(props) {
       >
         {isEnter && (
           <Icon
-            as={true ? GiSelfLove : FcLike}
+            as={isLiked ? FcLike : GiSelfLove}
             textStyle={"icon.md"}
             _hover={{
               color: "text.play",
               transition: "all 0.25s",
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onLiked(props.id, "track");
             }}
           />
         )}

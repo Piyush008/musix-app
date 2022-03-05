@@ -80,7 +80,7 @@ const theme = extendTheme({
         fontSize: pxToAll(24),
       },
       sm: {
-        fontSize: pxToAll(24),
+        fontSize: pxToAll(18),
       },
     },
   },

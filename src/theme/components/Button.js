@@ -16,6 +16,12 @@ const Button = {
       height: "max-content",
       minWidth: "max-content",
     },
+    mdlg: {
+      fontSize: pxToAll(20),
+      height: pxToAll(40),
+      minWidth: pxToAll(40),
+      borderRadius: "50%",
+    },
     xl: {
       height: pxToAll(60),
       fontSize: pxToAll(24),

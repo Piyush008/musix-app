@@ -14,3 +14,8 @@ export const albumPlaylistParamState = atom({
   key: "albumPlaylistParamState",
   default: null,
 });
+
+export const likedItemsState = atom({
+  key: "likedItemsState",
+  default: null,
+});
