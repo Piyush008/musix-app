@@ -2,6 +2,9 @@ import { Box, IconButton, Image, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import { pxToAll } from "./../../../utils/theme.utils.js";
 import { FaPlay, FaPause } from "react-icons/fa";
+import { useRecoilValue } from "recoil";
+import { authState } from "../../../atoms/auth.atoms.js";
+import useCustomToast from "../../../hooks/useCustomToast.js";
 
 function BigCard({
   imageSource,
@@ -13,21 +16,27 @@ function BigCard({
   onPlayClick,
   onPauseClick,
   isPlaying,
+  isLoading,
   ...otherProps
 }) {
   const [PlayButtonVisble, setPlayButtonVisble] = useState(false);
+  const auth = useRecoilValue(authState);
+  const toast = useCustomToast();
   const handlePlayClick = (e) => {
     e.stopPropagation();
-    if (!isPlaying) onPlayClick();
-    else onPauseClick();
+    if (auth.isAuth) {
+      if (!isLoading) {
+        if (!isPlaying) onPlayClick();
+        else onPauseClick();
+      }
+    } else toast();
   };
   return (
     <Box
       role="group"
       bgColor="blackAlpha.200"
       borderRadius="4"
-      padding="2.5"
-      cursor="pointer"
+      padding={"10px"}
       height={"max-content"}
       _hover={{ bgColor: "whiteAlpha.100" }}
       onMouseEnter={() => setPlayButtonVisble(true)}
@@ -43,7 +52,7 @@ function BigCard({
           src={imageSource}
         />
       </Box>
-      <Box height="0" pos="absolute" textAlign="right" right={pxToAll(15)}>
+      <Box height="0" pos="absolute" textAlign="right" right={"10px"}>
         <IconButton
           visibility={PlayButtonVisble ? "visible" : "hidden"}
           top={"0"}
@@ -52,6 +61,7 @@ function BigCard({
             top: `${imageWidth === "100%" ? "-2rem" : "0"}`,
             transition: "top 1s visibility 1s",
           }}
+          isLoading={isLoading}
           icon={isPlaying ? <FaPause /> : <FaPlay />}
           onClick={handlePlayClick}
         />

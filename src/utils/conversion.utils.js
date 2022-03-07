@@ -1,6 +1,6 @@
 import { extractContentByTime } from "./date.utils.js";
 
-const content = [
+export const content = [
   "toplists",
   ["workout", "dinner", "sleep"],
   "fresh_finds",
@@ -10,8 +10,16 @@ const content = [
   { as: "featured", property: "featured" },
   "at_home",
 ];
-export const showContentConversionUtil = () => {
-  return content.map((item) => {
+
+export const authContent = [
+  "toplists",
+  ["workout", "dinner", "sleep"],
+  { as: "release", property: "release" },
+  { as: "featured", property: "featured" },
+  ["mood", "focus", "at_home"],
+];
+export const showContentConversionUtil = (contents) => {
+  return contents.map((item) => {
     if (typeof item === "string") return { as: "category", property: item };
     else if (Array.isArray(item))
       return { as: "category", property: extractContentByTime(item) };

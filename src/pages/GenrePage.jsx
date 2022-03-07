@@ -1,7 +1,8 @@
 import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   useRecoilState,
+  useRecoilValue,
   useRecoilValueLoadable,
   useResetRecoilState,
   useSetRecoilState,
@@ -13,23 +14,29 @@ import ContentWrapper from "../components/ContentWrapper/ContentWrapper";
 import useAgent from "../hooks/useAgent";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
 import { useEffect } from "react";
+import { authState } from "../atoms/auth.atoms.js";
 
 export default function GenrePage() {
   const { property } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
+  const auth = useRecoilValue(authState);
   const [genreParam, setGenreParam] = useRecoilState(genreParamState);
   const resetGenreParam = useResetRecoilState(genreParamState);
   useEffect(() => {
     if (property) {
-      if (location.pathname.includes("recommend"))
-        setGenreParam({ as: "recommend", property, limit: 20 });
-      else if (
+      if (location.pathname.includes("recommend")) {
+        if (auth.isAuth)
+          setGenreParam({ as: "recommend", property, limit: 20 });
+        else navigate("/");
+      } else if (
         property === "recently" ||
         property === "mixes" ||
         property === "topPlayItems"
-      )
-        setGenreParam({ as: "user", property, limit: 20 });
-      else if (property === "featured" || property === "release")
+      ) {
+        if (auth.isAuth) setGenreParam({ as: "user", property, limit: 20 });
+        else navigate("/");
+      } else if (property === "featured" || property === "release")
         setGenreParam({ as: property, property, limit: 20 });
       else setGenreParam({ as: "category", property, limit: 20 });
     }

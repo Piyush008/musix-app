@@ -13,9 +13,8 @@ import {
 import { FaPause, FaPlay } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
 import { GiSelfLove } from "react-icons/gi";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
-  useRecoilCallback,
   useRecoilState,
   useRecoilValue,
   useRecoilValueLoadable,
@@ -30,10 +29,10 @@ import CustomSuspense from "../components/util/CustomSuspense";
 import useLiked from "../hooks/useLiked.js";
 import usePlayPauseClick from "../hooks/usePlayPauseClick.js";
 import { albumPlayListDetailsSate } from "../selector/albumPlayList.selector.js";
-import { musixToken } from "../utils/auth.utils.js";
-import { musixAxios } from "../utils/axios.utils.js";
 import ROUTER from "../utils/constants/router.constants.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../utils/theme.utils.js";
+import { authState } from "../atoms/auth.atoms.js";
+import useCustomToast from "../hooks/useCustomToast.js";
 
 export default function AlbumPlayListPage() {
   const location = useLocation();
@@ -41,6 +40,8 @@ export default function AlbumPlayListPage() {
   const [albumPlaylistParam, setAlbumPlaylistParam] = useRecoilState(
     albumPlaylistParamState
   );
+  const navigate = useNavigate();
+  const auth = useRecoilValue(authState);
   const resetParam = useResetRecoilState(albumPlaylistParamState);
   React.useEffect(() => {
     if (location.pathname.includes(`${ROUTER.PLAYLIST}`))
@@ -53,16 +54,21 @@ export default function AlbumPlayListPage() {
         type: ROUTER.ALBUM,
         id: params["albumId"],
       });
-    else if (location.pathname.includes("uPlaylist"))
-      setAlbumPlaylistParam({
-        type: "uPlaylist",
-        id: params["playlistId"],
-      });
-    else if (location.pathname.includes("collection"))
-      setAlbumPlaylistParam({
-        type: "collection",
-        id: "tracks",
-      });
+    else if (location.pathname.includes("uPlaylist")) {
+      if (auth.isAuth)
+        setAlbumPlaylistParam({
+          type: "uPlaylist",
+          id: params["playlistId"],
+        });
+      else navigate("/");
+    } else if (location.pathname.includes("collection")) {
+      if (auth.isAuth)
+        setAlbumPlaylistParam({
+          type: "collection",
+          id: "tracks",
+        });
+      else navigate("/");
+    }
     return () => {
       resetParam();
     };
@@ -314,31 +320,46 @@ function AlbumPlaylistHeaderContent({ url, type, name, desc }) {
 }
 
 function AlbumPlaylistMiddleContent({ id, type, title, imageSource, details }) {
-  const [isPlaying, onPlayClick, onPauseClick] = usePlayPauseClick(id);
+  const [isPlaying, isLoading, onPlayClick, onPauseClick] =
+    usePlayPauseClick(id);
   const onLiked = useLiked();
+  const toast = useCustomToast();
+  const auth = useRecoilValue(authState);
   const likedItems = useRecoilValue(likedItemsState);
-  const isLiked = !!likedItems[id] && likedItems[id] === type;
+  const location = useLocation();
+  const showLikeButton = location.pathname.includes("/collection");
+  const isLiked = !!likedItems?.[id] && likedItems?.[id] === type;
   const handleClick = () => {
-    if (isPlaying) onPauseClick();
-    else onPlayClick(type, title, imageSource, details);
+    if (auth.isAuth) {
+      if (!isLoading) {
+        if (isPlaying) onPauseClick();
+        else onPlayClick(type, title, imageSource, details);
+      }
+    } else toast();
   };
 
   return (
     <HStack spacing={pxToAll(20)} my={pxToAll(20)}>
       <IconButton
         size={"xl"}
+        isLoading={isLoading}
         icon={isPlaying ? <FaPause /> : <FaPlay />}
         onClick={handleClick}
       />
-      <Icon
-        as={isLiked ? FcLike : GiSelfLove}
-        textStyle={"icon.lg"}
-        _hover={{
-          color: "text.secondary",
-          transition: "all 0.25s",
-        }}
-        onClick={() => onLiked(id, type)}
-      />
+      {!showLikeButton && (
+        <Icon
+          as={isLiked ? FcLike : GiSelfLove}
+          textStyle={"icon.lg"}
+          _hover={{
+            color: "text.secondary",
+            transition: "all 0.25s",
+          }}
+          onClick={() => {
+            if (auth.isAuth) onLiked(id, type);
+            else toast();
+          }}
+        />
+      )}
     </HStack>
   );
 }

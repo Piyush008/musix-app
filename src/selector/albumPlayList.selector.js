@@ -66,7 +66,7 @@ export const albumPlayListSelectorTrackState = selector({
     set(searchTrackState, searchTrack);
     set(albumPlayListTrackState, {
       id: albumPlayListDetails.id,
-      isPlaying: PLAYMODE.PLAYING,
+      isPlaying: PLAYMODE.LOADING,
       items: modItems,
     });
   },

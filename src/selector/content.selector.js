@@ -1,7 +1,12 @@
 import { atom, selector, selectorFamily, waitForAll } from "recoil";
+import { authState } from "../atoms/auth.atoms.js";
 import { musixToken } from "../utils/auth.utils.js";
 import { musixAxios } from "../utils/axios.utils.js";
-import { showContentConversionUtil } from "../utils/conversion.utils.js";
+import {
+  authContent,
+  content,
+  showContentConversionUtil,
+} from "../utils/conversion.utils.js";
 import {
   getCategoryDetails,
   getCategoryPlayList,
@@ -12,7 +17,9 @@ import {
 export const showContentState = selector({
   key: "showContentState",
   get: ({ get }) => {
-    const metaData = showContentConversionUtil();
+    const auth = get(authState);
+    const contents = auth.isAuth ? authContent : content;
+    const metaData = showContentConversionUtil(contents);
     const data = metaData.map((content) => ({
       ...content,
       ...get(contentWrapperState({ ...content, limit: 6 })),

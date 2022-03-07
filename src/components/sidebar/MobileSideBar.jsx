@@ -2,11 +2,16 @@ import { HStack, Icon, Text } from "@chakra-ui/react";
 import { FcLike } from "react-icons/fc";
 import { MdHome, MdLibraryBooks, MdSearch } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { authState } from "../../atoms/auth.atoms.js";
+import useCustomToast from "../../hooks/useCustomToast.js";
 import ROUTER from "../../utils/constants/router.constants.js";
 import { pxToAll } from "../../utils/theme.utils.js";
 import CustomItem from "../util/CustomItem.jsx";
 
 export default function MobileSideBar() {
+  const auth = useRecoilValue(authState);
+  const toast = useCustomToast();
   const navigate = useNavigate();
   const location = useLocation();
   let pathName = location.pathname;
@@ -55,7 +60,10 @@ export default function MobileSideBar() {
       <CustomItem
         variant="tab"
         size="sm"
-        onClick={() => handleNavigate("collection/tracks")}
+        onClick={() => {
+          if (auth.isAuth) handleNavigate("collection/tracks");
+          else toast();
+        }}
         layerStyle={pathName.includes(`/collection/tracks`) && "iconActive"}
       >
         <Icon as={FcLike} textStyle={"icon.md"} />

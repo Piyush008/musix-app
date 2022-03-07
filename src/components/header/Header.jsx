@@ -17,6 +17,7 @@ export default function Header({ cb }) {
   const [headerOpacity, setHeaderOpacity] = useState(0);
   const handleLogoutSuccess = () => {
     setAuth((prevState) => ({ ...prevState, isAuth: false }));
+    window.location.reload();
   };
 
   const handleFailure = (resp) => {

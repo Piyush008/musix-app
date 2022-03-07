@@ -12,8 +12,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ROUTER from "../../utils/constants/router.constants.js";
 import AgentDetect from "../util/AgentDetect.jsx";
 import CustomItem from "../util/CustomItem.jsx";
+import { useRecoilValue } from "recoil";
+import { authState } from "../../atoms/auth.atoms.js";
+import useCustomToast from "../../hooks/useCustomToast.js";
 
 export default function DesktopSideBar() {
+  const auth = useRecoilValue(authState);
+  const toast = useCustomToast();
   const navigate = useNavigate();
   const location = useLocation();
   let pathName = location.pathname;
@@ -64,7 +69,10 @@ export default function DesktopSideBar() {
               Create Playlist
             </CustomItem>
             <CustomItem
-              onClick={() => handleNavigate("collection/tracks")}
+              onClick={() => {
+                if (auth.isAuth) handleNavigate("collection/tracks");
+                else toast();
+              }}
               layerStyle={pathName.includes(`/collection/tracks`) && "selected"}
             >
               <ListIcon as={FcLike} textStyle={"icon.md"} />

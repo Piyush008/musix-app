@@ -1,31 +1,8 @@
-import {
-  Box,
-  Flex,
-  Grid,
-  GridItem,
-  HStack,
-  Icon,
-  IconButton,
-  Image,
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, HStack, Icon, Image, Text } from "@chakra-ui/react";
 import useAgent from "../../hooks/useAgent.js";
-import { pxToAll } from "../../utils/theme.utils.js";
-import { FaPause, FaPlay, FaHamburger } from "react-icons/fa";
+import { pxToAll, pxToRemSm } from "../../utils/theme.utils.js";
 import { FcLike } from "react-icons/fc";
-import {
-  GiSelfLove,
-  GiSoundOn,
-  GiSoundOff,
-  GiSoundWaves,
-} from "react-icons/gi";
-import { CgPlayTrackNext, CgPlayTrackPrev } from "react-icons/cg";
-import { BiShuffle } from "react-icons/bi";
-import { MdRepeat } from "react-icons/md";
+import { GiSelfLove } from "react-icons/gi";
 import {
   selector,
   useRecoilRefresher_UNSTABLE,
@@ -37,10 +14,7 @@ import { musixToken, youtubeSearch } from "../../utils/auth.utils.js";
 import { musixAxios } from "../../utils/axios.utils.js";
 import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
 import { authState } from "../../atoms/auth.atoms.js";
-import {
-  getNewStateForPlayPause,
-  secondsToMins,
-} from "../../utils/conversion.utils.js";
+import { getNewStateForPlayPause } from "../../utils/conversion.utils.js";
 import { albumPlayListSelectorTrackState } from "../../selector/albumPlayList.selector.js";
 import {
   albumPlayListTrackState,
@@ -48,11 +22,13 @@ import {
   searchTrackState,
 } from "../../atoms/albumPlayList.atom.js";
 import useLiked from "../../hooks/useLiked.js";
+import AgentDetect from "../util/AgentDetect.jsx";
+import MobileMusixPlayer from "./MobileMusixPlayer.jsx";
+import DesktopMusixPlayer from "./DesktopMusixPlayer.jsx";
 
 const init = {
   track: null,
-  isLoading: false,
-  totalDuration: 1,
+  totalDuration: 0,
   currentTime: 0,
   isEnded: false,
   isSliding: false,
@@ -90,7 +66,6 @@ const audioTrackState = selector({
 });
 
 export default function MusixPlayer() {
-  const isMobile = useAgent();
   const player = React.useRef();
   const audioTrackLoadable = useRecoilValueLoadable(audioTrackState);
   const audioTrackRefresh = useRecoilRefresher_UNSTABLE(audioTrackState);
@@ -109,9 +84,7 @@ export default function MusixPlayer() {
 
   React.useEffect(() => {
     if (!!searchTrack) {
-      if (loadingState === "loading")
-        setPlayerState({ ...PlayerState, isLoading: true });
-      else if (loadingState === "hasValue")
+      if (loadingState === "hasValue")
         if (searchTrack)
           setPlayerState({
             ...PlayerState,
@@ -127,9 +100,17 @@ export default function MusixPlayer() {
   React.useEffect(() => {
     if (player.current) {
       player.current.src = PlayerState.track;
-      player.current.onstalled = () => console.log("stalled");
+      player.current.onstalled = () => {
+        setAlbumPlayListTrack((prevState) => ({
+          ...prevState,
+          isPlaying: PLAYMODE.LOADING,
+        }));
+      };
       player.current.onloadeddata = () => {
-        setPlayerState((prevState) => ({ ...prevState, isLoading: false }));
+        setAlbumPlayListTrack((prevState) => ({
+          ...prevState,
+          isPlaying: PLAYMODE.PLAYING,
+        }));
         player.current.play();
         playItemsTrack();
       };
@@ -254,124 +235,61 @@ export default function MusixPlayer() {
   return (
     <React.Fragment>
       <audio ref={player} />
-      <Grid
-        gridTemplateColumns={`minmax(200px, 1fr) minmax(300px, 1fr) 1fr`}
-        columnGap={"30px"}
-        px={pxToAll(20)}
-        bg={"brand.secondary"}
-        w={"100%"}
-        height={pxToAll(100)}
-        pos={"fixed"}
-        bottom={isMobile ? pxToAll(75) : "0"}
-        zIndex={"1"}
-        boxShadow={`0 -5px 25px rgba(0,0,0,0.2)`}
-        alignItems={"center"}
-      >
-        <GridItem>
-          {!!currentItem && <TrackLabel currentItem={currentItem} />}
-        </GridItem>
-        <GridItem>
-          <Flex direction={"row"} wrap="nowrap">
-            <Text textStyle={"label"}>
-              {secondsToMins(PlayerState.currentTime)}
-            </Text>
-            <Slider
-              aria-label="slider-ex-2"
-              defaultValue={0}
-              value={PlayerState.currentTime}
-              onChange={handlePlayerChange}
-              max={PlayerState.totalDuration}
-              isDisabled={PlayerState.isLoading}
-              onChangeEnd={handlePlayerChangeEnd}
-              focusThumbOnChange={false}
-              mx={pxToAll(15)}
-            >
-              <SliderTrack bg={"shade.hoverPrimary"}>
-                <SliderFilledTrack bg={"text.play"} />
-              </SliderTrack>
-              <SliderThumb bg={"text.primary"} hidden>
-                <Box color={"text.play"} as={GiSoundWaves} />
-              </SliderThumb>
-            </Slider>
-            <Text textStyle={"label"}>
-              {secondsToMins(PlayerState.totalDuration)}
-            </Text>
-          </Flex>
-          <Flex
-            direction={"row"}
-            w="100%"
-            justifyContent={"center"}
-            wrap="nowrap"
-            columnGap={pxToAll(20)}
-            marginTop={pxToAll(5)}
-            alignItems={"center"}
-          >
-            <Icon as={BiShuffle} textStyle={"icon.sm"} />
-            <IconButton size={"mdlg"} icon={<CgPlayTrackPrev />} />
-            <IconButton
-              onClick={handlePlayPauseClick}
-              isLoading={PlayerState.isLoading}
-              size={"mdlg"}
-              icon={isPlaying ? <FaPause /> : <FaPlay />}
-            />
-            <IconButton size={"mdlg"} icon={<CgPlayTrackNext />} />
-            <Icon as={MdRepeat} textStyle={"icon.sm"} />
-          </Flex>
-        </GridItem>
-        <GridItem>
-          <Flex
-            direction={"row"}
-            justifyContent={"flex-end"}
-            columnGap={pxToAll(20)}
-            alignItems={"center"}
-          >
-            <Icon as={FaHamburger} textStyle={"icon.md"} />
-            <Icon as={GiSoundOn} textStyle={"icon.md"} />
-            <Slider aria-label="slider-ex-2" defaultValue={0} w={pxToAll(100)}>
-              <SliderTrack bg={"shade.hoverPrimary"}>
-                <SliderFilledTrack bg={"text.play"} />
-              </SliderTrack>
-            </Slider>
-          </Flex>
-        </GridItem>
-      </Grid>
+      <AgentDetect
+        mobileComponent={
+          <MobileMusixPlayer
+            currentItem={currentItem}
+            isPlaying={isPlaying}
+            handlePlayPauseClick={handlePlayPauseClick}
+          />
+        }
+        desktopComponent={
+          <DesktopMusixPlayer
+            PlayerState={PlayerState}
+            currentItem={currentItem}
+            handlePlayerChange={handlePlayerChange}
+            isPlaying={isPlaying}
+            handlePlayerChangeEnd={handlePlayerChangeEnd}
+            handlePlayPauseClick={handlePlayPauseClick}
+          />
+        }
+      />
     </React.Fragment>
   );
 }
 
-function TrackLabel({ currentItem }) {
+export function TrackLabel({ currentItem }) {
   const { imageSource, song, itemId, artists } = currentItem;
   const artistName = artists.map((artist) => artist.name).join();
   const onLiked = useLiked();
   const likedItems = useRecoilValue(likedItemsState);
   const isLiked = !!likedItems[itemId] && likedItems[itemId] === "track";
+  const isMobile = useAgent();
   return (
-    <HStack>
-      <Box width={pxToAll(60)}>
+    <HStack columnGap={pxToAll(10)}>
+      <Box width={isMobile ? pxToAll(100) : pxToAll(60)}>
         <Image src={imageSource} />
       </Box>
       <Box maxW={pxToAll(150)}>
-        <Text textStyle={"h6"} color={"text.play"}>
+        <Text textStyle={isMobile ? "h5" : "h6"} color={"text.play"}>
           {song}
         </Text>
         <Text textStyle={"label"} isTruncated>
           {artistName}
         </Text>
       </Box>
-      <Box ml={pxToAll(20)}>
-        <Icon
-          as={isLiked ? FcLike : GiSelfLove}
-          textStyle={"icon.md"}
-          _hover={{
-            color: "text.play",
-            transition: "all 0.25s",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onLiked(itemId, "track");
-          }}
-        />
-      </Box>
+      <Icon
+        as={isLiked ? FcLike : GiSelfLove}
+        textStyle={"icon.md"}
+        _hover={{
+          color: "text.play",
+          transition: "all 0.25s",
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onLiked(itemId, "track");
+        }}
+      />
     </HStack>
   );
 }

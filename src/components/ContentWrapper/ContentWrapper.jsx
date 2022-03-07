@@ -72,7 +72,8 @@ export function BigCardWrapper(props) {
     props?.imgUrl || props?.images?.[0]?.url || props?.album?.images?.[0]?.url;
   const type = props?.album?.type || props?.type;
   const id = props?.spotifyId || props?.album?.id || props?.id;
-  const [isPlaying, onPlayClick, onPauseClick] = usePlayPauseClick(id);
+  const [isPlaying, isLoading, onPlayClick, onPauseClick] =
+    usePlayPauseClick(id);
   const handleClick = () => {
     navigate(`/${type}/${id}`);
   };
@@ -93,6 +94,7 @@ export function BigCardWrapper(props) {
       }
       onPauseClick={onPauseClick}
       isPlaying={isPlaying}
+      isLoading={isLoading}
     />
   );
 }

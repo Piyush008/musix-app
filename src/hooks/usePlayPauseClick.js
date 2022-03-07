@@ -23,6 +23,11 @@ export default function usePlayPauseClick(id) {
   const isPlaying =
     albumPlayListTrack?.id === id &&
     albumPlayListTrack?.isPlaying === PLAYMODE.PLAYING;
+
+  const isLoading =
+    albumPlayListTrack?.id === id &&
+    albumPlayListTrack?.isPlaying === PLAYMODE.LOADING;
+
   const handlePlayCallback = useRecoilCallback(
     ({ snapshot, set }) =>
       async (type, id) => {
@@ -54,7 +59,6 @@ export default function usePlayPauseClick(id) {
       },
     []
   );
-
   const handlePlayClick = async (type, title, imageSource, props) => {
     if (albumPlayListTrack?.id === id) {
       const { idx, totalLength } = albumPlayListSelectorTrack;
@@ -85,5 +89,5 @@ export default function usePlayPauseClick(id) {
     );
   };
 
-  return [isPlaying, handlePlayClick, handlePauseClick];
+  return [isPlaying, isLoading, handlePlayClick, handlePauseClick];
 }

@@ -10,11 +10,13 @@ import {
 import { FaPause, FaPlay } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
 import { GiSelfLove } from "react-icons/gi";
-import { useRecoilCallback, useRecoilValue } from "recoil";
+import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   albumPlayListTrackState,
   likedItemsState,
 } from "../../atoms/albumPlayList.atom.js";
+import { authState } from "../../atoms/auth.atoms.js";
+import useCustomToast from "../../hooks/useCustomToast.js";
 import useLiked from "../../hooks/useLiked.js";
 import usePlayPauseClick from "../../hooks/usePlayPauseClick.js";
 import {
@@ -25,21 +27,27 @@ import { musixToken } from "../../utils/auth.utils.js";
 import { musixAxios } from "../../utils/axios.utils.js";
 import { PLAYMODE } from "../../utils/constants/trackState.constants.js";
 import {
+  getNewStateForPlayPause,
   searchTrackTemplate,
   secondsToMins,
 } from "../../utils/conversion.utils.js";
 import { pxToAll, pxToRem, pxToRemSm } from "../../utils/theme.utils.js";
 
 export default function Track(props) {
-  const [isAlbumPlayListPlaying, , onPauseClick] = usePlayPauseClick(
-    props.header.id
-  );
-  const currentItem = useRecoilValue(
+  const [isAlbumPlayListPlaying, isAlbumPlayListLoading, , onPauseClick] =
+    usePlayPauseClick(props.header.id);
+  const setAlbumPlayListTrack = useSetRecoilState(albumPlayListTrackState);
+  const albumPlayListSelectorTrack = useRecoilValue(
     albumPlayListSelectorTrackState
-  )?.currentItem;
+  );
+  const auth = useRecoilValue(authState);
+  const toast = useCustomToast();
   const onLiked = useLiked();
   const likedItems = useRecoilValue(likedItemsState);
   const [isEnter, setEnter] = React.useState(false);
+  const currentItem = albumPlayListSelectorTrack?.currentItem;
+  const idx = albumPlayListSelectorTrack?.idx;
+  const totalLength = albumPlayListSelectorTrack?.totalLength;
   const isCurrentItem = currentItem?.itemId === props.id;
   const isPlaying =
     isCurrentItem && currentItem?.isPlaying === PLAYMODE.PLAYING;
@@ -47,10 +55,11 @@ export default function Track(props) {
   const album = props?.album;
   const imageUrl = props?.imgUrl || album?.images?.[0]?.url;
   const artistName = artists.map((artist) => artist.name);
-  const isLiked = !!likedItems[props.id] && likedItems[props.id] === "track";
+  const isLiked =
+    !!likedItems?.[props?.id] && likedItems?.[props?.id] === "track";
   const handlePlayCallback = useRecoilCallback(
     ({ snapshot, set }) =>
-      async (header, artists, trackName, artistName, trackId) => {
+      async (header, artists, trackName, artistName, trackId, obj) => {
         const albumPlayListTrack = snapshot.getLoadable(
           albumPlayListTrackState
         );
@@ -75,13 +84,21 @@ export default function Track(props) {
                 albumPlayListId: id,
               });
             }
-          } else
-            set(albumPlayListSelectorTrackState, {
-              id: trackId,
-              searchTrack: searchTrackTemplate(trackName, artistName),
-              type,
-              albumPlayListId: id,
-            });
+          } else {
+            if (obj.isCurrentItem) {
+              let currentIdx = obj.idx - 1;
+              if (idx == 0) currentIdx = obj.totalLength - 1;
+              setAlbumPlayListTrack((prevState) =>
+                getNewStateForPlayPause(prevState, PLAYMODE.PLAYING, currentIdx)
+              );
+            } else
+              set(albumPlayListSelectorTrackState, {
+                id: trackId,
+                searchTrack: searchTrackTemplate(trackName, artistName),
+                type,
+                albumPlayListId: id,
+              });
+          }
         } catch (e) {
           console.log(e);
         } finally {
@@ -92,15 +109,20 @@ export default function Track(props) {
   );
 
   const handleClick = () => {
-    if (isPlaying && isAlbumPlayListPlaying) onPauseClick();
-    else
-      handlePlayCallback(
-        props.header,
-        artists,
-        props.name,
-        artistName[0],
-        props.id
-      );
+    if (auth.isAuth) {
+      if (!isAlbumPlayListLoading) {
+        if (isPlaying && isAlbumPlayListPlaying) onPauseClick();
+        else
+          handlePlayCallback(
+            props.header,
+            artists,
+            props.name,
+            artistName[0],
+            props.id,
+            { isCurrentItem, idx, totalLength }
+          );
+      }
+    } else toast();
   };
   return (
     <Grid
@@ -190,7 +212,8 @@ export default function Track(props) {
             }}
             onClick={(e) => {
               e.stopPropagation();
-              onLiked(props.id, "track");
+              if (auth.isAuth) onLiked(props.id, "track");
+              else toast();
             }}
           />
         )}
