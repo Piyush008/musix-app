@@ -1,9 +1,8 @@
 import { KJUR as kjur } from "jsrsasign";
 import axios from "axios";
-import { API_KEY, CLIENT_ID } from "./constants/privateKey.constants.js";
 import { parseDurationIntoSec } from "./conversion.utils.js";
 export const authConfig = {
-  clientId: CLIENT_ID,
+  clientId: `${import.meta.env.SNOWPACK_PUBLIC_REACT_APP_CLIENT_ID}`,
   cookiePolicy: "single_host_origin",
   scope: "email profile https://www.googleapis.com/auth/youtube.force-ssl",
   prompt: "select_account",
@@ -20,7 +19,9 @@ export async function youtubeSearch(search) {
     data = undefined;
   try {
     const resp = await axios.get(
-      `https://youtube.googleapis.com/youtube/v3/search?part=snippet&order=relevance&q=${search}&type=video&key=${API_KEY}`,
+      `https://youtube.googleapis.com/youtube/v3/search?part=snippet&order=relevance&q=${search}&type=video&key=${
+        import.meta.env.SNOWPACK_PUBLIC_REACT_APP_API_KEY
+      }`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,7 +31,9 @@ export async function youtubeSearch(search) {
     );
     const videoId = resp.data?.items[0]?.id?.videoId;
     const resp2 = await axios.get(
-      `https://youtube.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${API_KEY}`,
+      `https://youtube.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${
+        import.meta.env.SNOWPACK_PUBLIC_REACT_APP_API_KEY
+      }`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -51,6 +54,6 @@ export const musixToken = () => {
   const exp = iat + 30;
   const sPayload = !sub ? { iat, exp } : { iat, exp, sub };
   return kjur.jws.JWS.sign(null, { alg: "HS256" }, sPayload, {
-    b64: "VkxHW8cnwZSnNkq7utZNg8mE2SPgzTtzxfGi1U27ujI=",
+    b64: `${import.meta.env.SNOWPACK_PUBLIC_REACT_APP_SECRET_KEY}`,
   });
 };

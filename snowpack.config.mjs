@@ -5,9 +5,7 @@ export default {
     public: { url: "/" },
     src: { url: "/dist" },
   },
-  plugins: [
-    /* ... */
-  ],
+  plugins: ["@snowpack/plugin-dotenv", "@snowpack/plugin-webpack"],
   routes: [
     {
       match: "routes",

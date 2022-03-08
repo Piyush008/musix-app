@@ -1,6 +1,7 @@
 import { Box, HStack, Icon, Image, Text } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import useAgent from "../../hooks/useAgent.js";
-import { pxToAll, pxToRemSm } from "../../utils/theme.utils.js";
+import { pxToAll } from "../../utils/theme.utils.js";
 import { FcLike } from "react-icons/fc";
 import { GiSelfLove } from "react-icons/gi";
 import {
@@ -88,7 +89,9 @@ export default function MusixPlayer() {
         if (searchTrack)
           setPlayerState({
             ...PlayerState,
-            track: `http://localhost:3000/youtube.com/watch?v=${audioContent.videoId}`,
+            track: `${
+              import.meta.env.SNOWPACK_PUBLIC_REACT_APP_YTB_STR_URL
+            }/youtube.com/watch?v=${audioContent.videoId}`,
             totalDuration: audioContent.totalDuration,
             isEnded: false,
           });
@@ -260,18 +263,49 @@ export default function MusixPlayer() {
 
 export function TrackLabel({ currentItem }) {
   const { imageSource, song, itemId, artists } = currentItem;
-  const artistName = artists.map((artist) => artist.name).join();
+  const songRef = React.useRef(null);
+  const songContRef = React.useRef(null);
+  const [animationReq, setAnimationReq] = React.useState(false);
   const onLiked = useLiked();
   const likedItems = useRecoilValue(likedItemsState);
-  const isLiked = !!likedItems[itemId] && likedItems[itemId] === "track";
   const isMobile = useAgent();
+  const artistName = artists.map((artist) => artist.name).join();
+  const isLiked = !!likedItems[itemId] && likedItems[itemId] === "track";
+  React.useLayoutEffect(() => {
+    if (songRef.current && songContRef.current) {
+      if (
+        parseFloat(window.getComputedStyle(songRef.current).width) ==
+        parseFloat(window.getComputedStyle(songContRef.current).maxWidth)
+      )
+        setAnimationReq(true);
+      else setAnimationReq(false);
+    }
+  }, [songRef.current?.innerText]);
+
+  const slide = keyframes`from {
+    transform: translateX(-125px)
+  }
+  to {
+    transform: translateX(125px)
+  }
+  `;
   return (
     <HStack columnGap={pxToAll(10)}>
       <Box width={isMobile ? pxToAll(100) : pxToAll(60)}>
         <Image src={imageSource} />
       </Box>
-      <Box maxW={pxToAll(150)}>
-        <Text textStyle={isMobile ? "h5" : "h6"} color={"text.play"}>
+      <Box maxW={"170px"} overflow={"hidden"} ref={songContRef}>
+        <Text
+          textStyle={isMobile ? "h5" : "h6"}
+          color={"text.play"}
+          whiteSpace={"nowrap"}
+          animation={
+            animationReq
+              ? `10s linear 0.25s infinite alternate ${slide}`
+              : "none"
+          }
+          ref={songRef}
+        >
           {song}
         </Text>
         <Text textStyle={"label"} isTruncated>

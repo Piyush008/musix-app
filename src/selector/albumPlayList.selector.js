@@ -2,7 +2,6 @@ import { selector, selectorFamily } from "recoil";
 import {
   albumPlayListTrackState,
   searchTrackState,
-  albumPlaylistParamState,
 } from "../atoms/albumPlayList.atom.js";
 import { musixToken } from "../utils/auth.utils.js";
 import { musixAxios } from "../utils/axios.utils.js";

@@ -1,10 +1,11 @@
 import { spotifyAxios } from "./axios.utils";
-import { SPOTIFY_AUTH } from "./constants/privateKey.constants";
 var spotifyToken = "";
 export async function spotifyAuth() {
   let error = undefined;
   try {
-    const resp = await spotifyAxios(SPOTIFY_AUTH).post(
+    const resp = await spotifyAxios(
+      `${import.meta.env.SNOWPACK_PUBLIC_REACT_APP_SPOTIFY_AUTH}`
+    ).post(
       "https://accounts.spotify.com/api/token?grant_type=client_credentials",
       null,
       {
